@@ -1,5 +1,3 @@
-import UIKit
-
 enum APIType {
     case login
     case handshake
