@@ -1,3 +1,3 @@
-struct AccessTokenResponseModel: Decodable {
+struct AccessTokenResponseModel: Codable {
     let accessToken: String
 }
