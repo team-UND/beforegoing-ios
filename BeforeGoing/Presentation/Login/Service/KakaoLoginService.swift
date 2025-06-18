@@ -71,7 +71,7 @@ final class KakaoLoginService {
                 if error != nil {
                     completion(.failure(.loginFailed))
                 } else if let idToken = oauthToken?.idToken {
-                    self.requestAccessToken(idToken: idToken) { _ in
+                    self.sendToServerIdToken(idToken: idToken) { _ in
                         self.fetchKakaoUserInfo(completion: completion)
                     }
                 } else {
@@ -82,7 +82,7 @@ final class KakaoLoginService {
     }
     
     // MARK: id 토큰을 서버에 전송
-    private func requestAccessToken(idToken: String, completion: @escaping (Result<Data, KakaoLoginError>) -> Void) {
+    private func sendToServerIdToken(idToken: String, completion: @escaping (Result<Data, KakaoLoginError>) -> Void) {
         let parameters: [String: Any] = [
             "provider": Provider.kakao.rawValue,
             "id_token": idToken
