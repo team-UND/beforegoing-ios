@@ -1,7 +1,17 @@
 import Alamofire
 
-final class APIManager {
-    
+protocol APIManaging {
+    func request<T: Decodable>(
+        url: String,
+        method: HTTPMethod,
+        parameters: [String: Any]?,
+        headers: HTTPHeaders?,
+        responseType: T.Type,
+        completion: @escaping (Result<T, Error>) -> Void
+    )
+}
+
+final class APIManager: APIManaging {
     static let shared = APIManager()
     private init() {}
     

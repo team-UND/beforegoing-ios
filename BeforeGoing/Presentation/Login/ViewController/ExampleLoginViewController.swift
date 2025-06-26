@@ -1,9 +1,16 @@
 import UIKit
+import KakaoSDKAuth
+import KakaoSDKUser
 
 final class ExampleLoginViewController: BaseViewController {
     
     private let loginView = ExampleLoginView()
-    private let kakaoLoginService = KakaoLoginService()
+    private let kakaoLoginService = KakaoLoginService(
+        authAPI: AuthAPIWrapper.self,
+        userAPI: UserAPIWrapper(),
+        apiManager: APIManager.shared,
+        keyChainHelper: KeyChainWrapper()
+    )
     
     override func loadView() {
         view = loginView
@@ -53,6 +60,8 @@ final class ExampleLoginViewController: BaseViewController {
     
     private func handleError(_ error: KakaoLoginError) {
         switch error {
+        case .hasNotToken:
+            showAlert("토큰이 유효하지 않습니다.")
         case .invalidToken:
             showAlert("토큰이 유효하지 않습니다.")
         case .loginFailed:

@@ -1,0 +1,34 @@
+import Alamofire
+import Foundation
+
+final class MockAPIManager: APIManaging {
+    
+    var nonce: NonceResponseModel? = NonceResponseModel(nonce: "nonce")
+    var accessToken: AccessTokenResponseModel? = AccessTokenResponseModel(accessToken: "accessToken")
+    var shouldFailed = true
+    
+    func request<T>(
+        url: String,
+        method: HTTPMethod,
+        parameters: [String : Any]?,
+        headers: HTTPHeaders?,
+        responseType: T.Type,
+        completion: @escaping (Result<T, any Error>) -> Void
+    ) where T : Decodable {
+        if shouldFailed {
+            if T.self == NonceResponseModel.self {
+                completion(.failure(KakaoLoginError.nonceRequestFailed))
+                return
+            } else if T.self == AccessTokenResponseModel.self {
+                completion(.failure(KakaoLoginError.idTokenMissing))
+                return
+            }
+        }
+
+        if T.self == NonceResponseModel.self, let nonce = nonce as? T {
+            completion(.success(nonce))
+        } else if T.self == AccessTokenResponseModel.self, let accessToken = accessToken as? T {
+            completion(.success(accessToken))
+        }
+    }
+}

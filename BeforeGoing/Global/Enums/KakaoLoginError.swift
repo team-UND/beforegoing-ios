@@ -1,4 +1,5 @@
 enum KakaoLoginError: Error {
+    case hasNotToken
     case invalidToken
     case loginFailed
     case idTokenMissing
