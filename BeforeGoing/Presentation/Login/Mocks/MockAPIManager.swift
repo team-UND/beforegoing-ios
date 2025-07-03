@@ -4,7 +4,13 @@ import Foundation
 final class MockAPIManager: APIManaging {
     
     var nonce: NonceResponseModel? = NonceResponseModel(nonce: "nonce")
-    var accessToken: AccessTokenResponseModel? = AccessTokenResponseModel(accessToken: "accessToken")
+    var accessToken: AccessTokenResponseModel? = AccessTokenResponseModel(
+        tokenType: "",
+        accessToken: "accessToken",
+        accessTokenExpiresIn: 0,
+        refreshToken: "",
+        refreshTokenExpiresIn: 0
+    )
     var shouldFailed = true
     
     func request<T>(

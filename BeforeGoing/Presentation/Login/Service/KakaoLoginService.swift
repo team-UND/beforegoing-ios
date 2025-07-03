@@ -9,6 +9,7 @@ final class KakaoLoginService {
     private let userAPI: UserAPIProtocol
     private let apiManager: APIManaging
     private let keyChainHelper: KeyChainProtocol
+    private var nonce: String?
     
     init(
         authAPI: AuthAPIProtocol.Type,
@@ -49,8 +50,7 @@ final class KakaoLoginService {
                 completion(.failure(.nonceRequestFailed))
                 return
             }
-            
-            self.loginWithKakao(nonce: nonce, completion: completion)
+            self.nonce = nonce
         }
     }
     
@@ -88,8 +88,9 @@ final class KakaoLoginService {
             }
     }
     
-    private func loginWithKakao(nonce: String, completion: @escaping (Result<User, KakaoLoginError>) -> Void) {
+    func loginWithKakao(completion: @escaping (Result<User, KakaoLoginError>) -> Void) {
         if userAPI.isKakaoTalkLoginAvailable() {
+            guard let nonce = nonce else { return }
             userAPI.loginWithKakaoTalk(nonce: nonce) { (oauthToken, error) in
                 if error != nil {
                     completion(.failure(.loginFailed))
@@ -123,7 +124,8 @@ final class KakaoLoginService {
                 switch result {
                 case .success(let data) :
                     self.keyChainHelper.save(data.accessToken, forKey: KeyChainKey.accessToken.rawValue)
-                case .failure :
+                    print("Access Token : \(data.accessToken)")
+                case .failure(let _) :
                     completion(.failure(.serverAuthFailed))
                 }
             }
@@ -140,5 +142,27 @@ final class KakaoLoginService {
             }
             completion(.success(User(nickname: nickname)))
         }
+    }
+    
+    func hello(completion: @escaping (String?) -> Void) {
+        let headers = ["Authorization", keyChainHelper.load(key: KeyChainKey.accessToken.rawValue)]
+        let url = APIType.hello.url
+        
+        apiManager
+            .request(
+                url: url,
+                method: .get,
+                parameters: nil,
+                headers: nil,
+                responseType: MessageResponseModel.self
+            ) { result in
+                switch result {
+                case .success(let data) :
+                    completion(data.message)
+                    print("Message : ", data.message)
+                case .failure :
+                    completion(nil)
+                }
+            }
     }
 }

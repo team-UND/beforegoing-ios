@@ -30,16 +30,30 @@ final class ExampleLoginViewController: BaseViewController {
     }
     
     override func setAction() {
+        loginView.nonceButton.addTarget(self, action: #selector(nonceButtonDidTap), for: .touchUpInside)
         loginView.kakaoLoginButton.addTarget(self, action: #selector(kakaoLoginButtonDidTap), for: .touchUpInside)
         loginView.logoutButton.addTarget(self, action: #selector(logoutButtonDidTap), for: .touchUpInside)
+        loginView.helloButton.addTarget(self, action: #selector(helloButtonDidTap), for: .touchUpInside)
+    }
+    
+    @objc
+    private func nonceButtonDidTap() {
+        kakaoLoginService.performLogin { result in
+            switch result {
+            case .success(let _) :
+                print("nonce 값을 받았습니다")
+            case .failure(let _) :
+                print("nonce 값을 받지 못했습니다")
+            }
+        }
     }
     
     @objc
     private func kakaoLoginButtonDidTap() {
-        kakaoLoginService.performLogin { result in
+        kakaoLoginService.loginWithKakao { result in
             switch result {
             case .success:
-                self.loginView.stateLabel.text = "로그인에 성공했습니다"
+                self.loginView.stateLabel.text = "로그인에 성공했습니다 \(KeyChainHelper.load(key: KeyChainKey.accessToken.rawValue))"
             case .failure(let error):
                 self.handleError(error)
             }
@@ -54,6 +68,18 @@ final class ExampleLoginViewController: BaseViewController {
                 self.loginView.stateLabel.text = "로그아웃에 성공했습니다"
             case .failure(let error):
                 self.handleError(error)
+            }
+        }
+    }
+    
+    @objc
+    private func helloButtonDidTap() {
+        kakaoLoginService.hello { result in
+            switch result {
+            case .some(let message) :
+                self.loginView.stateLabel.text = message
+            case .none :
+                self.loginView.stateLabel.text = "None"
             }
         }
     }

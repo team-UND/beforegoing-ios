@@ -23,7 +23,10 @@ final class APIManager: APIManaging {
         responseType: T.Type,
         completion: @escaping (Result<T, Error>) -> Void
     ) {
-        AF.request(url, method: method, parameters: parameters, encoding: JSONEncoding.default, headers: headers)
+        var newHeaders = headers
+        newHeaders?.update(name: "Content-Type", value: "application/json")
+        
+        AF.request(url, method: method, parameters: parameters, encoding: JSONEncoding.default, headers: newHeaders)
             .validate()
             .responseDecodable(of: responseType.self) { response in
                 switch response.result {

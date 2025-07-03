@@ -1,6 +1,7 @@
 protocol KeyChainProtocol {
     func save(_ value: String, forKey key: String)
     func delete(key: String)
+    func load(key: String) -> String?
 }
 
 struct KeyChainWrapper: KeyChainProtocol {
@@ -10,5 +11,9 @@ struct KeyChainWrapper: KeyChainProtocol {
     
     func delete(key: String) {
         KeyChainHelper.delete(key: key)
+    }
+    
+    func load(key: String) -> String? {
+        return KeyChainHelper.load(key: key)
     }
 }
