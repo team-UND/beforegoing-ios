@@ -2,6 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Pretendard-SemiBold.otfPretendard-Bold.otfPretendard-ExtraBold.otfPretendard-ExtraLight.otfPretendard-Light.otfPretendard-Medium.otfPretendard-Regular.otfPretendard-SemiBold.otfPretendard-Black.otf</string>
+		<string>Pretendard-Medium.otfPretendard-Bold.otfPretendard-ExtraBold.otfPretendard-ExtraLight.otfPretendard-Light.otfPretendard-Medium.otfPretendard-Regular.otfPretendard-SemiBold.otfPretendard-Bold.otf</string>
+		<string>Pretendard-Regular.otf</string>
+		<string>SCDream4.otfSCDream5.otfSCDream4.otf</string>
+		<string>SCDream4.otfSCDream5.otfSCDream5.otf</string>
+		<string>SCDream4.otfSCDream5.otfSCDream6.otf</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
