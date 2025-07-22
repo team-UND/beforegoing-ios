@@ -9,6 +9,7 @@ final class ExampleLoginView: BaseView {
     let logoutButton = UIButton()
     let stateLabel = UILabel()
     let helloButton = UIButton()
+    let refreshButton = UIButton()
     
     override func setStyle() {
         nonceButton.do {
@@ -42,10 +43,16 @@ final class ExampleLoginView: BaseView {
             $0.setTitle("HELLO", for: .normal)
             $0.layer.cornerRadius = 4
         }
+        
+        refreshButton.do {
+            $0.backgroundColor = .systemBlue
+            $0.setTitle("REFRESH", for: .normal)
+            $0.layer.cornerRadius = 4
+        }
     }
     
     override func setUI() {
-        addSubviews(nonceButton, kakaoLoginButton, logoutButton, stateLabel, helloButton)
+        addSubviews(nonceButton, kakaoLoginButton, logoutButton, stateLabel, helloButton, refreshButton)
     }
     
     override func setLayout() {
@@ -79,6 +86,13 @@ final class ExampleLoginView: BaseView {
         
         helloButton.snp.makeConstraints {
             $0.top.equalTo(stateLabel.snp.bottom).offset(25)
+            $0.centerX.equalToSuperview()
+            $0.width.equalTo(200)
+            $0.height.equalTo(50)
+        }
+        
+        refreshButton.snp.makeConstraints {
+            $0.top.equalTo(helloButton.snp.bottom).offset(25)
             $0.centerX.equalToSuperview()
             $0.width.equalTo(200)
             $0.height.equalTo(50)

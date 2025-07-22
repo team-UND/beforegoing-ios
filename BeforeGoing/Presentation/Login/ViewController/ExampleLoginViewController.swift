@@ -34,15 +34,16 @@ final class ExampleLoginViewController: BaseViewController {
         loginView.kakaoLoginButton.addTarget(self, action: #selector(kakaoLoginButtonDidTap), for: .touchUpInside)
         loginView.logoutButton.addTarget(self, action: #selector(logoutButtonDidTap), for: .touchUpInside)
         loginView.helloButton.addTarget(self, action: #selector(helloButtonDidTap), for: .touchUpInside)
+        loginView.refreshButton.addTarget(self, action: #selector(refreshButtonDidTap), for: .touchUpInside)
     }
     
     @objc
     private func nonceButtonDidTap() {
         kakaoLoginService.performLogin { result in
             switch result {
-            case .success(let _) :
+            case .success(let _):
                 print("nonce 값을 받았습니다")
-            case .failure(let _) :
+            case .failure(let _):
                 print("nonce 값을 받지 못했습니다")
             }
         }
@@ -76,8 +77,20 @@ final class ExampleLoginViewController: BaseViewController {
     private func helloButtonDidTap() {
         kakaoLoginService.hello { result in
             switch result {
-            case .some(let message) :
+            case .some(let message):
                 self.loginView.stateLabel.text = message
+            case .none :
+                self.loginView.stateLabel.text = "None"
+            }
+        }
+    }
+    
+    @objc
+    private func refreshButtonDidTap() {
+        kakaoLoginService.refresh { result in
+            switch result {
+            case .some(let data):
+                self.loginView.stateLabel.text = result
             case .none :
                 self.loginView.stateLabel.text = "None"
             }

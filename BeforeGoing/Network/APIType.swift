@@ -1,7 +1,7 @@
 enum APIType {
     case login
-    case handshake
-    case refresh
+    case nonce
+    case tokens
     case hello
 }
 
@@ -10,10 +10,10 @@ extension APIType {
         switch self {
         case .login:
             return Environment.baseURL + "/api/v1/auth/login"
-        case .handshake:
-            return Environment.baseURL + "/api/v1/auth/handshake"
-        case .refresh:
-            return Environment.baseURL + "/api/v1/auth/refresh"
+        case .nonce:
+            return Environment.baseURL + "/api/v1/auth/nonce"
+        case .tokens:
+            return Environment.baseURL + "/api/v1/auth/tokens"
         case .hello:
             return Environment.baseURL + "/hello"
         }

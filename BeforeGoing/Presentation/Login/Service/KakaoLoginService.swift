@@ -2,6 +2,7 @@ import UIKit
 import KakaoSDKUser
 import KakaoSDKAuth
 import KakaoSDKCommon
+import Alamofire
 
 final class KakaoLoginService {
     
@@ -69,7 +70,7 @@ final class KakaoLoginService {
     // MARK: 서버에 nonce 요청
     private func requestNonce(completion: @escaping (String?) -> Void) {
         let parameters: [String: Any] = ["provider": Provider.kakao.rawValue]
-        let url = APIType.handshake.url
+        let url = APIType.nonce.url
         
         apiManager
             .request(
@@ -80,9 +81,9 @@ final class KakaoLoginService {
                 responseType: NonceResponseModel.self
             ) { result in
                 switch result {
-                case .success(let data) :
+                case .success(let data):
                     completion(data.nonce)
-                case .failure :
+                case .failure:
                     completion(nil)
                 }
             }
@@ -122,10 +123,10 @@ final class KakaoLoginService {
                 responseType: AccessTokenResponseModel.self
             ) { result in
                 switch result {
-                case .success(let data) :
+                case .success(let data):
                     self.keyChainHelper.save(data.accessToken, forKey: KeyChainKey.accessToken.rawValue)
-                    print("Access Token : \(data.accessToken)")
-                case .failure(let _) :
+                    self.keyChainHelper.save(data.refreshToken, forKey: KeyChainKey.refreshToken.rawValue)
+                case .failure:
                     completion(.failure(.serverAuthFailed))
                 }
             }
@@ -145,7 +146,9 @@ final class KakaoLoginService {
     }
     
     func hello(completion: @escaping (String?) -> Void) {
-        let headers = ["Authorization", keyChainHelper.load(key: KeyChainKey.accessToken.rawValue)]
+        guard let accessToken = keyChainHelper.load(key: KeyChainKey.accessToken.rawValue) else { return }
+        
+        var headers = HTTPHeaders(arrayLiteral: HTTPHeader(name: "Authorization", value: accessToken))
         let url = APIType.hello.url
         
         apiManager
@@ -153,7 +156,7 @@ final class KakaoLoginService {
                 url: url,
                 method: .get,
                 parameters: nil,
-                headers: nil,
+                headers: headers,
                 responseType: MessageResponseModel.self
             ) { result in
                 switch result {
@@ -162,6 +165,37 @@ final class KakaoLoginService {
                     print("Message : ", data.message)
                 case .failure :
                     completion(nil)
+                }
+            }
+    }
+    
+    func refresh(completion: @escaping (String?) -> Void) {
+        guard let accessToken = keyChainHelper.load(key: KeyChainKey.accessToken.rawValue),
+              let refreshToken = keyChainHelper.load(key: KeyChainKey.refreshToken.rawValue) else {
+            return
+        }
+        
+        let parameters: [String: Any] = [
+            "access_token": accessToken,
+            "refres_hToken": refreshToken
+        ]
+        let url = APIType.tokens.url
+        
+        apiManager
+            .request(
+                url: url,
+                method: .post,
+                parameters: parameters,
+                headers: nil,
+                responseType: RefreshResponseModel.self
+            ) { result in
+                switch result {
+                case .success(let data) :
+                    print("Refresh : \(data.accessToken)")
+                    print("Refresh : \(data.refreshToken)")
+                    completion(data.accessToken)
+                case .failure :
+                    print("Refresh 실패")
                 }
             }
     }

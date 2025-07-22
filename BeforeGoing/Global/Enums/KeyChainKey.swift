@@ -1,3 +1,3 @@
 enum KeyChainKey: String {
-    case accessToken
+    case accessToken, refreshToken
 }
