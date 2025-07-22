@@ -1,4 +1,4 @@
-struct RefreshResponseModel: Codable {
+struct RefreshResponseDTO: Codable {
     let tokenType: String
     let accessToken: String
     let accessTokenExpiresIn: Int

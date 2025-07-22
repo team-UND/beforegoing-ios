@@ -25,7 +25,7 @@ final class KakaoLoginService {
     }
     
     // MARK: 카카오 로그인 체크
-    func checkLoginStatus(completion: @escaping (Result<User, KakaoLoginError>) -> Void) {
+    func checkLoginStatus(completion: @escaping (Result<UserEntity, KakaoLoginError>) -> Void) {
         guard authAPI.hasToken() else {
             completion(.failure(.hasNotToken))
             return
@@ -45,7 +45,7 @@ final class KakaoLoginService {
     }
     
     // MARK: 카카오 로그인 수행
-    func performLogin(completion: @escaping (Result<User, KakaoLoginError>) -> Void) {
+    func performLogin(completion: @escaping (Result<UserEntity, KakaoLoginError>) -> Void) {
         requestNonce { nonce in
             guard let nonce = nonce else {
                 completion(.failure(.nonceRequestFailed))
@@ -78,7 +78,7 @@ final class KakaoLoginService {
                 method: .post,
                 parameters: parameters,
                 headers: nil,
-                responseType: NonceResponseModel.self
+                responseType: NonceResponseDTO.self
             ) { result in
                 switch result {
                 case .success(let data):
@@ -89,7 +89,7 @@ final class KakaoLoginService {
             }
     }
     
-    func loginWithKakao(completion: @escaping (Result<User, KakaoLoginError>) -> Void) {
+    func loginWithKakao(completion: @escaping (Result<UserEntity, KakaoLoginError>) -> Void) {
         if userAPI.isKakaoTalkLoginAvailable() {
             guard let nonce = nonce else { return }
             userAPI.loginWithKakaoTalk(nonce: nonce) { (oauthToken, error) in
@@ -120,7 +120,7 @@ final class KakaoLoginService {
                 method: .post,
                 parameters: parameters,
                 headers: nil,
-                responseType: AccessTokenResponseModel.self
+                responseType: AccessTokenResponseDTO.self
             ) { result in
                 switch result {
                 case .success(let data):
@@ -133,7 +133,7 @@ final class KakaoLoginService {
     }
     
     // MARK: 카카오 로그인 > 사용자 정보
-    private func fetchKakaoUserInfo(completion: @escaping (Result<User, KakaoLoginError>) -> Void) {
+    private func fetchKakaoUserInfo(completion: @escaping (Result<UserEntity, KakaoLoginError>) -> Void) {
         userAPI.me { (user, error) in
             guard error == nil,
                   let nickname = user?.kakaoAccount?.profile?.nickname
@@ -141,7 +141,7 @@ final class KakaoLoginService {
                 completion(.failure(.userInfoRequestFailed))
                 return
             }
-            completion(.success(User(nickname: nickname)))
+            completion(.success(UserEntity(nickname: nickname)))
         }
     }
     
@@ -157,7 +157,7 @@ final class KakaoLoginService {
                 method: .get,
                 parameters: nil,
                 headers: headers,
-                responseType: MessageResponseModel.self
+                responseType: MessageResponseDTO.self
             ) { result in
                 switch result {
                 case .success(let data) :
@@ -187,7 +187,7 @@ final class KakaoLoginService {
                 method: .post,
                 parameters: parameters,
                 headers: nil,
-                responseType: RefreshResponseModel.self
+                responseType: RefreshResponseDTO.self
             ) { result in
                 switch result {
                 case .success(let data) :

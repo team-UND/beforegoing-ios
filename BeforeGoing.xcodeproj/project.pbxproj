@@ -41,7 +41,7 @@
 		186E07032DDDF10600E32490 /* Exceptions for "BeforeGoing" folder in "BeforeGoing" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Global/Info.plist,
+				Resource/Info.plist,
 			);
 			target = 186E06DA2DDDF10500E32490 /* BeforeGoing */;
 		};
@@ -103,7 +103,6 @@
 				186E06DD2DDDF10500E32490 /* BeforeGoing */,
 				186E06F42DDDF10600E32490 /* BeforeGoingTests */,
 				186E06FE2DDDF10600E32490 /* BeforeGoingUITests */,
-				18E723852DE09856004CCF42 /* Frameworks */,
 				186E06DC2DDDF10500E32490 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -116,13 +115,6 @@
 				186E06FB2DDDF10600E32490 /* BeforeGoingUITests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		18E723852DE09856004CCF42 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -314,7 +306,7 @@
 		186E07052DDDF10600E32490 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 186E06DD2DDDF10500E32490 /* BeforeGoing */;
-			baseConfigurationReferenceRelativePath = Config.xcconfig;
+			baseConfigurationReferenceRelativePath = Data/Config/Config.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -322,7 +314,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Z5J43V9D9J;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = BeforeGoing/Global/Info.plist;
+				INFOPLIST_FILE = BeforeGoing/Resource/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -344,7 +336,7 @@
 		186E07062DDDF10600E32490 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 186E06DD2DDDF10500E32490 /* BeforeGoing */;
-			baseConfigurationReferenceRelativePath = Config.xcconfig;
+			baseConfigurationReferenceRelativePath = Data/Config/Config.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -352,7 +344,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Z5J43V9D9J;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = BeforeGoing/Global/Info.plist;
+				INFOPLIST_FILE = BeforeGoing/Resource/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -374,7 +366,7 @@
 		186E07072DDDF10600E32490 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 186E06DD2DDDF10500E32490 /* BeforeGoing */;
-			baseConfigurationReferenceRelativePath = Config.xcconfig;
+			baseConfigurationReferenceRelativePath = Data/Config/Config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -439,7 +431,7 @@
 		186E07082DDDF10600E32490 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 186E06DD2DDDF10500E32490 /* BeforeGoing */;
-			baseConfigurationReferenceRelativePath = Config.xcconfig;
+			baseConfigurationReferenceRelativePath = Data/Config/Config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -497,7 +489,7 @@
 		186E070A2DDDF10600E32490 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 186E06DD2DDDF10500E32490 /* BeforeGoing */;
-			baseConfigurationReferenceRelativePath = Config.xcconfig;
+			baseConfigurationReferenceRelativePath = Data/Config/Config.xcconfig;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -518,7 +510,7 @@
 		186E070B2DDDF10600E32490 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 186E06DD2DDDF10500E32490 /* BeforeGoing */;
-			baseConfigurationReferenceRelativePath = Config.xcconfig;
+			baseConfigurationReferenceRelativePath = Data/Config/Config.xcconfig;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -539,7 +531,7 @@
 		186E070D2DDDF10600E32490 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 186E06DD2DDDF10500E32490 /* BeforeGoing */;
-			baseConfigurationReferenceRelativePath = Config.xcconfig;
+			baseConfigurationReferenceRelativePath = Data/Config/Config.xcconfig;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -558,7 +550,7 @@
 		186E070E2DDDF10600E32490 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReferenceAnchor = 186E06DD2DDDF10500E32490 /* BeforeGoing */;
-			baseConfigurationReferenceRelativePath = Config.xcconfig;
+			baseConfigurationReferenceRelativePath = Data/Config/Config.xcconfig;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;

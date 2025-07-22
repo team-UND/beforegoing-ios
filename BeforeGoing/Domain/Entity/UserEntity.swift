@@ -1,3 +1,3 @@
-struct User {
+struct UserEntity {
     let nickname: String
 }

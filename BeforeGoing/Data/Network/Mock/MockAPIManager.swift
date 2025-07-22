@@ -3,8 +3,8 @@ import Foundation
 
 final class MockAPIManager: APIManaging {
     
-    var nonce: NonceResponseModel? = NonceResponseModel(nonce: "nonce")
-    var accessToken: AccessTokenResponseModel? = AccessTokenResponseModel(
+    var nonce: NonceResponseDTO? = NonceResponseDTO(nonce: "nonce")
+    var accessToken: AccessTokenResponseDTO? = AccessTokenResponseDTO(
         tokenType: "",
         accessToken: "accessToken",
         accessTokenExpiresIn: 0,
@@ -22,18 +22,18 @@ final class MockAPIManager: APIManaging {
         completion: @escaping (Result<T, any Error>) -> Void
     ) where T : Decodable {
         if shouldFailed {
-            if T.self == NonceResponseModel.self {
+            if T.self == NonceResponseDTO.self {
                 completion(.failure(KakaoLoginError.nonceRequestFailed))
                 return
-            } else if T.self == AccessTokenResponseModel.self {
+            } else if T.self == AccessTokenResponseDTO.self {
                 completion(.failure(KakaoLoginError.idTokenMissing))
                 return
             }
         }
 
-        if T.self == NonceResponseModel.self, let nonce = nonce as? T {
+        if T.self == NonceResponseDTO.self, let nonce = nonce as? T {
             completion(.success(nonce))
-        } else if T.self == AccessTokenResponseModel.self, let accessToken = accessToken as? T {
+        } else if T.self == AccessTokenResponseDTO.self, let accessToken = accessToken as? T {
             completion(.success(accessToken))
         }
     }
