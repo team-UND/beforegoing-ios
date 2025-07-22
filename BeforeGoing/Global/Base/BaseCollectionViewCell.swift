@@ -9,7 +9,7 @@ class BaseCollectionViewCell: UICollectionViewCell, ReuseIdentifiable {
         setUI()
         setLayout()
     }
-
+    
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         
