@@ -17,7 +17,7 @@ final class BottomNavigationViewController: UITabBarController {
         setAppearance()
     }
     
-    private func setViewControllers() {
+    private func setViewControllers() { 
         self.viewControllers = BottomNavigationItem.allCases.map {
              createViewController(
                 for: $0.component.viewController,
