@@ -12,6 +12,7 @@ enum ButtonItem {
     case disableLongButton
     case enableShortButton
     case disableShortButton
+    case addScenarioButton
     
     var component: ButtonComponent {
         switch self {
@@ -52,6 +53,17 @@ enum ButtonItem {
                 height: 41.adjustedH,
                 cornerRadius: 20.5,
                 font: .custom(.bodyMDSemiBold)
+            )
+        case .addScenarioButton:
+            return ButtonComponent(
+                backgroundColor: .white,
+                textColor: .blue500,
+                borderColor: UIColor.blue400.cgColor,
+                borderWidth: 1.5,
+                width: 350.adjustedW,
+                height: 48.adjustedH,
+                cornerRadius: 14,
+                font: .custom(.bodyLGSemiBold)
             )
         }
     }
