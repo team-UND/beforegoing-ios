@@ -62,7 +62,7 @@ jobs:
             -configuration Debug \
             -derivedDataPath DerivedData \
             -enableCodeCoverage YES \
-            clean test \
+            test \
             -resultBundlePath TestResults.xcresult
 
       - name: Generate Coverage Report
