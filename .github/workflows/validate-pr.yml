@@ -15,6 +15,7 @@ permissions:
 jobs:
   swiftlint:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,6 +27,7 @@ jobs:
 
   build-and-analyze:
     runs-on: macos-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -101,6 +103,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [swiftlint, build-and-analyze]
     if: always()
+
     steps:
       - name: Send Success Message
         if: ${{ needs.swiftlint.result == 'success' && needs.build-and-analyze.result == 'success' }}
