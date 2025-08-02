@@ -51,11 +51,20 @@ jobs:
       
       - name: Build and Test
         run: |
+          echo "=== Resolving dependencies ==="
+          xcodebuild -resolvePackageDependencies -scheme "${{ env.SCHEME_NAME }}"
+
+          echo "=== Building project ==="
+          xcodebuild -scheme "${{ env.SCHEME_NAME }}" \
+            -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
+            -configuration Debug \
+            build
+
+          echo "=== Running tests ==="
           xcodebuild -scheme "${{ env.SCHEME_NAME }}" \
             -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
             -enableCodeCoverage YES \
-            -derivedDataPath DerivedData \
-            clean build test \
+            test \
             -resultBundlePath TestResults.xcresult
     
       - name: Generate Coverage Report
