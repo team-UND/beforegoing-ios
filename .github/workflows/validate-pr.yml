@@ -37,35 +37,26 @@ jobs:
       - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: latest-stable
+          xcode-version: '15.0'
 
-      - name: Cache SwiftPM
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2.9'
+
+      - name: Cache Gems
         uses: actions/cache@v4
         with:
-          path: |
-            DerivedData/SourcePackages
-          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
-          restore-keys: ${{ runner.os }}-spm-
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
 
-      - name: Resolve SPM Dependencies
-        run: |
-          xcodebuild -resolvePackageDependencies \
-            -project BeforeGoing.xcodeproj \
-            -scheme "${{ env.SCHEME_NAME }}" \
-            -derivedDataPath DerivedData \
-            -clonedSourcePackagesDirPath DerivedData/SourcePackages
+      - name: Bundle Install
+        run: bundle install --jobs 4 --retry 3 --path vendor/bundle
 
-      - name: Build and Test
-        run: |
-          xcodebuild -project BeforeGoing.xcodeproj \
-            -scheme "${{ env.SCHEME_NAME }}" \
-            -destination 'platform=iOS Simulator,name=iPhone 16' \
-            -configuration Debug \
-            -derivedDataPath DerivedData \
-            -clonedSourcePackagesDirPath DerivedData/SourcePackages \
-            -enableCodeCoverage YES \
-            test \
-            -resultBundlePath TestResults.xcresult
+      - name: Run Fastlane
+        run: bundle exec fastlane test
 
       - name: Generate Coverage Report
         run: |
