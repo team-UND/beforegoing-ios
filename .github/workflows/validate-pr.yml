@@ -1,0 +1,136 @@
+name: Validate PR
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+env:
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+  SCHEME_NAME: ${{ vars.SCHEME_NAME }}
+
+permissions:
+  contents: read
+
+jobs:
+  swiftlint:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Run SwiftLint
+        uses: norio-nomura/action-swiftlint@3.2.1
+
+  build-and-analyze:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Developer/Xcode/DerivedData
+            ~/.package-cache
+          key: ${{ runner.os }}-xcode-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-xcode-
+      
+      - name: Build and Test
+        run: |
+          xcodebuild -scheme "${{ env.SCHEME_NAME }}" \
+            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            -enableCodeCoverage YES \
+            -derivedDataPath DerivedData \
+            clean build test \
+            -resultBundlePath TestResults.xcresult
+    
+      - name: Generate Coverage Report
+        run: |
+          xcrun xccov view --report --json TestResults.xcresult > coverage.json
+          
+          if [ -f "scripts/convert_coverage.py" ]; then
+            python3 scripts/convert_coverage.py coverage.json sonarqube-generic-coverage.xml
+          else
+            echo "[ERROR]: Coverage conversion script not found"
+          fi
+    
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+
+      - name: Send Success Message
+        if: ${{ success() }}
+        uses: Ilshidur/action-discord@0.3.2
+        with:
+          args: "We got a new pull request 👏"
+        env:
+          DISCORD_WEBHOOK: ${{ env.DISCORD_WEBHOOK }}
+          DISCORD_EMBEDS: |
+            [
+              {
+                "author": {
+                  "name": "${{ github.event.pull_request.user.login }}"
+                },
+                "title": "#${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}",
+                "color": 10478271,
+                "description": "${{ github.event.pull_request.html_url }}",
+                "fields": [
+                  {
+                    "name": "Base Branch",
+                    "value": "${{ github.base_ref }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "Compare Branch",
+                    "value": "${{ github.head_ref }}",
+                    "inline": true
+                  }
+                ]
+              }
+            ]
+
+      - name: Send Failure Message
+        if: ${{ failure() }}
+        uses: Ilshidur/action-discord@0.3.2
+        with:
+          args: "The pull request failed. Please resolve the issue and try again 👽"
+        env:
+          DISCORD_WEBHOOK: ${{ env.DISCORD_WEBHOOK }}
+          DISCORD_EMBEDS: |
+            [
+              {
+                "author": {
+                  "name": "${{ github.event.pull_request.user.login }}"
+                },
+                "title": "#${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}",
+                "color": 13458524,
+                "description": "${{ github.event.pull_request.html_url }}",
+                "fields": [
+                  {
+                    "name": "Base Branch",
+                    "value": "${{ github.base_ref }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "Compare Branch",
+                    "value": "${{ github.head_ref }}",
+                    "inline": true
+                  }
+                ]
+              }
+            ]
