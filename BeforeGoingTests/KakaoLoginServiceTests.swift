@@ -1,4 +1,3 @@
-/*
 import KakaoSDKCommon
 import XCTest
 @testable import BeforeGoing
@@ -83,6 +82,7 @@ final class KakaoLoginServiceTests: XCTestCase {
         }
     }
     
+    /*
     // MARK: - 로그아웃
     
     func test_logout() {
@@ -224,5 +224,5 @@ final class KakaoLoginServiceTests: XCTestCase {
         XCTAssertEqual(mockKeyChainHelper.savedKey, "key")
         XCTAssertEqual(mockKeyChainHelper.savedValue, "value")
     }
+    */
 }
-*/
