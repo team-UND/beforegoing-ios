@@ -27,7 +27,7 @@ jobs:
 
   build-and-analyze:
     runs-on: macos-latest
-
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,61 +39,48 @@ jobs:
         with:
           xcode-version: latest-stable
 
-      - name: Clean build environment
+      - name: Clean DerivedData
         run: |
-          rm -rf ~/Library/Developer/Xcode/DerivedData
-          rm -rf DerivedData .swiftpm
+          rm -rf DerivedData
+          rm -rf .build
           mkdir -p DerivedData
 
-      - name: Cache SwiftPM Dependencies
+      - name: Cache SwiftPM
         uses: actions/cache@v4
         with:
           path: |
-            ~/.package-cache
-            .swiftpm
+            ~/.swiftpm
+            .build
           key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
-          restore-keys: |
-            ${{ runner.os }}-spm-
+          restore-keys: ${{ runner.os }}-spm-
 
-      - name: Resolve Dependencies
-        run: xcodebuild -resolvePackageDependencies -scheme "${{ env.SCHEME_NAME }}"
-
-      - name: Show Build Settings
+      - name: Resolve dependencies
         run: |
-          xcodebuild -scheme "${{ env.SCHEME_NAME }}" \
+          xcodebuild -project BeforeGoing.xcodeproj \
+            -scheme "${{ env.SCHEME_NAME }}" \
+            -derivedDataPath DerivedData \
+            -resolvePackageDependencies
+
+      - name: Build and Test
+        run: |
+          xcodebuild -project BeforeGoing.xcodeproj \
+            -scheme "${{ env.SCHEME_NAME }}" \
             -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
             -configuration Debug \
-            -showBuildSettings | tee build-settings.log
-
-      - name: Build Project
-        run: |
-          xcodebuild -scheme "${{ env.SCHEME_NAME }}" \
-            -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
-            -configuration Debug \
+            -derivedDataPath DerivedData \
             clean build
 
-      - name: Check if KakaoSDKFriendResources.bundle exists
-        run: |
-          echo "🔎 Searching for bundle..."
-          find ~/Library/Developer/Xcode/DerivedData -name KakaoSDKFriendResources.bundle || {
-            echo "❌ Bundle not found"
-            exit 1
-          }
-
-      - name: Test Project
-        run: |
-          xcodebuild \
-            -project BeforeGoing.xcodeproj \
-            -scheme "${SCHEME_NAME}" \
+          xcodebuild -project BeforeGoing.xcodeproj \
+            -scheme "${{ env.SCHEME_NAME }}" \
             -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
+            -configuration Debug \
+            -derivedDataPath DerivedData \
             -enableCodeCoverage YES \
             test \
             -resultBundlePath TestResults.xcresult
 
       - name: Generate Coverage Report
         run: |
-          set -e
-
           if [ ! -f "TestResults.xcresult" ]; then
             echo "[ERROR]: TestResults.xcresult not found"
             exit 1
@@ -104,7 +91,6 @@ jobs:
             exit 1
           fi
 
-          echo "=== Extracting coverage ==="
           xcrun xccov view --report --json TestResults.xcresult > coverage.json
           python3 scripts/convert_coverage.py coverage.json sonarqube-generic-coverage.xml
 
