@@ -15,12 +15,12 @@ permissions:
 jobs:
   swiftlint:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
 
       - name: Run SwiftLint
         uses: norio-nomura/action-swiftlint@3.2.1
@@ -32,21 +32,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
 
       - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
-      
+
       - name: Clean build environment
         run: |
           rm -rf ~/Library/Developer/Xcode/DerivedData
-          rm -rf DerivedData
-          rm -rf .swiftpm
+          rm -rf DerivedData .swiftpm
           mkdir -p DerivedData
-      
-      - name: Cache dependencies
+
+      - name: Cache SwiftPM Dependencies
         uses: actions/cache@v4
         with:
           path: |
@@ -55,33 +54,51 @@ jobs:
           key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
             ${{ runner.os }}-spm-
-      
+
       - name: Build and Test
         run: |
+          set -e
+
           echo "=== Resolving dependencies ==="
-          xcodebuild -resolvePackageDependencies -scheme "${{ env.SCHEME_NAME }}"
+          xcodebuild -resolvePackageDependencies \
+            -project BeforeGoing.xcodeproj \
+            -scheme "${SCHEME_NAME}"
 
           echo "=== Building project ==="
-          xcodebuild -scheme "${{ env.SCHEME_NAME }}" \
+          xcodebuild \
+            -project BeforeGoing.xcodeproj \
+            -scheme "${SCHEME_NAME}" \
             -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
             -configuration Debug \
             clean build
 
           echo "=== Running tests ==="
-          xcodebuild -scheme "${{ env.SCHEME_NAME }}" \
+          xcodebuild \
+            -project BeforeGoing.xcodeproj \
+            -scheme "${SCHEME_NAME}" \
             -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
             -enableCodeCoverage YES \
             test \
             -resultBundlePath TestResults.xcresult
-    
+
       - name: Generate Coverage Report
         run: |
-          [ -f "TestResults.xcresult" ] || { echo "[ERROR]: TestResults.xcresult not found"; exit 1; }
-          [ -f "scripts/convert_coverage.py" ] || { echo "[ERROR]: Coverage conversion script not found"; exit 1; }
+          set -e
 
+          if [ ! -f "TestResults.xcresult" ]; then
+            echo "[ERROR]: TestResults.xcresult not found"
+            exit 1
+          fi
+
+          if [ ! -f "scripts/convert_coverage.py" ]; then
+            echo "[ERROR]: Coverage conversion script not found"
+            exit 1
+          fi
+
+          echo "=== Extracting coverage ==="
           xcrun xccov view --report --json TestResults.xcresult > coverage.json
           python3 scripts/convert_coverage.py coverage.json sonarqube-generic-coverage.xml
-    
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
@@ -91,7 +108,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [swiftlint, build-and-analyze]
     if: always()
-    
+
     steps:
       - name: Send Success Message
         if: ${{ needs.swiftlint.result == 'success' && needs.build-and-analyze.result == 'success' }}
