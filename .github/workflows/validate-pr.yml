@@ -58,43 +58,29 @@ jobs:
       
       - name: Build and Test
         run: |
-          DERIVED_DATA_PATH="${GITHUB_WORKSPACE}/DerivedData"
-          
-          echo "=== Using DerivedData path: $DERIVED_DATA_PATH ==="
-          
           echo "=== Resolving dependencies ==="
-          xcodebuild -resolvePackageDependencies \
-            -scheme "${{ env.SCHEME_NAME }}" \
-            -derivedDataPath "$DERIVED_DATA_PATH"
+          xcodebuild -resolvePackageDependencies -scheme "${{ env.SCHEME_NAME }}"
 
           echo "=== Building project ==="
           xcodebuild -scheme "${{ env.SCHEME_NAME }}" \
             -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
             -configuration Debug \
-            -derivedDataPath "$DERIVED_DATA_PATH" \
             clean build
 
           echo "=== Running tests ==="
           xcodebuild -scheme "${{ env.SCHEME_NAME }}" \
             -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
             -enableCodeCoverage YES \
-            -derivedDataPath "$DERIVED_DATA_PATH" \
             test \
             -resultBundlePath TestResults.xcresult
     
       - name: Generate Coverage Report
         run: |
-          if [ -f "TestResults.xcresult" ]; then
-            xcrun xccov view --report --json TestResults.xcresult > coverage.json
-            
-            if [ -f "scripts/convert_coverage.py" ]; then
-              python3 scripts/convert_coverage.py coverage.json sonarqube-generic-coverage.xml
-            else
-              echo "[ERROR]: Coverage conversion script not found"
-            fi
-          else
-            echo "[ERROR]: TestResults.xcresult not found"
-          fi
+          [ -f "TestResults.xcresult" ] || { echo "[ERROR]: TestResults.xcresult not found"; exit 1; }
+          [ -f "scripts/convert_coverage.py" ] || { echo "[ERROR]: Coverage conversion script not found"; exit 1; }
+
+          xcrun xccov view --report --json TestResults.xcresult > coverage.json
+          python3 scripts/convert_coverage.py coverage.json sonarqube-generic-coverage.xml
     
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
