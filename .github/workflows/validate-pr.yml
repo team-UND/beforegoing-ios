@@ -53,7 +53,7 @@ jobs:
         run: |
           xcodebuild -scheme "${{ env.SCHEME_NAME }}" \
             -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
-            -enableCodeCoverage YES \
+            # -enableCodeCoverage YES \
             -derivedDataPath DerivedData \
             clean build
             -resultBundlePath TestResults.xcresult
