@@ -73,7 +73,9 @@ jobs:
           python3 scripts/convert_coverage.py coverage.json sonarqube-generic-coverage.xml
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+        uses: SonarSource/sonarqube-scan-action@v5.0.0
+        with:
+          projectBaseDir: .
         env:
           SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
 
