@@ -55,24 +55,33 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-spm-
 
-      - name: Build and Test
+      - name: Resolve Dependencies
+        run: xcodebuild -resolvePackageDependencies -scheme "${{ env.SCHEME_NAME }}"
+
+      - name: Show Build Settings
         run: |
-          set -e
+          xcodebuild -scheme "${{ env.SCHEME_NAME }}" \
+            -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
+            -configuration Debug \
+            -showBuildSettings | tee build-settings.log
 
-          echo "=== Resolving dependencies ==="
-          xcodebuild -resolvePackageDependencies \
-            -project BeforeGoing.xcodeproj \
-            -scheme "${SCHEME_NAME}"
-
-          echo "=== Building project ==="
-          xcodebuild \
-            -project BeforeGoing.xcodeproj \
-            -scheme "${SCHEME_NAME}" \
+      - name: Build Project
+        run: |
+          xcodebuild -scheme "${{ env.SCHEME_NAME }}" \
             -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
             -configuration Debug \
             clean build
 
-          echo "=== Running tests ==="
+      - name: Check if KakaoSDKFriendResources.bundle exists
+        run: |
+          echo "🔎 Searching for bundle..."
+          find ~/Library/Developer/Xcode/DerivedData -name KakaoSDKFriendResources.bundle || {
+            echo "❌ Bundle not found"
+            exit 1
+          }
+
+      - name: Test Project
+        run: |
           xcodebuild \
             -project BeforeGoing.xcodeproj \
             -scheme "${SCHEME_NAME}" \
