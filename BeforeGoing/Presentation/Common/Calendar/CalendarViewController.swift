@@ -19,7 +19,10 @@ final class CalendarViewController: BaseViewController {
     }()
     public var currentDate = DateUtil.getCurrentDate()
     private var startOfMonth: Date {
-        calendar.date(from: calendar.dateComponents([.year, .month], from: currentDate))!
+        guard let date = calendar.date(from: calendar.dateComponents([.year, .month], from: currentDate)) else {
+            fatalError("Unable to calculate the start of the month.")
+        }
+        return date
     }
     private lazy var selectedDate = currentDate
     private var selectableStartDate: Date?

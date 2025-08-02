@@ -14,7 +14,10 @@ struct DateUtil {
     static func getCurrentDate() -> Date {
         let now = Date()
         let components = calendar.dateComponents([.year, .month, .day], from: now)
-        return calendar.date(from: components)!
+        guard let date = calendar.date(from: components) else {
+            fatalError("Failed to create date from components. This should not happen.")
+        }
+        return date
     }
     
     static func getPreviousMonth(from date: Date) -> Date {
@@ -26,6 +29,9 @@ struct DateUtil {
     }
     
     private static func getMonth(from date: Date, offset: Int) -> Date {
-        return calendar.date(byAdding: .month, value: offset, to: date)!
+        guard let date = calendar.date(byAdding: .month, value: offset, to: date) else {
+            fatalError("Failed to create date from components. This should not happen.")
+        }
+        return date
     }
 }

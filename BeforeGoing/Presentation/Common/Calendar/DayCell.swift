@@ -10,7 +10,7 @@ import UIKit
 enum DayCellState {
     case notInMonth
     case notSelectable(day: Int)
-    case normal(day: Int?, isSelected: Bool, isToday: Bool)
+    case normal(day: Int, isSelected: Bool, isToday: Bool)
 }
 
 final class DayCell: UICollectionViewCell {
@@ -83,7 +83,7 @@ extension DayCell {
             }
             blurView.isHidden = true
         case let .normal(day, isSelected, isToday):
-            dayLabel.text = "\(day!)"
+            dayLabel.text = "\(day)"
             if isSelected {
                 dayLabel.do {
                     $0.textColor = .white
