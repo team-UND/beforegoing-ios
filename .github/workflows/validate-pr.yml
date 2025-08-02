@@ -65,25 +65,12 @@ jobs:
             -clonedSourcePackagesDirPath DerivedData/SourcePackages \
             -enableCodeCoverage YES \
             test \
-            -resultBundlePath ${{ github.workspace }}/TestResults.xcresult
-
-      - name: See what files are in the directory
-        run: ls -R
+            -resultBundlePath TestResults.xcresult
 
       - name: Generate Coverage Report
         run: |
-          if [ ! -f "${{ github.workspace }}/TestResults.xcresult" ]; then
-            echo "[ERROR]: TestResults.xcresult not found"
-            exit 1
-          fi
-
-          if [ ! -f "scripts/convert_coverage.py" ]; then
-            echo "[ERROR]: Coverage conversion script not found"
-            exit 1
-          fi
-
-          xcrun xccov view --report --json ${{ github.workspace }}/TestResults.xcresult > ${{ github.workspace }}/coverage.json
-          python3 scripts/convert_coverage.py ${{ github.workspace }}/coverage.json sonarqube-generic-coverage.xml
+          xcrun xccov view --report --json TestResults.xcresult > coverage.json
+          python3 scripts/convert_coverage.py coverage.json sonarqube-generic-coverage.xml
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
