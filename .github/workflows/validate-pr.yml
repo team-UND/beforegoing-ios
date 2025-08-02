@@ -52,7 +52,7 @@ jobs:
       - name: Build and Test
         run: |
           xcodebuild -scheme "${{ env.SCHEME_NAME }}" \
-            -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
+            -destination 'platform=iOS Simulator,OS=17.5,name=iPhone 15 Pro' \
             -enableCodeCoverage YES \
             -derivedDataPath DerivedData \
             clean build test \
@@ -80,7 +80,7 @@ jobs:
     
     steps:
       - name: Send Success Message
-        if: ${{ success() }}
+        if: ${{ needs.swiftlint.result == 'success' && needs.build-and-analyze.result == 'success' }}
         uses: Ilshidur/action-discord@0.3.2
         with:
           args: "We got a new pull request 👏"
@@ -111,7 +111,7 @@ jobs:
             ]
 
       - name: Send Failure Message
-        if: ${{ failure() }}
+        if: ${{ needs.swiftlint.result == 'failure' || needs.build-and-analyze.result == 'failure' }}
         uses: Ilshidur/action-discord@0.3.2
         with:
           args: "The pull request failed. Please resolve the issue and try again 👽"
