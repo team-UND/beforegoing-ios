@@ -52,7 +52,8 @@ jobs:
           xcodebuild -resolvePackageDependencies \
             -project BeforeGoing.xcodeproj \
             -scheme "${{ env.SCHEME_NAME }}" \
-            -derivedDataPath DerivedData
+            -derivedDataPath DerivedData \
+            -clonedSourcePackagesDirPath DerivedData/SourcePackages
 
       - name: Build and Test
         run: |
@@ -64,11 +65,11 @@ jobs:
             -clonedSourcePackagesDirPath DerivedData/SourcePackages \
             -enableCodeCoverage YES \
             test \
-            -resultBundlePath TestResults.xcresult
+            -resultBundlePath ${{ github.workspace }}/TestResults.xcresult
 
       - name: Generate Coverage Report
         run: |
-          if [ ! -f "TestResults.xcresult" ]; then
+          if [ ! -f "${{ github.workspace }}/TestResults.xcresult" ]; then
             echo "[ERROR]: TestResults.xcresult not found"
             exit 1
           fi
@@ -78,8 +79,8 @@ jobs:
             exit 1
           fi
 
-          xcrun xccov view --report --json TestResults.xcresult > coverage.json
-          python3 scripts/convert_coverage.py coverage.json sonarqube-generic-coverage.xml
+          xcrun xccov view --report --json ${{ github.workspace }}/TestResults.xcresult > ${{ github.workspace }}/coverage.json
+          python3 scripts/convert_coverage.py ${{ github.workspace }}/coverage.json sonarqube-generic-coverage.xml
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
