@@ -55,8 +55,10 @@ jobs:
             -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
             -enableCodeCoverage YES \
             -derivedDataPath DerivedData \
-            clean build test \
+            clean build
             -resultBundlePath TestResults.xcresult
+            # clean build test \
+            # -resultBundlePath TestResults.xcresult
     
       - name: Generate Coverage Report
         run: |
