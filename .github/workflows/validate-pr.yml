@@ -67,6 +67,9 @@ jobs:
             test \
             -resultBundlePath ${{ github.workspace }}/TestResults.xcresult
 
+      - name: See what files are in the directory
+        run: ls -R
+
       - name: Generate Coverage Report
         run: |
           if [ ! -f "${{ github.workspace }}/TestResults.xcresult" ]; then
