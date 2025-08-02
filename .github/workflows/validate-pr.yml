@@ -39,42 +39,61 @@ jobs:
         with:
           xcode-version: latest-stable
       
+      - name: Clean build environment
+        run: |
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+          rm -rf DerivedData
+          rm -rf .swiftpm
+          mkdir -p DerivedData
+      
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
           path: |
-            ~/Library/Developer/Xcode/DerivedData
             ~/.package-cache
-          key: ${{ runner.os }}-xcode-${{ hashFiles('**/Package.resolved') }}
+            .swiftpm
+          key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
-            ${{ runner.os }}-xcode-
+            ${{ runner.os }}-spm-
       
       - name: Build and Test
         run: |
+          DERIVED_DATA_PATH="${GITHUB_WORKSPACE}/DerivedData"
+          
+          echo "=== Using DerivedData path: $DERIVED_DATA_PATH ==="
+          
           echo "=== Resolving dependencies ==="
-          xcodebuild -resolvePackageDependencies -scheme "${{ env.SCHEME_NAME }}"
+          xcodebuild -resolvePackageDependencies \
+            -scheme "${{ env.SCHEME_NAME }}" \
+            -derivedDataPath "$DERIVED_DATA_PATH"
 
           echo "=== Building project ==="
           xcodebuild -scheme "${{ env.SCHEME_NAME }}" \
             -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
             -configuration Debug \
-            build
+            -derivedDataPath "$DERIVED_DATA_PATH" \
+            clean build
 
           echo "=== Running tests ==="
           xcodebuild -scheme "${{ env.SCHEME_NAME }}" \
             -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
             -enableCodeCoverage YES \
+            -derivedDataPath "$DERIVED_DATA_PATH" \
             test \
             -resultBundlePath TestResults.xcresult
     
       - name: Generate Coverage Report
         run: |
-          xcrun xccov view --report --json TestResults.xcresult > coverage.json
-          
-          if [ -f "scripts/convert_coverage.py" ]; then
-            python3 scripts/convert_coverage.py coverage.json sonarqube-generic-coverage.xml
+          if [ -f "TestResults.xcresult" ]; then
+            xcrun xccov view --report --json TestResults.xcresult > coverage.json
+            
+            if [ -f "scripts/convert_coverage.py" ]; then
+              python3 scripts/convert_coverage.py coverage.json sonarqube-generic-coverage.xml
+            else
+              echo "[ERROR]: Coverage conversion script not found"
+            fi
           else
-            echo "[ERROR]: Coverage conversion script not found"
+            echo "[ERROR]: TestResults.xcresult not found"
           fi
     
       - name: SonarCloud Scan
@@ -120,7 +139,7 @@ jobs:
             ]
 
       - name: Send Failure Message
-        if: ${{ needs.swiftlint.result == 'failure' || needs.build-and-analyze.result == 'failure' }}
+        if: ${{ needs.swiftlint.result != 'success' || needs.build-and-analyze.result != 'success' }}
         uses: Ilshidur/action-discord@0.3.2
         with:
           args: "The pull request failed. Please resolve the issue and try again 👽"
