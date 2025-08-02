@@ -39,26 +39,26 @@ jobs:
         with:
           xcode-version: latest-stable
 
-      - name: Clean DerivedData
-        run: |
-          rm -rf DerivedData
-          rm -rf .build
-          mkdir -p DerivedData
-
       - name: Cache SwiftPM
         uses: actions/cache@v4
         with:
           path: |
-            ~/.swiftpm
-            .build
+            DerivedData/SourcePackages
           key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
           restore-keys: ${{ runner.os }}-spm-
+
+      - name: Resolve SPM Dependencies
+        run: |
+          xcodebuild -resolvePackageDependencies \
+            -project BeforeGoing.xcodeproj \
+            -scheme "${{ env.SCHEME_NAME }}" \
+            -derivedDataPath DerivedData
 
       - name: Build and Test
         run: |
           xcodebuild -project BeforeGoing.xcodeproj \
             -scheme "${{ env.SCHEME_NAME }}" \
-            -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
             -configuration Debug \
             -derivedDataPath DerivedData \
             -enableCodeCoverage YES \
