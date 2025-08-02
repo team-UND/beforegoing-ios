@@ -54,13 +54,6 @@ jobs:
           key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
           restore-keys: ${{ runner.os }}-spm-
 
-      - name: Resolve dependencies
-        run: |
-          xcodebuild -project BeforeGoing.xcodeproj \
-            -scheme "${{ env.SCHEME_NAME }}" \
-            -derivedDataPath DerivedData \
-            -resolvePackageDependencies
-
       - name: Build and Test
         run: |
           xcodebuild -project BeforeGoing.xcodeproj \
@@ -68,15 +61,8 @@ jobs:
             -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
             -configuration Debug \
             -derivedDataPath DerivedData \
-            clean build
-
-          xcodebuild -project BeforeGoing.xcodeproj \
-            -scheme "${{ env.SCHEME_NAME }}" \
-            -destination 'platform=iOS Simulator,OS=18.2,name=iPhone 16' \
-            -configuration Debug \
-            -derivedDataPath DerivedData \
             -enableCodeCoverage YES \
-            test \
+            clean test \
             -resultBundlePath TestResults.xcresult
 
       - name: Generate Coverage Report
