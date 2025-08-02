@@ -13,13 +13,14 @@ extension UIFont {
         case bodyLGSemiBold, bodyLGMedium, bodyLGRegular
         case bodyMDSemiBold, bodyMDMedium, bodyMDRegular
         case bodySMSemiBold, bodySMMedium, bodySMRegular
+        case bodySmallMedium
         case brandingH4, brandingMedium, brandingRegular
         
         var weight: String {
             switch self {
             case .headingH1, .headingH2, .headingH3, .headingH4, .headingH5, .bodyLGSemiBold, .bodyMDSemiBold, .bodySMSemiBold:
                 "Pretendard-SemiBold"
-            case .bodyLGMedium, .bodyMDMedium, .bodySMMedium:
+            case .bodyLGMedium, .bodyMDMedium, .bodySMMedium, .bodySmallMedium:
                 "Pretendard-Medium"
             case .bodyLGRegular, .bodyMDRegular, .bodySMRegular:
                 "NotoSansKR-ExtraBold"
@@ -46,6 +47,7 @@ extension UIFont {
             case .bodyLGSemiBold, .bodyLGMedium, .bodyLGRegular: 16
             case .bodyMDSemiBold, .bodyMDMedium, .bodyMDRegular, .brandingMedium, .brandingRegular: 14
             case .bodySMSemiBold, .bodySMMedium, .bodySMRegular: 12
+            case .bodySmallMedium: 8
             }
         }
     }

@@ -4,12 +4,12 @@
 <dict>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Pretendard-SemiBold.otfPretendard-Bold.otfPretendard-ExtraBold.otfPretendard-ExtraLight.otfPretendard-Light.otfPretendard-Medium.otfPretendard-Regular.otfPretendard-SemiBold.otfPretendard-Black.otf</string>
-		<string>Pretendard-Medium.otfPretendard-Bold.otfPretendard-ExtraBold.otfPretendard-ExtraLight.otfPretendard-Light.otfPretendard-Medium.otfPretendard-Regular.otfPretendard-SemiBold.otfPretendard-Bold.otf</string>
+		<string>Pretendard-SemiBold.otf</string>
+		<string>Pretendard-Medium.otf</string>
 		<string>Pretendard-Regular.otf</string>
-		<string>SCDream4.otfSCDream5.otfSCDream4.otf</string>
-		<string>SCDream4.otfSCDream5.otfSCDream5.otf</string>
-		<string>SCDream4.otfSCDream5.otfSCDream6.otf</string>
+		<string>SCDream4.otf</string>
+		<string>SCDream5.otf</string>
+		<string>SCDream6.otf</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
