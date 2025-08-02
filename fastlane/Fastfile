@@ -6,6 +6,7 @@ platform :ios do
     scan(
       scheme: ENV["SCHEME_NAME"],
       project: "./BeforeGoing.xcodeproj",
+      destination: 'platform=iOS Simulator,name=iPhone 16',
       derived_data_path: "DerivedData",
       result_bundle: true,
       code_coverage: true,
