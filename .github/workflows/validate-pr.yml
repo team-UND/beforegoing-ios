@@ -60,7 +60,7 @@ jobs:
 
       - name: Generate Coverage Report
         run: |
-          xcrun xccov view --report --json TestResults.xcresult > coverage.json
+          xcrun xccov view --report --json BeforeGoing.xcresult > coverage.json
           python3 scripts/convert_coverage.py coverage.json sonarqube-generic-coverage.xml
 
       - name: SonarCloud Scan
