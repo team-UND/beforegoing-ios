@@ -16,14 +16,14 @@ jobs:
   swiftlint:
     runs-on: ubuntu-latest
 
-    # steps:
-    #   - name: Checkout
-    #     uses: actions/checkout@v4
-    #     with:
-    #       fetch-depth: 0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    #   - name: Run SwiftLint
-    #     uses: norio-nomura/action-swiftlint@3.2.1
+      # - name: Run SwiftLint
+      #   uses: norio-nomura/action-swiftlint@3.2.1
 
   build-and-analyze:
     runs-on: macos-latest
