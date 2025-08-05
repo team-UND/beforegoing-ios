@@ -38,7 +38,7 @@ jobs:
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
-      
+
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -54,7 +54,7 @@ jobs:
 
       - name: Bundle Install
         run: bundle install --jobs 4 --retry 3 --path vendor/bundle
-      
+
       - name: Set up SSH key for match
         run: |
           mkdir -p ~/.ssh
