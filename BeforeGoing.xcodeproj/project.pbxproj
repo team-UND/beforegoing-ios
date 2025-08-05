@@ -10,7 +10,7 @@
 		186E07FE2DDDFA0E00E32490 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 186E07FD2DDDFA0E00E32490 /* SnapKit */; };
 		186E08002DDDFA0E00E32490 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 186E07FF2DDDFA0E00E32490 /* Then */; };
 		18E723872DE09856004CCF42 /* KakaoSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 18E723862DE09856004CCF42 /* KakaoSDK */; };
-		D2E280BF2E41AC6A00A90122 /* KakaoSDKFriendResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = D2E280BE2E41AC6A00A90122 /* KakaoSDKFriendResources.bundle */; };
+		D2E280C72E41AE3900A90122 /* KakaoSDKFriendResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = D2E280C62E41AE3900A90122 /* KakaoSDKFriendResources.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,7 +34,7 @@
 		186E06DB2DDDF10500E32490 /* BeforeGoing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BeforeGoing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		186E06F12DDDF10600E32490 /* BeforeGoingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BeforeGoingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		186E06FB2DDDF10600E32490 /* BeforeGoingUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BeforeGoingUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D2E280BE2E41AC6A00A90122 /* KakaoSDKFriendResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = KakaoSDKFriendResources.bundle; path = "../../../../Library/Developer/Xcode/DerivedData/BeforeGoing-hktjwicekvwpzbbmmmfkhbfbcbkh/SourcePackages/checkouts/kakao-ios-sdk/Sources/KakaoSDKFriendCore/KakaoSDKFriendResources.bundle"; sourceTree = "<group>"; };
+		D2E280C62E41AE3900A90122 /* KakaoSDKFriendResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = KakaoSDKFriendResources.bundle; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -99,7 +99,7 @@
 		186E06D22DDDF10500E32490 = {
 			isa = PBXGroup;
 			children = (
-				D2E280BE2E41AC6A00A90122 /* KakaoSDKFriendResources.bundle */,
+				D2E280C62E41AE3900A90122 /* KakaoSDKFriendResources.bundle */,
 				186E06DD2DDDF10500E32490 /* BeforeGoing */,
 				186E06F42DDDF10600E32490 /* BeforeGoingTests */,
 				186E06FE2DDDF10600E32490 /* BeforeGoingUITests */,
@@ -245,7 +245,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D2E280BF2E41AC6A00A90122 /* KakaoSDKFriendResources.bundle in Resources */,
+				D2E280C72E41AE3900A90122 /* KakaoSDKFriendResources.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
