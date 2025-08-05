@@ -29,6 +29,14 @@ platform :ios do
   desc "Push a new beta build to TestFlight"
   lane :beta do
     test
+
+    create_keychain(
+      name: KEYCHAIN_NAME,
+      password: KEYCHAIN_PASSWORD,
+      default_keychain: true,
+      unlock: true,
+      lock_when_sleeps: false
+    )
     
     app_store_connect_api_key(
        key_id: APP_STORE_CONNECT_API_KEY_KEY_ID,
