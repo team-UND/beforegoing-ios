@@ -37,11 +37,10 @@ platform :ios do
     )
 
     match(
-      git_url: "git@github.com:team-UND/beforegoing-ios.git",
+      git_url: "git@github.com:team-UND/fastlane-match-ios.git",
       storage_mode: "git",
       type: "appstore",
       readonly: true,
-      ssh_key: MATCH_SSH_KEY,
       keychain_name: KEYCHAIN_NAME,
       keychain_password: KEYCHAIN_PASSWORD,
       password: MATCH_PASSWORD
