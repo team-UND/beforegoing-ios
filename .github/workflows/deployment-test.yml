@@ -16,7 +16,7 @@ env:
   MATCH_SSH_KEY: ${{ secrets.MATCH_SSH_KEY }}
   MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
 
-  KEYCHAIN_NAME: fastlane-keychain
+  KEYCHAIN_NAME: ${{ secrets.KEYCHAIN_NAME }}
   KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
 
   DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
