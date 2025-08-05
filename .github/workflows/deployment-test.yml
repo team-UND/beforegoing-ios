@@ -63,47 +63,47 @@ jobs:
           ssh-keyscan github.com >> ~/.ssh/known_hosts
 
       - name: Run Fastlane
-        run: bundle exec fastlane test
+        run: bundle exec fastlane beta
       
-      # - name: Notify Success to Discord
-      #   if: success()
-      #   uses: Ilshidur/action-discord@0.3.2
-      #   with:
-      #     args: "A new iOS beta build has been uploaded to TestFlight 🚀"
-      #   env:
-      #     DISCORD_WEBHOOK: ${{ env.DISCORD_WEBHOOK }}
-      #     DISCORD_EMBEDS: |
-      #       [
-      #         {
-      #           "author": { "name": "${{ github.actor }}" },
-      #           "title": "Deployment Succeeded",
-      #           "description": "Branch: `${{ github.ref_name }}`\nWorkflow: [View on GitHub](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
-      #           "color": 10478271,
-      #           "fields": [
-      #             { "name": "App", "value": "BeforeGoing (iOS)", "inline": true },
-      #             { "name": "Scheme", "value": "${{ env.SCHEME_NAME }}", "inline": true },
-      #             { "name": "Timestamp", "value": "${{ steps.date.outputs.timestamp }}", "inline": true }
-      #           ]
-      #         }
-      #       ]
+      - name: Notify Success to Discord
+        if: success()
+        uses: Ilshidur/action-discord@0.3.2
+        with:
+          args: "A new iOS beta build has been uploaded to TestFlight 🚀"
+        env:
+          DISCORD_WEBHOOK: ${{ env.DISCORD_WEBHOOK }}
+          DISCORD_EMBEDS: |
+            [
+              {
+                "author": { "name": "${{ github.actor }}" },
+                "title": "Deployment Succeeded",
+                "description": "Branch: `${{ github.ref_name }}`\nWorkflow: [View on GitHub](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                "color": 10478271,
+                "fields": [
+                  { "name": "App", "value": "BeforeGoing (iOS)", "inline": true },
+                  { "name": "Scheme", "value": "${{ env.SCHEME_NAME }}", "inline": true },
+                  { "name": "Timestamp", "value": "${{ steps.date.outputs.timestamp }}", "inline": true }
+                ]
+              }
+            ]
 
-      # - name: Notify Failure to Discord
-      #   if: failure()
-      #   uses: Ilshidur/action-discord@0.3.2
-      #   with:
-      #     args: "TestFlight deployment failed 😢"
-      #   env:
-      #     DISCORD_WEBHOOK: ${{ env.DISCORD_WEBHOOK }}
-      #     DISCORD_EMBEDS: |
-      #       [
-      #         {
-      #           "author": { "name": "${{ github.actor }}" },
-      #           "title": "Deployment Failed",
-      #           "description": "Branch: `${{ github.ref_name }}`\nWorkflow: [View on GitHub](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
-      #           "color": 13458524,
-      #           "fields": [
-      #             { "name": "App", "value": "나가기전에", "inline": true },
-      #             { "name": "Scheme", "value": "${{ env.SCHEME_NAME }}", "inline": true }
-      #           ]
-      #         }
-      #       ]
+      - name: Notify Failure to Discord
+        if: failure()
+        uses: Ilshidur/action-discord@0.3.2
+        with:
+          args: "TestFlight deployment failed 😢"
+        env:
+          DISCORD_WEBHOOK: ${{ env.DISCORD_WEBHOOK }}
+          DISCORD_EMBEDS: |
+            [
+              {
+                "author": { "name": "${{ github.actor }}" },
+                "title": "Deployment Failed",
+                "description": "Branch: `${{ github.ref_name }}`\nWorkflow: [View on GitHub](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                "color": 13458524,
+                "fields": [
+                  { "name": "App", "value": "나가기전에", "inline": true },
+                  { "name": "Scheme", "value": "${{ env.SCHEME_NAME }}", "inline": true }
+                ]
+              }
+            ]
