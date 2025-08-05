@@ -54,15 +54,13 @@ jobs:
 
       - name: Bundle Install
         run: bundle install --jobs 4 --retry 3 --path vendor/bundle
-      
-      - name: Set known hosts
-        run: echo "$(ssh-keyscan github.com)" > known_hosts
 
-      - name: Install SSH key with known_hosts
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.MATCH_SSH_KEY }}
-          known_hosts: ${{ steps.set-known-hosts.outputs.known_hosts }}
+      - name: Set up SSH key for match
+        run: |
+          mkdir -p ~/.ssh
+          echo "${MATCH_SSH_KEY}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
 
       - name: Run Fastlane
         run: bundle exec fastlane beta
