@@ -1,0 +1,66 @@
+name: Deployment to Development Server
+
+on:
+  push:
+    branches: [cicd/#20-deploy-beta]
+
+env:
+  PROJECT_NAME: ${{ env.PROJECT_NAME }}
+  SCHEME_NAME: ${{ env.SCHEME_NAME }}
+  APP_IDENTIFIER: ${{ env.APP_IDENTIFIER }}
+
+  APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
+  APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+  APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+
+  MATCH_SSH_KEY: ${{ secrets.MATCH_SSH_KEY }}
+  MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+
+  KEYCHAIN_NAME: fastlane-keychain
+  KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+
+  DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2.9'
+
+      - name: Cache Gems
+        uses: actions/cache@v4
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+
+      - name: Bundle Install
+        run: bundle install --jobs 4 --retry 3 --path vendor/bundle
+      
+      - name: Set up SSH key for match
+        run: |
+          mkdir -p ~/.ssh
+          echo "${MATCH_SSH_KEY}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: Run Fastlane
+        run: bundle exec fastlane beta
