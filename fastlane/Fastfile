@@ -1,4 +1,3 @@
-PROJECT_NAME = ENV['PROJECT_NAME']
 SCHEME_NAME = ENV['SCHEME_NAME']
 APP_IDENTIFIER = ENV['APP_IDENTIFIER']
 
@@ -58,10 +57,10 @@ platform :ios do
     )
 
     build_app(
-      workspace: "#{PROJECT_NAME}.xcworkspace",
+      workspace: "project.xcworkspace",
       scheme: SCHEME_NAME,
+      export_method: "app-store",
       export_options: {
-          method: "app-store-connect",
           signingStyle: "manual",
           provisioningProfiles: {
             "#{APP_IDENTIFIER}" => "match AppStore #{APP_IDENTIFIER}"
