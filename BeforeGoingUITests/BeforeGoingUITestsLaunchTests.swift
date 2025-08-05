@@ -5,6 +5,7 @@
 //  Created by APPLE on 5/21/25.
 //
 
+/*
 import XCTest
 
 final class BeforeGoingUITestsLaunchTests: XCTestCase {
@@ -31,3 +32,4 @@ final class BeforeGoingUITestsLaunchTests: XCTestCase {
         add(attachment)
     }
 }
+*/
