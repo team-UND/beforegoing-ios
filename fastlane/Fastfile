@@ -57,7 +57,7 @@ platform :ios do
     )
 
     build_app(
-      workspace: "project.xcworkspace",
+      workspace: "BeforeGoing.xcodeproj/project.xcworkspace",
       scheme: SCHEME_NAME,
       export_method: "app-store",
       export_options: {
