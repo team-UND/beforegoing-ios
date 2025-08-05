@@ -5,13 +5,27 @@ on:
     branches: [dev]
 
 env:
+  PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+  SCHEME_NAME: ${{ vars.SCHEME_NAME }}
+  APP_IDENTIFIER: ${{ vars.APP_IDENTIFIER }}
+
+  APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
+  APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+  APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+
+  MATCH_SSH_KEY: ${{ secrets.MATCH_SSH_KEY }}
+  MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+
+  KEYCHAIN_NAME: fastlane-keychain
+  KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+
   DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
 
 permissions:
   contents: read
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: macos-latest
 
     steps:
@@ -40,5 +54,63 @@ jobs:
 
       - name: Bundle Install
         run: bundle install --jobs 4 --retry 3 --path vendor/bundle
+      
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ env.MATCH_SSH_KEY }}
 
-      # TODO: Add steps for test and deployment to Test Flight by Fastlane
+      - name: Add GitHub to known_hosts
+        run: ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: Run Fastlane
+        run: bundle exec fastlane beta
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [build-and-deploy]
+    if: always()
+
+    steps:
+      - name: Notify Success to Discord
+        if: ${{ needs.build-and-deploy.result == 'success' }}
+        uses: Ilshidur/action-discord@0.3.2
+        with:
+          args: "A new iOS beta build has been uploaded to TestFlight 🚀"
+        env:
+          DISCORD_WEBHOOK: ${{ env.DISCORD_WEBHOOK }}
+          DISCORD_EMBEDS: |
+            [
+              {
+                "author": { "name": "${{ github.actor }}" },
+                "title": "Deployment Succeeded",
+                "description": "Branch: `${{ github.ref_name }}`\nWorkflow: [View on GitHub](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                "color": 10478271,
+                "fields": [
+                  { "name": "App", "value": "BeforeGoing (iOS)", "inline": true },
+                  { "name": "Scheme", "value": "${{ env.SCHEME_NAME }}", "inline": true },
+                  { "name": "Timestamp", "value": "${{ steps.date.outputs.timestamp }}", "inline": true }
+                ]
+              }
+            ]
+
+      - name: Notify Failure to Discord
+        if: ${{ needs.build-and-deploy.result != 'success' }}
+        uses: Ilshidur/action-discord@0.3.2
+        with:
+          args: "TestFlight deployment failed 😢"
+        env:
+          DISCORD_WEBHOOK: ${{ env.DISCORD_WEBHOOK }}
+          DISCORD_EMBEDS: |
+            [
+              {
+                "author": { "name": "${{ github.actor }}" },
+                "title": "Deployment Failed",
+                "description": "Branch: `${{ github.ref_name }}`\nWorkflow: [View on GitHub](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+                "color": 13458524,
+                "fields": [
+                  { "name": "App", "value": "나가기전에", "inline": true },
+                  { "name": "Scheme", "value": "${{ env.SCHEME_NAME }}", "inline": true }
+                ]
+              }
+            ]
