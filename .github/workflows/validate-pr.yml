@@ -53,7 +53,7 @@ jobs:
             ${{ runner.os }}-gems-
 
       - name: Bundle Install
-        run: bundle install --jobs 4 --retry 3 --path vendor/bundle
+        run: bundle install --deployment --jobs 4 --retry 3 --path vendor/bundle
 
       - name: Run Fastlane
         run: bundle exec fastlane test
