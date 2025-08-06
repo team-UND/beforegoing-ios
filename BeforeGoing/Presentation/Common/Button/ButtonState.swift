@@ -7,7 +7,7 @@
 
 import UIKit
 
-enum ButtonItem {
+enum ButtonState {
     case enableLongButton
     case disableLongButton
     case enableShortButton
