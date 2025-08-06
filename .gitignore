@@ -1,2 +1,6 @@
 .DS_Store
 .env
+
+/vendor/bundle/
+/.bundle/
+.ruby-version
