@@ -1,16 +1,73 @@
+SCHEME_NAME = ENV['SCHEME_NAME']
+APP_IDENTIFIER = ENV['APP_IDENTIFIER']
+
+APP_STORE_CONNECT_API_KEY_KEY_ID = ENV['APP_STORE_CONNECT_API_KEY_KEY_ID']
+APP_STORE_CONNECT_API_KEY_ISSUER_ID = ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID']
+APP_STORE_CONNECT_API_KEY_CONTENT = ENV['APP_STORE_CONNECT_API_KEY_CONTENT']
+
+MATCH_SSH_KEY = ENV['MATCH_SSH_KEY']
+MATCH_PASSWORD = ENV['MATCH_PASSWORD']
+KEYCHAIN_NAME = ENV['KEYCHAIN_NAME']
+KEYCHAIN_PASSWORD = ENV['KEYCHAIN_PASSWORD']
+
 default_platform(:ios)
 
 platform :ios do
   desc "Run tests"
   lane :test do
     scan(
-      scheme: ENV["SCHEME_NAME"],
+      scheme: SCHEME_NAME,
       destination: 'platform=iOS Simulator,name=iPhone 16',
-      derived_data_path: "DerivedData",
       result_bundle: true,
       code_coverage: true,
       output_directory: ".",
       output_types: "junit,xcresult"
     )
+  end
+
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    test
+
+    create_keychain(
+      name: KEYCHAIN_NAME,
+      password: KEYCHAIN_PASSWORD,
+      default_keychain: true,
+      unlock: true,
+      lock_when_sleeps: false
+    )
+    
+    app_store_connect_api_key(
+       key_id: APP_STORE_CONNECT_API_KEY_KEY_ID,
+       issuer_id: APP_STORE_CONNECT_API_KEY_ISSUER_ID,
+       key_content: APP_STORE_CONNECT_API_KEY_CONTENT
+    )
+
+    match(
+      git_url: "git@github.com:team-UND/fastlane-match-ios.git",
+      storage_mode: "git",
+      type: "appstore",
+      readonly: true,
+      keychain_name: KEYCHAIN_NAME,
+      keychain_password: KEYCHAIN_PASSWORD
+    )
+
+    increment_build_number(
+      xcodeproj: "BeforeGoing.xcodeproj"
+    )
+
+    build_app(
+      workspace: "BeforeGoing.xcodeproj/project.xcworkspace",
+      scheme: SCHEME_NAME,
+      export_method: "app-store",
+      export_options: {
+          signingStyle: "manual",
+          provisioningProfiles: {
+            "#{APP_IDENTIFIER}" => "match AppStore #{APP_IDENTIFIER}"
+          }
+        }
+    )
+    
+    upload_to_testflight
   end
 end

@@ -53,7 +53,7 @@ jobs:
             ${{ runner.os }}-gems-
 
       - name: Bundle Install
-        run: bundle install --jobs 4 --retry 3 --path vendor/bundle
+        run: bundle install --deployment --jobs 4 --retry 3 --path vendor/bundle
 
       - name: Run Fastlane
         run: bundle exec fastlane test
@@ -91,7 +91,7 @@ jobs:
                 },
                 "title": "#${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}",
                 "color": 10478271,
-                "description": "${{ github.event.pull_request.html_url }}",
+                "description": "[View on GitHub](${{ github.event.pull_request.html_url }})",
                 "fields": [
                   {
                     "name": "Base Branch",
@@ -122,7 +122,7 @@ jobs:
                 },
                 "title": "#${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}",
                 "color": 13458524,
-                "description": "${{ github.event.pull_request.html_url }}",
+                "description": "[View on GitHub](${{ github.event.pull_request.html_url }})",
                 "fields": [
                   {
                     "name": "Base Branch",
