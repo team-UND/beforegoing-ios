@@ -1,3 +1,6 @@
+fastlane_require 'active_support'
+fastlane_require 'active_support/core_ext/time'
+
 SCHEME_NAME = ENV['SCHEME_NAME']
 APP_IDENTIFIER = ENV['APP_IDENTIFIER']
 
