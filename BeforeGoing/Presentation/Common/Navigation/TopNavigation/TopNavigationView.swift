@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class BeforeGoingNavigationView: BaseView {
+final class TopNavigationView: BaseView {
         
     private let containerView = UIView()
     let backButton = UIButton()
