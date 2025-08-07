@@ -15,4 +15,5 @@ struct TextFieldComponent {
     var borderWidth: CGFloat = 0
     let font: UIFont = .custom(.bodyLGMedium)
     let cornerRadius: CGFloat = 20
+    let autocapitalizationType: UITextAutocapitalizationType = .none
 }
