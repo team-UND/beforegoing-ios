@@ -12,6 +12,10 @@ final class NicknameViewController: BaseViewController {
     private let nicknameView = NicknameView()
     private static let maxNumberOfCharacters = 8
     
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationItem.hidesBackButton = true
+    }
+    
     override func setView() {
         TopNavigationBar.makeNavigationBar(
             navigationController: self.navigationController,
@@ -29,6 +33,13 @@ final class NicknameViewController: BaseViewController {
             action: #selector(textFieldDidChange),
             for: .editingChanged
         )
+    }
+}
+
+extension NicknameViewController: Backable {
+    
+    func back() {
+        self.navigationController?.popViewController(animated: false)
     }
 }
 

@@ -19,10 +19,3 @@ class BaseViewController: UIViewController {
     // Delegate, DataSource 등 설정
     func setDelegate() {}
 }
-
-extension BaseViewController {
-    @objc
-    func backButtonDidTap() {
-        navigationController?.popViewController(animated: true)
-    }
-}

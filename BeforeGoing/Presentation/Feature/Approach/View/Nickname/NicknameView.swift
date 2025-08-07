@@ -54,6 +54,7 @@ final class NicknameView: BaseView {
         }
         topNavigationView.snp.makeConstraints {
             $0.top.equalTo(self.safeAreaLayoutGuide.snp.top)
+            $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(48.adjustedH)
         }
         nameLabel.snp.makeConstraints {

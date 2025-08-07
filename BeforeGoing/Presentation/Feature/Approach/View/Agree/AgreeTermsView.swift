@@ -9,14 +9,14 @@ import UIKit
 
 final class AgreeTermsView: BaseView {
     
-    private let topNavigationView = TopNavigationView(title: "약관동의")
+    let topNavigationView = TopNavigationView(title: "약관동의")
     private let backgroundImageView = UIImageView()
     let checkBox = CheckBox()
     private let agreeToAllLabel = UILabel()
     private let dividerLabel = UILabel()
     let tableView = UITableView()
     private let introduceLabel = UILabel()
-    private let agreeButton = CustomButton(state: .disableLongButton, title: "동의하기")
+    let agreeButton = CustomButton(state: .disableLongButton, title: "동의하기")
             
     override func setStyle() {
         backgroundImageView.do {
@@ -63,6 +63,7 @@ final class AgreeTermsView: BaseView {
         }
         topNavigationView.snp.makeConstraints {
             $0.top.equalTo(self.safeAreaLayoutGuide.snp.top)
+            $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(48.adjustedH)
         }
         checkBox.snp.makeConstraints {

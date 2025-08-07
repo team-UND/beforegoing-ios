@@ -42,7 +42,10 @@ final class AgreeTermsViewController: BaseViewController {
     }
     
     override func setAction() {
-        agreeTermsView.checkBox.addTarget(self, action: #selector(mainCheckBoxDidTap), for: .touchUpInside)
+        agreeTermsView.do {
+            $0.checkBox.addTarget(self, action: #selector(mainCheckBoxDidTap), for: .touchUpInside)
+            $0.agreeButton.addTarget(self, action: #selector(agreeButtonDidTap), for: .touchUpInside)
+        }
     }
     
     override func setDelegate() {
@@ -63,6 +66,12 @@ extension AgreeTermsViewController {
         viewModel.toggleAllItems(checkBoxState: checkBoxState)
         viewModel.isAllNecssaryChecked ? agreeTermsView.enableAgreement() : agreeTermsView.disableAgreement()
         agreeTermsView.tableView.reloadData()
+    }
+    
+    @objc
+    private func agreeButtonDidTap() {
+        let nicknameViewController = NicknameViewController()
+        self.navigationController?.pushViewController(nicknameViewController, animated: false)
     }
 }
 
