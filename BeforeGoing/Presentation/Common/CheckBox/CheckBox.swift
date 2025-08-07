@@ -44,7 +44,7 @@ final class CheckBox: UIButton {
         }
     }
     
-    func toggle() {
-        currentState.toggle()
+    func toggle() -> CheckBoxState {
+        return currentState.toggle()
     }
 }

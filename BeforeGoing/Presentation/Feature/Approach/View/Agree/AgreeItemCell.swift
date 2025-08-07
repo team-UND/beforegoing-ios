@@ -14,11 +14,11 @@ final class AgreeItemCell: UITableViewCell {
     private let isNecessaryLabel = UILabel()
     private let goToSettingButton = UIButton()
     
-    private var item: AgreeItem?
-    var onDidTap: ((AgreeItem, CheckBoxState) -> Void)?
+    var onDidTap: ((CheckBoxState) -> Void)?
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
         setStyle()
         setUI()
         setLayout()
@@ -84,7 +84,6 @@ final class AgreeItemCell: UITableViewCell {
 extension AgreeItemCell {
     
     func bind(item: AgreeItem, checkBoxState: CheckBoxState) {
-        self.item = item
         bindData(item: item)
         bindCheckBox(state: checkBoxState)
     }
@@ -118,9 +117,6 @@ extension AgreeItemCell {
     
     @objc
     private func checkBoxDidTap() {
-        checkBox.toggle()
-        
-        guard let item = item else { return }
-        onDidTap?(item, checkBox.currentState)
+        onDidTap?(checkBox.toggle())
     }
 }

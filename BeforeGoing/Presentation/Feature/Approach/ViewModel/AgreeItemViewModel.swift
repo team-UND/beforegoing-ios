@@ -1,44 +1,35 @@
 //
-//  AgreeItemViewModel.swift
+//  SecondAgreeItemViewModel.swift
 //  BeforeGoing
 //
-//  Created by APPLE on 8/5/25.
+//  Created by APPLE on 8/7/25.
 //
 
 final class AgreeItemViewModel {
     
-    struct Output {
-        var currentAgreeItem: Observable<[AgreeItem: CheckBoxState]> = {
-            var checkBoxStates: [AgreeItem: CheckBoxState] = [:]
-            AgreeItem.allCases.forEach { checkBoxStates[$0] = .unchecked }
-            return Observable<[AgreeItem: CheckBoxState]>(checkBoxStates)
-        }()
+    private var agreeItems = AgreeItem.allCases
+    private var checkBoxStates: [AgreeItem : CheckBoxState] = [:]
+    
+    init() {
+        agreeItems.forEach { checkBoxStates[$0] = .unchecked }
     }
     
-    private(set) var output = Output()
-}
-
-extension AgreeItemViewModel {
-    
-    func bindAll(checkBoxState: CheckBoxState) -> Bool {
-        let updatedAgreeItem = output.currentAgreeItem.data.mapValues { _ in checkBoxState }
-        output.currentAgreeItem.data = updatedAgreeItem
-        return isAllChecked()
+    var isAllNecssaryChecked: Bool {
+        agreeItems
+            .filter { $0.component.isNecessary }
+            .allSatisfy { checkBoxStates[$0] == .checked }
     }
     
-    func bindItem(_ item: AgreeItem, checkBoxState: CheckBoxState) -> Bool {
-        output.currentAgreeItem.data[item] = checkBoxState
-        return isAllNecessaryChecked()
+    var isAllChecked: Bool {
+        agreeItems
+            .allSatisfy { checkBoxStates[$0] == .checked }
     }
     
-    func isAllChecked() -> Bool {
-        return output.currentAgreeItem.data
-            .allSatisfy { $0.value == .checked }
+    func toggleAllItems(checkBoxState: CheckBoxState) {
+        agreeItems.forEach { checkBoxStates[$0] = checkBoxState }
     }
     
-    private func isAllNecessaryChecked() -> Bool {
-        return output.currentAgreeItem.data
-            .filter { $0.key.component.isNecessary }
-            .allSatisfy { $0.value == .checked }
+    func toggleItem(item: AgreeItem, checkBoxState: CheckBoxState) {
+        checkBoxStates[item] = checkBoxState
     }
 }

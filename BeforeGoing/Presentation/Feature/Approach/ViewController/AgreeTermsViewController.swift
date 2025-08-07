@@ -28,7 +28,6 @@ final class AgreeTermsViewController: BaseViewController {
         setView()
         setAction()
         setDelegate()
-        sink()
     }
     
     override func setView() {
@@ -57,42 +56,13 @@ final class AgreeTermsViewController: BaseViewController {
 
 extension AgreeTermsViewController {
     
-    private func sink() {
-        viewModel.output.currentAgreeItem.bind { [weak self] agreeItems in
-            guard let self = self else { return }
-            
-            for (index, item) in AgreeItem.allCases.enumerated() {
-                let indexPath = IndexPath(row: index, section: 0)
-                guard let cell = self.agreeTermsView.tableView.cellForRow(at: indexPath) as? AgreeItemCell,
-                      let state = agreeItems[item] else { return }
-                
-                cell.do {
-                    $0.bind(item: item, checkBoxState: state)
-                    $0.onDidTap = { [weak self] (item, checkBoxState) in
-                        guard let self = self else { return }
-                        updateAgreeTerms(item: item, checkBoxState: checkBoxState)
-                    }
-                }
-            }
-        }
-    }
-    
-    private func updateAgreeTerms(item: AgreeItem, checkBoxState: CheckBoxState) {
-        let isNecessaryAllChecked = self.viewModel.bindItem(item, checkBoxState: checkBoxState)
-        isNecessaryAllChecked ? self.agreeTermsView.enableAgreement() : self.agreeTermsView.disableAgreement()
-        
-        let isAllChecked = self.viewModel.isAllChecked()
-        self.agreeTermsView.checkBox.currentState = isAllChecked ? .checked : .unchecked
-    }
-}
-
-extension AgreeTermsViewController {
-    
     @objc
     private func mainCheckBoxDidTap() {
-        agreeTermsView.checkBox.toggle()
-        let isAllChecked = viewModel.bindAll(checkBoxState: agreeTermsView.checkBox.currentState)
-        isAllChecked ? self.agreeTermsView.enableAgreement() : self.agreeTermsView.disableAgreement()
+        let checkBoxState = agreeTermsView.checkBox.toggle()
+        
+        viewModel.toggleAllItems(checkBoxState: checkBoxState)
+        viewModel.isAllNecssaryChecked ? agreeTermsView.enableAgreement() : agreeTermsView.disableAgreement()
+        agreeTermsView.tableView.reloadData()
     }
 }
 
@@ -110,11 +80,27 @@ extension AgreeTermsViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
+        let item = AgreeItem.allCases[indexPath.row]
+        
         cell.bind(
-            item: AgreeItem.allCases[indexPath.row],
+            item: item,
             checkBoxState: agreeTermsView.checkBox.currentState
         )
+        cell.onDidTap = { [weak self] checkBoxState in
+            guard let self = self else { return }
+            self.viewModel.toggleItem(item: item, checkBoxState: checkBoxState)
+            updateAgreementButtonState()
+            updateCheckBoxState()
+        }
         
         return cell
+    }
+    
+    private func updateAgreementButtonState() {
+        viewModel.isAllNecssaryChecked ? agreeTermsView.enableAgreement() : agreeTermsView.disableAgreement()
+    }
+    
+    private func updateCheckBoxState() {
+        agreeTermsView.checkBox.currentState = viewModel.isAllChecked ? .checked : .unchecked
     }
 }

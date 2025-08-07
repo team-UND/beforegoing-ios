@@ -29,7 +29,8 @@ enum CheckBoxState: Equatable {
         }
     }
     
-    mutating func toggle() {
+    mutating func toggle() -> Self {
         self = (self == .checked) ? .unchecked : .checked
+        return self
     }
 }
