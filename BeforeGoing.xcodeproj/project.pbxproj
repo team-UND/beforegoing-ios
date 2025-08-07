@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1829AC952DE0689F00038A00 /* KakaoSDKFriendResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 1829AC942DE0689F00038A00 /* KakaoSDKFriendResources.bundle */; };
 		186E07FE2DDDFA0E00E32490 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 186E07FD2DDDFA0E00E32490 /* SnapKit */; };
 		186E08002DDDFA0E00E32490 /* Then in Frameworks */ = {isa = PBXBuildFile; productRef = 186E07FF2DDDFA0E00E32490 /* Then */; };
 		18E723872DE09856004CCF42 /* KakaoSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 18E723862DE09856004CCF42 /* KakaoSDK */; };
+		D2E280C72E41AE3900A90122 /* KakaoSDKFriendResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = D2E280C62E41AE3900A90122 /* KakaoSDKFriendResources.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,10 +31,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		1829AC942DE0689F00038A00 /* KakaoSDKFriendResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = KakaoSDKFriendResources.bundle; path = "../../Library/Developer/Xcode/DerivedData/BeforeGoing-hhrvulkwhatauybhwaprrnaduehr/SourcePackages/checkouts/kakao-ios-sdk/Sources/KakaoSDKFriendCore/KakaoSDKFriendResources.bundle"; sourceTree = "<group>"; };
 		186E06DB2DDDF10500E32490 /* BeforeGoing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BeforeGoing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		186E06F12DDDF10600E32490 /* BeforeGoingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BeforeGoingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		186E06FB2DDDF10600E32490 /* BeforeGoingUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BeforeGoingUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D2E280C62E41AE3900A90122 /* KakaoSDKFriendResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = KakaoSDKFriendResources.bundle; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -99,7 +99,7 @@
 		186E06D22DDDF10500E32490 = {
 			isa = PBXGroup;
 			children = (
-				1829AC942DE0689F00038A00 /* KakaoSDKFriendResources.bundle */,
+				D2E280C62E41AE3900A90122 /* KakaoSDKFriendResources.bundle */,
 				186E06DD2DDDF10500E32490 /* BeforeGoing */,
 				186E06F42DDDF10600E32490 /* BeforeGoingTests */,
 				186E06FE2DDDF10600E32490 /* BeforeGoingUITests */,
@@ -245,7 +245,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1829AC952DE0689F00038A00 /* KakaoSDKFriendResources.bundle in Resources */,
+				D2E280C72E41AE3900A90122 /* KakaoSDKFriendResources.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -310,9 +310,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Z5J43V9D9J;
+				CODE_SIGN_ENTITLEMENTS = BeforeGoing/BeforeGoing.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 6;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = G6423FVY8X;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BeforeGoing/Resource/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -325,8 +329,10 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.heopaka.BeforeGoing;
+				PRODUCT_BUNDLE_IDENTIFIER = com.und.BeforeGoing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore com.und.BeforeGoing";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -340,9 +346,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Z5J43V9D9J;
+				CODE_SIGN_ENTITLEMENTS = BeforeGoing/BeforeGoing.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 6;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = G6423FVY8X;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BeforeGoing/Resource/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -355,8 +365,10 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.heopaka.BeforeGoing;
+				PRODUCT_BUNDLE_IDENTIFIER = com.und.BeforeGoing;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore com.und.BeforeGoing";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -417,7 +429,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -476,7 +488,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -492,14 +504,16 @@
 			baseConfigurationReferenceRelativePath = Data/Config/Config.xcconfig;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Z5J43V9D9J;
+				CURRENT_PROJECT_VERSION = 6;
+				DEVELOPMENT_TEAM = G6423FVY8X;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.heopaka.BeforeGoingTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.und.BeforeGoingTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -513,14 +527,16 @@
 			baseConfigurationReferenceRelativePath = Data/Config/Config.xcconfig;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Z5J43V9D9J;
+				CURRENT_PROJECT_VERSION = 6;
+				DEVELOPMENT_TEAM = G6423FVY8X;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.heopaka.BeforeGoingTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.und.BeforeGoingTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -533,13 +549,15 @@
 			baseConfigurationReferenceAnchor = 186E06DD2DDDF10500E32490 /* BeforeGoing */;
 			baseConfigurationReferenceRelativePath = Data/Config/Config.xcconfig;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Z5J43V9D9J;
+				CURRENT_PROJECT_VERSION = 6;
+				DEVELOPMENT_TEAM = G6423FVY8X;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.heopaka.BeforeGoingUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.und.BeforeGoingUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -552,13 +570,15 @@
 			baseConfigurationReferenceAnchor = 186E06DD2DDDF10500E32490 /* BeforeGoing */;
 			baseConfigurationReferenceRelativePath = Data/Config/Config.xcconfig;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Z5J43V9D9J;
+				CURRENT_PROJECT_VERSION = 6;
+				DEVELOPMENT_TEAM = G6423FVY8X;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.heopaka.BeforeGoingUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.und.BeforeGoingUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

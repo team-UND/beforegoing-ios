@@ -1,9 +1,14 @@
-name: Assigned Issue Notification
+name: Notify Assigned Issue
 
 on:
   issues:
-    types:
-      - assigned
+    types: [assigned]
+
+env:
+  DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+
+permissions:
+  contents: read
 
 jobs:
   notify:
@@ -12,15 +17,15 @@ jobs:
       - name: Send Discord Notification
         uses: Ilshidur/action-discord@0.3.2
         with:
-          args: "이슈가 할당됐어요 🎉"
+          args: "A new issue has been assigned 🎉"
         env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_WEBHOOK: ${{ env.DISCORD_WEBHOOK }}
           DISCORD_EMBEDS: |
             [
               {
                 "title": "${{ github.event.issue.title }}",
                 "color": 10478271,
-                "description": "${{ github.event.issue.html_url }}",
+                "description": "[View on GitHub](${{ github.event.issue.html_url }})",
                 "fields": [
                   {
                     "name": "Issue Number",
