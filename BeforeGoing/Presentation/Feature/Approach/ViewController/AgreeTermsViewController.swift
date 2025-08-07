@@ -93,7 +93,7 @@ extension AgreeTermsViewController: UITableViewDataSource {
         
         cell.bind(
             item: item,
-            checkBoxState: agreeTermsView.checkBox.currentState
+            checkBoxState: viewModel.getState(item: item)
         )
         cell.onDidTap = { [weak self] checkBoxState in
             guard let self = self else { return }

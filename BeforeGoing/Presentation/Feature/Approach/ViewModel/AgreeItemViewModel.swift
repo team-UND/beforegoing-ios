@@ -25,6 +25,10 @@ final class AgreeItemViewModel {
             .allSatisfy { checkBoxStates[$0] == .checked }
     }
     
+    func getState(item: AgreeItem) -> CheckBoxState {
+        return checkBoxStates[item] ?? .unchecked
+    }
+    
     func toggleAllItems(checkBoxState: CheckBoxState) {
         agreeItems.forEach { checkBoxStates[$0] = checkBoxState }
     }
