@@ -79,10 +79,10 @@ final class NicknameView: BaseView {
 extension NicknameView {
     
     func enableStartButton() {
-        startButton.updateUI(state: .enableLongButton)
+        startButton.currentState = .enableLongButton
     }
     
     func disableStartButton() {
-        startButton.updateUI(state: .disableLongButton)
+        startButton.currentState = .disableLongButton
     }
 }

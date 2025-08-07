@@ -102,11 +102,11 @@ extension AgreeTermsView {
     
     func enableAgreement() {
         introduceLabel.isHidden = true
-        agreeButton.updateUI(state: .enableLongButton)
+        agreeButton.currentState = .enableLongButton
     }
     
     func disableAgreement() {
         introduceLabel.isHidden = false
-        agreeButton.updateUI(state: .disableLongButton)
+        agreeButton.currentState = .disableLongButton
     }
 }

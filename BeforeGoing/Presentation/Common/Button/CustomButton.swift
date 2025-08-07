@@ -9,9 +9,16 @@ import UIKit
 
 final class CustomButton: UIButton {
     
+    var currentState: ButtonState {
+        didSet {
+            setStyle()
+        }
+    }
+    
     init(state: ButtonState, title: String) {
+        self.currentState = state
         super.init(frame: .zero)
-        setStyle(state: state, title: title)
+        setStyle(title: title)
         setLayout(state: state)
     }
     
@@ -19,13 +26,13 @@ final class CustomButton: UIButton {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func setStyle(state: ButtonState, title: String) {
+    private func setStyle(title: String) {
         self.setTitle(title, for: .normal)
-        setStyle(state: state)
+        setStyle()
     }
     
-    private func setStyle(state: ButtonState) {
-        let compoonent = state.component
+    private func setStyle() {
+        let compoonent = currentState.component
         self.do {
             $0.backgroundColor = compoonent.backgroundColor
             $0.setTitleColor(compoonent.textColor, for: .normal)
@@ -42,10 +49,5 @@ final class CustomButton: UIButton {
             $0.width.equalTo(compoonent.width)
             $0.height.equalTo(compoonent.height)
         }
-    }
-    
-    func updateUI(state: ButtonState) {
-        setStyle(state: state)
-        setLayout(state: state)
     }
 }
