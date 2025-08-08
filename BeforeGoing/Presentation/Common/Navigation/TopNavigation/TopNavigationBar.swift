@@ -15,7 +15,7 @@ enum NavigationBarType: Equatable {
     case clear, none
 }
 
-struct BeforeGoingNavigationBar {
+struct TopNavigationBar {
     
     static func makeNavigationBar(
         navigationController: UINavigationController?,

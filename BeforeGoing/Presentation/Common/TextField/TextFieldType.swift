@@ -7,7 +7,7 @@
 
 import UIKit
 
-enum TextFieldItem: Equatable {
+enum TextFieldType: Equatable {
     case nicknameField
     case enableAddField
     case disableAddField

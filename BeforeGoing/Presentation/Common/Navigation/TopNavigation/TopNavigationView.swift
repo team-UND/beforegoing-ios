@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class BeforeGoingNavigationView: BaseView {
+final class TopNavigationView: BaseView {
         
     private let containerView = UIView()
     let backButton = UIButton()
@@ -16,6 +16,11 @@ final class BeforeGoingNavigationView: BaseView {
     init(title: String) {
         self.titleLabel.text = title
         super.init(frame: .zero)
+        
+        setStyle()
+        setUI()
+        setLayout()
+        setAction()
     }
     
     required init?(coder: NSCoder) {
@@ -26,6 +31,7 @@ final class BeforeGoingNavigationView: BaseView {
         backButton.do {
             $0.setImage(.chevronLeft, for: .normal)
             $0.tintColor = .black
+            $0.isUserInteractionEnabled = true
         }
         titleLabel.do {
             $0.font = .custom(.headingH3)
@@ -47,6 +53,7 @@ final class BeforeGoingNavigationView: BaseView {
         containerView.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide.snp.top)
             $0.width.equalTo(375.adjustedW)
+            $0.height.equalTo(48.adjustedH)
         }
         backButton.snp.makeConstraints {
             $0.top.equalTo(containerView.snp.top)
@@ -56,5 +63,17 @@ final class BeforeGoingNavigationView: BaseView {
             $0.top.equalTo(backButton.snp.top).offset(10.adjustedH)
             $0.leading.equalTo(backButton.snp.trailing).offset(3.adjustedW)
         }
+    }
+    
+    private func setAction() {
+        backButton.addTarget(self, action: #selector(backButtonDidTap), for: .touchUpInside)
+    }
+}
+
+extension TopNavigationView {
+    
+    @objc
+    func backButtonDidTap() {
+        (self.findPresentViewController() as? Backable)?.back()
     }
 }

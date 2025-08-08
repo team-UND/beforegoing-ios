@@ -14,7 +14,7 @@ extension UIFont {
         case bodyMDSemiBold, bodyMDMedium, bodyMDRegular
         case bodySMSemiBold, bodySMMedium, bodySMRegular
         case bodySmallMedium
-        case brandingH4, brandingMedium, brandingRegular
+        case brandingH3, brandingMedium, brandingRegular
         
         var weight: String {
             switch self {
@@ -24,10 +24,8 @@ extension UIFont {
                 "Pretendard-Medium"
             case .bodyLGRegular, .bodyMDRegular, .bodySMRegular:
                 "NotoSansKR-ExtraBold"
-            case .brandingH4:
-                "SCDream6"
-            case .brandingMedium:
-                "SCDream5"
+            case .brandingH3, .brandingMedium:
+                "Cafe24SsurroundairOTF"
             case .brandingRegular:
                 "SCDream4"
             }
@@ -41,7 +39,7 @@ extension UIFont {
             switch self {
             case .headingH1: 36
             case .headingH2: 28
-            case .headingH3, .brandingH4: 24
+            case .headingH3, .brandingH3: 24
             case .headingH4: 20
             case .headingH5: 18
             case .bodyLGSemiBold, .bodyLGMedium, .bodyLGRegular: 16
