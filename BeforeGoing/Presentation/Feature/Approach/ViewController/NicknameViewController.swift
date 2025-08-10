@@ -33,6 +33,11 @@ final class NicknameViewController: BaseViewController {
             action: #selector(textFieldDidChange),
             for: .editingChanged
         )
+        nicknameView.deleteButton.addTarget(
+            self,
+            action: #selector(deleteButtonDidTap),
+            for: .touchUpInside
+        )
     }
 }
 
@@ -49,7 +54,10 @@ extension NicknameViewController {
     private func textFieldDidChange() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self,
-            let text = nicknameView.nicknameTextField.text else { return }
+                  let text = nicknameView.nicknameTextField.text else {
+                return
+            }
+            text.isEmpty ? nicknameView.hideDeleteButton() : nicknameView.revealDeleteButton()
             
             let trimmedText = trimText(text)
             if trimmedText.isValidNickname {
@@ -58,6 +66,12 @@ extension NicknameViewController {
             }
             nicknameView.disableStartButton()
         }
+    }
+    
+    @objc
+    private func deleteButtonDidTap() {
+        nicknameView.nicknameTextField.text = ""
+        textFieldDidChange()
     }
     
     private func trimText(_ text: String) -> String {
