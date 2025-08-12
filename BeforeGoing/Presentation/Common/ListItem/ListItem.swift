@@ -33,6 +33,10 @@ final class ListItem: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         todayLabelBackgroundGradient.frame = todayBackgroundView.bounds
+        expressTodayView.roundCorners(
+            corners: [.topRight, .bottomRight],
+            radius: 14
+        )
     }
     
     private func setStyle() {
@@ -41,6 +45,7 @@ final class ListItem: UIView {
             $0.layer.borderColor = UIColor.blue50.cgColor
             $0.layer.borderWidth = 1.4
             $0.layer.cornerRadius = 14
+            $0.clipsToBounds = true
         }
         todayBackgroundView.do {
             $0.layer.borderColor = UIColor.blue200.cgColor
@@ -70,10 +75,6 @@ final class ListItem: UIView {
         }
         expressTodayView.do {
             $0.backgroundColor = .blue50
-            $0.roundCorners(
-                corners: [.topLeft, .bottomLeft],
-                radius: 14
-            )
         }
     }
     
@@ -111,6 +112,9 @@ final class ListItem: UIView {
             }
             expressTodayView.snp.makeConstraints {
                 $0.trailing.equalToSuperview()
+                $0.centerY.equalToSuperview()
+                $0.width.equalTo(10.adjustedW)
+                $0.height.equalTo(50.adjustedH)
             }
             return
         }
