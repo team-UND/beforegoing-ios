@@ -9,11 +9,5 @@ enum ListItemState {
     
     case today
     case original
-    
-    var isToday: Bool {
-        switch self {
-        case .today: return true
-        case .original: return false
-        }
-    }
+    case completed
 }
