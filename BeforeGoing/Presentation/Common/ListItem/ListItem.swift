@@ -18,8 +18,9 @@ final class ListItem: UIView {
     private let contentLabel = UILabel()
     private let expressTodayView = UIView()
     
-    init(state: ListItemState) {
+    init(state: ListItemState, title: String) {
         self.state = state
+        self.contentLabel.text = title
         super.init(frame: .zero)
         setStyle()
         setUI()
@@ -69,7 +70,6 @@ final class ListItem: UIView {
             todayBackgroundView.layer.insertSublayer($0, at: 0)
         }
         contentLabel.do {
-            $0.text = "가스불 끄기"
             $0.textColor = .gray900
             $0.font = .custom(.bodyLGMedium)
         }
