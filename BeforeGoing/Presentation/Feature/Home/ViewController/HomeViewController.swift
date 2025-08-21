@@ -36,7 +36,7 @@ final class HomeViewController: BaseViewController {
         )
         homeView.modalView.deleteTaskButton.addTarget(
             self,
-            action: #selector(deleteTaskButtonDidTap),
+            action: #selector(clearTaskTextField),
             for: .touchUpInside
         )
         homeView.modalView.addTaskButton.addTarget(
@@ -82,7 +82,7 @@ extension HomeViewController {
     }
     
     @objc
-    private func deleteTaskButtonDidTap() {
+    private func clearTaskTextField() {
         homeView.modalView.do {
             $0.taskTextField.text = ""
             $0.disableAddTaskButton()
@@ -93,7 +93,7 @@ extension HomeViewController {
     @objc
     private func addTaskButtonDidTap() {
         guard let task = homeView.modalView.taskTextField.text else { return }
-        deleteTaskButtonDidTap()
+        clearTaskTextField()
         items.insert((title: task, state: .today, beforeState: .today), at: 0)
         homeView.modalView.listTableView.reloadData()
     }
