@@ -82,17 +82,13 @@ final class CompletedListItem: BaseView, ListItemProtocol {
     }
     
     override func setUI() {
-        if beforeState == .normal {
-            addSubviews(
-                checkBox,
-                contentLabel
-            )
-        }
+        addSubviews(
+            checkBox,
+            contentLabel
+        )
         if beforeState == .today {
             todayBackgroundView.addSubview(todayLabel)
             addSubviews(
-                checkBox,
-                contentLabel,
                 todayBackgroundView,
                 expressTodayView
             )
