@@ -229,7 +229,7 @@ extension CalendarViewController: UICollectionViewDataSource {
         
         let isSelected = calendar.isDate(selectedDate, inSameDayAs: date)
         let isToday = calendar.isDateInToday(date)
-        
+
         cell.bind(state: .normal(day: day, isSelected: isSelected, isToday: isToday))
         return cell
     }

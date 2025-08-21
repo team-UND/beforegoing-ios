@@ -16,11 +16,24 @@ final class CalendarView: BaseView {
     private let flowLayout = UICollectionViewFlowLayout()
     lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        self.layer.do {
+            $0.shadowColor = UIColor.blue500.cgColor
+            $0.shadowOpacity = 0.5
+            $0.shadowRadius = 1
+            $0.shadowOffset = .zero
+            $0.shadowPath = UIBezierPath(
+                roundedRect: bounds,
+                cornerRadius: layer.cornerRadius
+            ).cgPath
+        }
+    }
+    
     override func setStyle() {
         self.do {
             $0.backgroundColor = .white
             $0.layer.cornerRadius = 14
-            // TO-DO : border shadow color 추가
         }
         flowLayout.do {
             $0.minimumInteritemSpacing = 0

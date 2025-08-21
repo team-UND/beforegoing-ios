@@ -17,9 +17,11 @@ final class DayCell: UICollectionViewCell {
     
     private let dayLabel = UILabel()
     private let blurView = UIView()
+    let gradientLayer = CAGradientLayer()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
         setStyle()
         setUI()
         setLayout()
@@ -36,7 +38,15 @@ final class DayCell: UICollectionViewCell {
             $0.clipsToBounds = true
             $0.layer.cornerRadius = 14.5
             $0.isHidden = true
-            // TO-DO : 블러 처리
+        }
+        gradientLayer.do {
+            $0.type = .radial
+            $0.colors = [
+                UIColor.blue600.cgColor,
+                UIColor.blue200.cgColor
+            ]
+            $0.startPoint = CGPoint(x: 0.5, y: 0.5)
+            $0.endPoint = CGPoint(x: 1, y: 1)
         }
     }
     
@@ -65,6 +75,12 @@ final class DayCell: UICollectionViewCell {
         }
         blurView.isHidden = true
     }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        gradientLayer.frame = blurView.bounds
+        gradientLayer.cornerRadius = blurView.layer.cornerRadius
+    }
 }
 
 extension DayCell: ReuseIdentifiable {}
@@ -90,18 +106,23 @@ extension DayCell {
                     $0.font = .custom(.bodyLGMedium)
                 }
                 blurView.isHidden = false
+                if gradientLayer.superlayer == nil {
+                    blurView.layer.insertSublayer(gradientLayer, at: 0)
+                }
             } else if isToday {
                 dayLabel.do {
                     $0.textColor = .blue700
                     $0.font = .custom(.bodyLGMedium)
                 }
                 blurView.isHidden = true
+                gradientLayer.removeFromSuperlayer()
             } else {
                 dayLabel.do {
                     $0.textColor = .gray500
                     $0.font = .custom(.bodyLGRegular)
                 }
                 blurView.isHidden = true
+                gradientLayer.removeFromSuperlayer()
             }
         }
     }
