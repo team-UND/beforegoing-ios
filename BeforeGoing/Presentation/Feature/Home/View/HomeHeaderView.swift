@@ -17,6 +17,13 @@ final class HomeHeaderView: BaseView {
     private let tipView = UIView()
     private let circleView = UIView()
     
+    override func layoutSubviews() {
+        circleView.layer.shadowPath = UIBezierPath(
+            roundedRect: circleView.bounds,
+            cornerRadius: circleView.layer.cornerRadius
+        ).cgPath
+    }
+    
     override func setStyle() {
         dateStacView.do {
             $0.axis = .horizontal
