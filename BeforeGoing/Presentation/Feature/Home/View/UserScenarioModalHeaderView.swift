@@ -14,7 +14,6 @@ final class UserScenarioModalHeaderView: BaseView {
     
     private let scenarioStackView = UIStackView()
     private let scenarioScrollView = UIScrollView()
-    private let selectBarLabel = UILabel()
     private let addScenarioView = UIView()
     private let addScenarioButton = UIButton()
     

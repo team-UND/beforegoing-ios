@@ -71,11 +71,6 @@ final class HomeHeaderView: BaseView {
             shapeLayer.strokeColor = UIColor.borderBlue.cgColor
             shapeLayer.lineWidth = 1
             $0.layer.addSublayer(shapeLayer)
-            
-            let linePath = UIBezierPath()
-            linePath.move(to: CGPoint(x: 0, y: 0))
-            linePath.addLine(to: CGPoint(x: width, y: 0))
-            linePath.close()
         }
         circleView.do {
             $0.backgroundColor = .white
@@ -87,10 +82,6 @@ final class HomeHeaderView: BaseView {
             $0.layer.shadowOffset = CGSize(width: 2, height: 2)
             $0.layer.shadowRadius = 4
             $0.layer.masksToBounds = false
-            $0.layer.shadowPath = UIBezierPath(
-                roundedRect: $0.bounds,
-                cornerRadius: $0.layer.cornerRadius
-            ).cgPath
         }
     }
     
