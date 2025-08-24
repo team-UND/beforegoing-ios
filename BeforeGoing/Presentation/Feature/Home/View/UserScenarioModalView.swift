@@ -94,7 +94,7 @@ final class UserScenarioModalView: BaseView {
     private func setGesture() {
         let panGesture = UIPanGestureRecognizer()
         panGesture.addTarget(self, action: #selector(handlePan(_:)))
-        addGestureRecognizer(panGesture)
+        headerView.addGestureRecognizer(panGesture)
     }
 }
 
