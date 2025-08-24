@@ -36,23 +36,49 @@ final class CalendarViewController: BaseViewController {
     private var days: [String?] = []
     
     private let calendarView = CalendarView()
+    private let blurEffect = UIBlurEffect(style: .systemMaterialLight)
+    private lazy var blurView: UIVisualEffectView = UIVisualEffectView(effect: blurEffect)
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .lightGray
-        view.addSubview(calendarView)
+
+        setStyle()
+        setUI()
+        setLayout()
+    }
+    
+    private func setStyle() {
+        view.backgroundColor = .clear
+    }
+    
+    private func setUI() {
+        view.addSubviews(
+            blurView,
+            calendarView
+        )
+    }
+    
+    private func setLayout() {
+        blurView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
         calendarView.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(100.adjustedH)
-            $0.centerX.equalToSuperview()
+            $0.center.equalToSuperview()
         }
     }
     
     override func setAction() {
         calendarView.headerView.previousButton
             .addTarget(self, action: #selector(previousButtonDidTap), for: .touchUpInside)
-        
         calendarView.headerView.nextButton
             .addTarget(self, action: #selector(nextButtonDidTap), for: .touchUpInside)
+        setTapGesture()
+    }
+    
+    private func setTapGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(backgroundDidTap))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
     }
     
     override func setDelegate() {
@@ -148,6 +174,14 @@ extension CalendarViewController {
         currentDate = date
         reload()
     }
+    
+    @objc
+    private func backgroundDidTap(_ sender: UIGestureRecognizer) {
+        let location = sender.location(in: view)
+        if !calendarView.frame.contains(location) {
+            self.dismiss(animated: true)
+        }
+    }
 }
 
 extension CalendarViewController: UICollectionViewDelegate {
@@ -195,7 +229,7 @@ extension CalendarViewController: UICollectionViewDataSource {
         
         let isSelected = calendar.isDate(selectedDate, inSameDayAs: date)
         let isToday = calendar.isDateInToday(date)
-        
+
         cell.bind(state: .normal(day: day, isSelected: isSelected, isToday: isToday))
         return cell
     }

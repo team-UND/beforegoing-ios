@@ -13,7 +13,8 @@ final class NicknameView: BaseView {
     private let topNavigationView = TopNavigationView(title: "환영합니다")
     private let nameLabel = UILabel()
     private let necessaryLabel = UILabel()
-    let nicknameTextField = TextField(type: .nicknameField)
+    private(set) var nicknameTextField = TextField(type: .nicknameField)
+    private(set) var deleteButton = UIButton()
     private let startButton = CustomButton(state: .disableLongButton, title: "시작하기")
     
     override func setStyle() {
@@ -35,6 +36,10 @@ final class NicknameView: BaseView {
             $0.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 20, height: nicknameTextField.frame.height))
             $0.leftViewMode = .always
         }
+        deleteButton.do {
+            $0.setImage(.union, for: .normal)
+            $0.isHidden = true
+        }
     }
     
     override func setUI() {
@@ -44,6 +49,7 @@ final class NicknameView: BaseView {
             nameLabel,
             necessaryLabel,
             nicknameTextField,
+            deleteButton,
             startButton
         )
     }
@@ -69,6 +75,10 @@ final class NicknameView: BaseView {
             $0.top.equalTo(nameLabel.snp.bottom).offset(8.adjustedH)
             $0.leading.trailing.equalToSuperview().inset(20.adjustedW)
         }
+        deleteButton.snp.makeConstraints {
+            $0.trailing.equalTo(nicknameTextField.snp.trailing).offset(-20.adjustedW)
+            $0.centerY.equalTo(nicknameTextField.snp.centerY)
+        }
         startButton.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(20.adjustedW)
             $0.bottom.equalToSuperview().inset(34.adjustedH)
@@ -84,5 +94,13 @@ extension NicknameView {
     
     func disableStartButton() {
         startButton.currentState = .disableLongButton
+    }
+    
+    func revealDeleteButton() {
+        deleteButton.isHidden = false
+    }
+    
+    func hideDeleteButton() {
+        deleteButton.isHidden = true
     }
 }
