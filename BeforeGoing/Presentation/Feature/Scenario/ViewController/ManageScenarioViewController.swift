@@ -28,7 +28,11 @@ final class ManageScenarioViewController: BaseViewController {
     }
     
     override func setAction() {
-        
+        rootView.selectButton.addTarget(
+            self,
+            action: #selector(selectButtonDidTap),
+            for: .touchUpInside
+        )
     }
     
     override func setDelegate() {
@@ -39,6 +43,16 @@ final class ManageScenarioViewController: BaseViewController {
             $0.dropDelegate = self
             $0.register(ManageScenarioCell.self, forCellReuseIdentifier: ManageScenarioCell.identifier)
         }
+    }
+}
+
+extension ManageScenarioViewController {
+    
+    @objc
+    func selectButtonDidTap() {
+        let viewController = SettingScenarioViewController()
+        viewController.navigationItem.hidesBackButton = true
+        self.navigationController?.pushViewController(viewController, animated: false)
     }
 }
 
