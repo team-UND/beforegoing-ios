@@ -13,6 +13,7 @@ final class ManageScenarioViewController: BaseViewController {
     
     private var templates: [ScenarioType] = [.mine, .outing, .goWork, .leaveWork, .exercise, .miracle]
     private var didCellTap: Bool = false
+    private var selectedIndex: Int?
     
     override func loadView() {
         view = rootView
@@ -50,8 +51,14 @@ extension ManageScenarioViewController {
     
     @objc
     func selectButtonDidTap() {
+        guard let selectedIndex = selectedIndex else { return }
+        
         let viewController = SettingScenarioViewController()
+        let scenarioType = templates[selectedIndex]
+        
         viewController.navigationItem.hidesBackButton = true
+        viewController.configure(scenarioType: scenarioType)
+        
         self.navigationController?.pushViewController(viewController, animated: false)
     }
 }
@@ -78,6 +85,8 @@ extension ManageScenarioViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        selectedIndex = indexPath.section
+        
         for visibleIndexPath in tableView.indexPathsForVisibleRows ?? [] {
             guard let cell = tableView.cellForRow(at: visibleIndexPath) as? ManageScenarioCell else {
                 return
