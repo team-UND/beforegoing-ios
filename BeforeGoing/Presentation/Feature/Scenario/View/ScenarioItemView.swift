@@ -10,15 +10,17 @@ import UIKit
 final class ScenarioItemView: BaseView {
     
     private var height: CGFloat
+    private let isExistSubtitle: Bool
     
     private let background = UIView()
     private let dragButton = UIButton()
     private(set) var titleLabel = UILabel()
     private(set) var subtitleLabel = UILabel()
     private let labelView = UIView()
-    
-    init(height: CGFloat) {
+        
+    init(height: CGFloat, isExistSubtitle: Bool) {
         self.height = height
+        self.isExistSubtitle = isExistSubtitle
         super.init(frame: .zero)
     }
 
@@ -40,9 +42,11 @@ final class ScenarioItemView: BaseView {
             $0.textColor = .gray900
             $0.font = .custom(.bodyLGSemiBold)
         }
-        subtitleLabel.do {
-            $0.textColor = .gray400
-            $0.font = .custom(.bodyMDRegular)
+        if isExistSubtitle {
+            subtitleLabel.do {
+                $0.textColor = .gray400
+                $0.font = .custom(.bodyMDRegular)
+            }
         }
         labelView.do {
             $0.backgroundColor = .blue50
@@ -59,9 +63,11 @@ final class ScenarioItemView: BaseView {
         background.addSubviews(
             dragButton,
             titleLabel,
-            subtitleLabel,
             labelView
         )
+        if isExistSubtitle {
+            background.addSubview(subtitleLabel)
+        }
     }
     
     override func setLayout() {
@@ -74,13 +80,20 @@ final class ScenarioItemView: BaseView {
             $0.centerY.equalToSuperview()
             $0.size.equalTo(24.adjustedW)
         }
-        titleLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(20.adjustedH)
-            $0.leading.equalTo(dragButton.snp.trailing).offset(12.adjustedW)
-        }
-        subtitleLabel.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom)
-            $0.leading.equalTo(dragButton.snp.trailing).offset(12.adjustedW)
+        if isExistSubtitle {
+            titleLabel.snp.makeConstraints {
+                $0.top.equalToSuperview().inset(20.adjustedH)
+                $0.leading.equalTo(dragButton.snp.trailing).offset(12.adjustedW)
+            }
+            subtitleLabel.snp.makeConstraints {
+                $0.top.equalTo(titleLabel.snp.bottom)
+                $0.leading.equalTo(dragButton.snp.trailing).offset(12.adjustedW)
+            }
+        } else {
+            titleLabel.snp.makeConstraints {
+                $0.centerY.equalToSuperview()
+                $0.leading.equalTo(dragButton.snp.trailing).offset(12.adjustedW)
+            }
         }
         labelView.snp.makeConstraints {
             $0.trailing.equalToSuperview()
