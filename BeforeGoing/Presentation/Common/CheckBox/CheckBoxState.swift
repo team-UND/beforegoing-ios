@@ -33,4 +33,12 @@ enum CheckBoxState: Equatable {
         self = (self == .checked) ? .unchecked : .checked
         return self
     }
+    
+    mutating func toggle(isOn: Bool) {
+        self = isOn ? .checked : .unchecked
+    }
+    
+    func matchState() -> Bool {
+        return self == .checked ? true : false
+    }
 }
