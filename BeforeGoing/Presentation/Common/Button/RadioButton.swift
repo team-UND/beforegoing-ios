@@ -44,4 +44,8 @@ extension RadioButton {
     func matchState() -> Bool {
         return currentState.matchState()
     }
+    
+    func changeState(_ state: Bool) {
+        currentState.setCurrentState(state)
+    }
 }

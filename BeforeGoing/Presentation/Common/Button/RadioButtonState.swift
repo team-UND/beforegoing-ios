@@ -30,4 +30,8 @@ enum RadioButtonState {
     func matchState() -> Bool {
         return self == .enable ? true : false
     }
+    
+    mutating func setCurrentState(_ state: Bool) {
+        self = state ? .enable : .disable
+    }
 }
