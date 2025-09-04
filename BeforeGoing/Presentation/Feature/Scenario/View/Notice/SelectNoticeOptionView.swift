@@ -7,11 +7,11 @@
 
 import UIKit
 
-final class SelectAlarmOptionView: BaseView {
+final class SelectNoticeOptionView: BaseView {
     
     private let optionStackView = UIStackView()
-    private(set) var noAlarmView = AlarmOptionView(type: .noNotice)
-    private(set) var setTimeAlarmView = AlarmOptionView(type: .setTimeNotice)
+    private(set) var noAlarmView = NoticeOptionView(type: .noNotice)
+    private(set) var setTimeAlarmView = NoticeOptionView(type: .setTimeNotice)
     
     override func setStyle() {
         optionStackView.do {
@@ -42,18 +42,18 @@ final class SelectAlarmOptionView: BaseView {
     }
 }
 
-extension SelectAlarmOptionView {
+extension SelectNoticeOptionView {
     
-    func toggleOption(selectedView: AlarmOptionView) {
+    func toggleOption(selectedView: NoticeOptionView) {
         optionStackView.arrangedSubviews.forEach {
-            let optionView = $0 as! AlarmOptionView
+            let optionView = $0 as! NoticeOptionView
             if !optionView.equalTo(selectedView) {
                 optionView.updateUI(isSelected: false)
             }
         }
     }
     
-    func isSelectedSetAlarmOption(_ optionView: AlarmOptionView) -> Bool {
+    func isSelectedSetAlarmOption(_ optionView: NoticeOptionView) -> Bool {
         optionView == setTimeAlarmView
     }
 }

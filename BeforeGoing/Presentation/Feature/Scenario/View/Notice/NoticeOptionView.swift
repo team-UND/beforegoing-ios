@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class AlarmOptionView: BaseView {
+final class NoticeOptionView: BaseView {
     
     private let optionType: NoticeOptionType
     private let titleLabel = UILabel()
@@ -60,7 +60,7 @@ final class AlarmOptionView: BaseView {
     }
 }
 
-extension AlarmOptionView {
+extension NoticeOptionView {
     
     func updateUI(isSelected: Bool) {
         self.do {
@@ -70,7 +70,7 @@ extension AlarmOptionView {
         radioButton.changeState(isSelected)
     }
     
-    func equalTo(_ view: AlarmOptionView) -> Bool {
-        return self.titleLabel.text == view.titleLabel.text
+    func equalTo(_ view: NoticeOptionView) -> Bool {
+        return self.optionType == view.optionType
     }
 }

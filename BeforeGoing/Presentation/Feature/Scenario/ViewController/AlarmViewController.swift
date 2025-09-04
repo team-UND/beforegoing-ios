@@ -7,24 +7,24 @@
 
 import UIKit
 
-final class AlarmViewController: BaseViewController {
+final class NoticeViewController: BaseViewController {
     
-    private let rootView = AlarmView()
+    private let rootView = NoticeView()
     
     override func loadView() {
         view = rootView
     }
     
     override func setAction() {
-        [rootView.selectAlarmOptionView.noAlarmView, rootView.selectAlarmOptionView.setTimeAlarmView].forEach {
+        [rootView.selectNoticeOptionView.noAlarmView, rootView.selectNoticeOptionView.setTimeAlarmView].forEach {
             $0.radioButton.addTarget(self, action: #selector(radioButtonDidTap), for: .touchUpInside)
         }
-        rootView.setAlarmTimeView.selectDayView.everydayButton.addTarget(
+        rootView.setNoticeTimeView.selectDayView.everydayButton.addTarget(
             self,
             action: #selector(everydayButtonDidTap),
             for: .touchUpInside
         )
-        rootView.setAlarmTimeView.selectDayView.dayOfWeekLabels.forEach {
+        rootView.setNoticeTimeView.selectDayView.dayOfWeekLabels.forEach {
             let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(dayOfWeekLabelDidTap(_:)))
             $0.addGestureRecognizer(tapRecognizer)
             $0.isUserInteractionEnabled = true
@@ -37,25 +37,25 @@ final class AlarmViewController: BaseViewController {
     }
 }
 
-extension AlarmViewController: Backable {
+extension NoticeViewController: Backable {
     
     func back() {
         self.navigationController?.popViewController(animated: false)
     }
 }
 
-extension AlarmViewController {
+extension NoticeViewController {
     
     @objc
     private func radioButtonDidTap(_ sender: RadioButton) {
-        guard let optionView = sender.superview as? AlarmOptionView else { return }
+        guard let optionView = sender.superview as? NoticeOptionView else { return }
         
         sender.updateState()
         optionView.updateUI(isSelected: sender.matchState())
-        rootView.selectAlarmOptionView.toggleOption(selectedView: optionView)
+        rootView.selectNoticeOptionView.toggleOption(selectedView: optionView)
         
-        let isSelectedSetAlarmOption = rootView.selectAlarmOptionView.isSelectedSetAlarmOption(optionView)
-        rootView.setAlarmTimeView.updateHiddenState(isSelectedUseTime: isSelectedSetAlarmOption)
+        let isSelectedSetAlarmOption = rootView.selectNoticeOptionView.isSelectedSetAlarmOption(optionView)
+        rootView.setNoticeTimeView.updateHiddenState(isSelectedUseTime: isSelectedSetAlarmOption)
         rootView.updateButtonState(isNeededChange: isSelectedSetAlarmOption)
     }
     
@@ -64,7 +64,7 @@ extension AlarmViewController {
         guard let label = tapRecognizer.view as? UILabel,
               let dayText = label.text else { return }
         
-        rootView.setAlarmTimeView.selectDayView.do {
+        rootView.setNoticeTimeView.selectDayView.do {
             $0.updateDayOfWeekState(dayText: dayText)
             $0.checkAllSelected()
         }
@@ -72,9 +72,9 @@ extension AlarmViewController {
     
     @objc
     private func everydayButtonDidTap() {
-        let state = rootView.setAlarmTimeView.selectDayView.everydayButton.toggle()
+        let state = rootView.setNoticeTimeView.selectDayView.everydayButton.toggle()
         let condition = state.matchState()
-        rootView.setAlarmTimeView.selectDayView.updateAllDay(condition: condition)
+        rootView.setNoticeTimeView.selectDayView.updateAllDay(condition: condition)
     }
     
     @objc
