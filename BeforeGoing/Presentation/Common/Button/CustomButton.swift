@@ -51,3 +51,10 @@ final class CustomButton: UIButton {
         }
     }
 }
+
+extension CustomButton {
+    
+    func updateTitle(_ title: String) {
+        self.setTitle(title, for: .normal)
+    }
+}

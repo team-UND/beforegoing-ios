@@ -20,7 +20,7 @@ enum BottomNavigationItem: CaseIterable {
             )
         case .scenario:
             return BottomNavigationComponent(
-                viewController: ScenarioViewController(),
+                viewController: MyScenarioViewController(),
                 title: BottomNavigationLiteral.scenario.rawValue,
                 image: .list
             )
