@@ -52,6 +52,8 @@ extension MyScenarioViewController {
     private func addScenarioButtonDidTap() {
         let viewController = ManageScenarioViewController()
         viewController.navigationItem.hidesBackButton = true
+        viewController.hidesBottomBarWhenPushed = true
+        
         self.navigationController?.pushViewController(viewController, animated: false)
     }
 }
