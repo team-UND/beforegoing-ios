@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class ScenarioViewController: BaseViewController {
+final class MyScenarioViewController: BaseViewController {
     
     private let rootView = ScenarioListView()
     
@@ -46,7 +46,7 @@ final class ScenarioViewController: BaseViewController {
     }
 }
 
-extension ScenarioViewController {
+extension MyScenarioViewController {
     
     @objc
     private func addScenarioButtonDidTap() {
@@ -56,7 +56,7 @@ extension ScenarioViewController {
     }
 }
 
-extension ScenarioViewController: UITableViewDelegate {
+extension MyScenarioViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 76.adjustedH
@@ -71,7 +71,7 @@ extension ScenarioViewController: UITableViewDelegate {
     }
 }
 
-extension ScenarioViewController: UITableViewDataSource {
+extension MyScenarioViewController: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return scenarios.count
@@ -108,7 +108,7 @@ extension ScenarioViewController: UITableViewDataSource {
     }
 }
 
-extension ScenarioViewController: UITableViewDragDelegate {
+extension MyScenarioViewController: UITableViewDragDelegate {
     
     func tableView(
         _ tableView: UITableView,
@@ -119,7 +119,7 @@ extension ScenarioViewController: UITableViewDragDelegate {
     }
 }
 
-extension ScenarioViewController: UITableViewDropDelegate {
+extension MyScenarioViewController: UITableViewDropDelegate {
     
     func tableView(_ tableView: UITableView, performDropWith coordinator: UITableViewDropCoordinator) {
         guard let destinationIndexPath = coordinator.destinationIndexPath else { return }
