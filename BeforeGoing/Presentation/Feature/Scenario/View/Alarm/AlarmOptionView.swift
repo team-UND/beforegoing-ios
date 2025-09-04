@@ -9,12 +9,16 @@ import UIKit
 
 final class AlarmOptionView: BaseView {
     
+    private let optionType: NoticeOptionType
     private let titleLabel = UILabel()
-    private(set) var radioButton = RadioButton()
+    private(set) var radioButton: RadioButton
     
-    init(title: String) {
+    init(type: NoticeOptionType) {
+        self.optionType = type
+        self.radioButton = type.component.radioButton
         super.init(frame: .zero)
-        self.titleLabel.text = title
+        
+        self.titleLabel.text = type.component.title
     }
 
     required init?(coder: NSCoder) {
@@ -23,9 +27,9 @@ final class AlarmOptionView: BaseView {
     
     override func setStyle() {
         self.do {
-            $0.backgroundColor = .clear
+            $0.backgroundColor = (optionType == .noNotice) ? .blue100 : .clear
             $0.layer.cornerRadius = 14
-            $0.layer.borderColor = UIColor.gray200.cgColor
+            $0.layer.borderColor = (optionType == .noNotice) ? UIColor.blue400.cgColor : UIColor.gray200.cgColor
             $0.layer.borderWidth = 1
         }
         titleLabel.do {
@@ -63,5 +67,10 @@ extension AlarmOptionView {
             $0.backgroundColor = isSelected ? .blue100 : .clear
             $0.layer.borderColor = isSelected ? UIColor.blue400.cgColor : UIColor.gray200.cgColor
         }
+        radioButton.changeState(isSelected)
+    }
+    
+    func equalTo(_ view: AlarmOptionView) -> Bool {
+        return self.titleLabel.text == view.titleLabel.text
     }
 }

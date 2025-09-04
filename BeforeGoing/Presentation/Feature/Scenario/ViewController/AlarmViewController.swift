@@ -29,6 +29,11 @@ final class AlarmViewController: BaseViewController {
             $0.addGestureRecognizer(tapRecognizer)
             $0.isUserInteractionEnabled = true
         }
+        rootView.saveNextButton.addTarget(
+            self,
+            action: #selector(saveNextButtonDidTap),
+            for: .touchUpInside
+        )
     }
 }
 
@@ -36,11 +41,15 @@ extension AlarmViewController {
     
     @objc
     private func radioButtonDidTap(_ sender: RadioButton) {
-        if let alarmOptionView = sender.superview as? AlarmOptionView {
-            sender.updateState()
-            alarmOptionView.updateUI(isSelected: sender.matchState())
-            //To-Do : 하나 눌리면 하나는 해제되기 만들기
-        }
+        guard let optionView = sender.superview as? AlarmOptionView else { return }
+        
+        sender.updateState()
+        optionView.updateUI(isSelected: sender.matchState())
+        rootView.selectAlarmOptionView.toggleOption(selectedView: optionView)
+        
+        let isSelectedSetAlarmOption = rootView.selectAlarmOptionView.isSelectedSetAlarmOption(optionView)
+        rootView.setAlarmTimeView.updateHiddenState(isSelectedUseTime: isSelectedSetAlarmOption)
+        rootView.updateButtonState(isNeededChange: isSelectedSetAlarmOption)
     }
     
     @objc
@@ -59,5 +68,21 @@ extension AlarmViewController {
         let state = rootView.setAlarmTimeView.selectDayView.everydayButton.toggle()
         let condition = state.matchState()
         rootView.setAlarmTimeView.selectDayView.updateAllDay(condition: condition)
+    }
+    
+    @objc
+    private func saveNextButtonDidTap(_ sender: UIButton) {
+        guard let text = sender.titleLabel?.text else { return }
+        
+        switch text {
+        case "저장하기":
+            self.navigationController?.popToRootViewController(animated: false)
+        case "다음":
+            let viewController = SetNoticeMethodViewController()
+            viewController.navigationItem.hidesBackButton = true
+            self.navigationController?.pushViewController(viewController, animated: false)
+        default:
+            break
+        }
     }
 }

@@ -43,7 +43,7 @@ final class AlarmView: BaseView {
             $0.horizontalEdges.equalToSuperview().inset(20.adjustedW)
         }
         setAlarmTimeView.snp.makeConstraints {
-            $0.top.equalTo(selectAlarmOptionView.snp.bottom).inset(81.adjustedH)
+            $0.top.equalTo(navigationView.snp.bottom).offset(220.adjustedH)
             $0.horizontalEdges.equalToSuperview()
         }
         saveNextButton.snp.makeConstraints {
@@ -56,7 +56,7 @@ final class AlarmView: BaseView {
 
 extension AlarmView {
     
-    func updateButtonState() {
-        
+    func updateButtonState(isNeededChange: Bool) {
+        isNeededChange ? saveNextButton.updateTitle("다음") : saveNextButton.updateTitle("저장하기")
     }
 }

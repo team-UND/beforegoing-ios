@@ -10,8 +10,8 @@ import UIKit
 final class SelectAlarmOptionView: BaseView {
     
     private let optionStackView = UIStackView()
-    private(set) var noAlarmView = AlarmOptionView(title: "알람 없이 사용")
-    private(set) var setTimeAlarmView = AlarmOptionView(title: "설정한 시간에 알림")
+    private(set) var noAlarmView = AlarmOptionView(type: .noNotice)
+    private(set) var setTimeAlarmView = AlarmOptionView(type: .setTimeNotice)
     
     override func setStyle() {
         optionStackView.do {
@@ -39,5 +39,21 @@ final class SelectAlarmOptionView: BaseView {
         setTimeAlarmView.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview()
         }
+    }
+}
+
+extension SelectAlarmOptionView {
+    
+    func toggleOption(selectedView: AlarmOptionView) {
+        optionStackView.arrangedSubviews.forEach {
+            let optionView = $0 as! AlarmOptionView
+            if !optionView.equalTo(selectedView) {
+                optionView.updateUI(isSelected: false)
+            }
+        }
+    }
+    
+    func isSelectedSetAlarmOption(_ optionView: AlarmOptionView) -> Bool {
+        optionView == setTimeAlarmView
     }
 }
