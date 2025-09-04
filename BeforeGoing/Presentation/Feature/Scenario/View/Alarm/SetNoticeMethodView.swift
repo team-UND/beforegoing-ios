@@ -13,7 +13,7 @@ final class SetNoticeMethodView: BaseView {
     private let navigationView = TopNavigationView(title: "알림 설정")
     private let questionLabel = UILabel()
     private(set) var selectNoticeMethodView = SelectNoticeMethodView()
-    private let saveButton = CustomButton(state: .enableLongButton, title: "저장하기")
+    private(set) var saveButton = CustomButton(state: .enableLongButton, title: "저장하기")
     
     override func setStyle() {
         backgroundImageView.do {
