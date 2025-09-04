@@ -38,9 +38,10 @@ final class ManageScenarioView: BaseView {
             $0.height.equalTo(82.adjustedH)
         }
         templateTableView.snp.makeConstraints {
-            $0.top.equalTo(topNavigationView.snp.bottom).offset(36.adjustedH)
+            $0.top.equalTo(topNavigationView.snp.bottom).offset(24.adjustedH)
             $0.horizontalEdges.equalToSuperview().inset(20.adjustedW)
-            $0.bottom.equalTo(selectButton.snp.top).offset(-33.adjustedH)
+            $0.height.equalTo(516.adjustedH)
+            $0.bottom.equalToSuperview()
         }
         selectButton.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(20.adjustedW)
