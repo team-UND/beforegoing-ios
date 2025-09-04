@@ -19,6 +19,11 @@ final class SetNoticeMethodViewController: BaseViewController {
         [rootView.selectNoticeMethodView.pushNoticeView, rootView.selectNoticeMethodView.alarmView].forEach {
             $0.radioButton.addTarget(self, action: #selector(radioButtonDidTap), for: .touchUpInside)
         }
+        rootView.saveButton.addTarget(
+            self,
+            action: #selector(saveButtonDidTap),
+            for: .touchUpInside
+        )
     }
 }
 
@@ -36,5 +41,10 @@ extension SetNoticeMethodViewController {
         guard let methodView = sender.superview as? NoticeMethodView else { return }
         
         rootView.selectNoticeMethodView.toggleMethod(selectedView: methodView)
+    }
+    
+    @objc
+    private func saveButtonDidTap() {
+        self.navigationController?.popToRootViewController(animated: false)
     }
 }

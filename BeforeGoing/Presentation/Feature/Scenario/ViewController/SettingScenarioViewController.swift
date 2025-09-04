@@ -61,6 +61,11 @@ final class SettingScenarioViewController: BaseViewController {
             action: #selector(addMissionButtonDidTap),
             for: .touchUpInside
         )
+        rootView.nextButton.addTarget(
+            self,
+            action: #selector(nextButtonDidTap),
+            for: .touchUpInside
+        )
     }
     
     override func setDelegate() {
@@ -158,6 +163,13 @@ extension SettingScenarioViewController {
             with: .automatic
         )
         checkNextButtonState()
+    }
+    
+    @objc
+    private func nextButtonDidTap() {
+        let viewController = AlarmViewController()
+        viewController.navigationItem.hidesBackButton = true
+        self.navigationController?.pushViewController(viewController, animated: false)
     }
     
     private func checkNextButtonState() {

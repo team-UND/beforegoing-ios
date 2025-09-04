@@ -37,6 +37,13 @@ final class AlarmViewController: BaseViewController {
     }
 }
 
+extension AlarmViewController: Backable {
+    
+    func back() {
+        self.navigationController?.popViewController(animated: false)
+    }
+}
+
 extension AlarmViewController {
     
     @objc
