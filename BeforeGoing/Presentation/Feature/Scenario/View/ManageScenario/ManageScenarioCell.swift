@@ -65,7 +65,7 @@ final class ManageScenarioCell: UITableViewCell {
         templateImageView.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(16.adjustedW)
             $0.centerY.equalToSuperview()
-            $0.size.equalTo(24.adjustedW)
+            $0.size.equalTo(32.adjustedW)
         }
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview().inset(20.adjustedH)
