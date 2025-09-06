@@ -167,7 +167,7 @@ extension SettingScenarioViewController {
     
     @objc
     private func nextButtonDidTap() {
-        let viewController = AlarmViewController()
+        let viewController = NoticeViewController()
         viewController.navigationItem.hidesBackButton = true
         self.navigationController?.pushViewController(viewController, animated: false)
     }

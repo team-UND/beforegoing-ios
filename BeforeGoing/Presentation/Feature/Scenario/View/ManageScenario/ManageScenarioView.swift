@@ -13,7 +13,7 @@ final class ManageScenarioView: BaseView {
     private let topNavigationView = TopNavigationView(title: "나에게 딱 맞는\n시나리오 템플릿을 선택해요")
     private(set) var templateTableView = UITableView()
     private(set) var selectButton = CustomButton(state: .disableLongButton, title: "템플릿 선택하기")
-        
+    
     override func setStyle() {
         backgroundImageView.image = .bgTop
         templateTableView.separatorStyle = .none

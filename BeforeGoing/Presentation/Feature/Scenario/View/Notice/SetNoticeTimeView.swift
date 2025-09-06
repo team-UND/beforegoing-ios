@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class SetAlarmTimeView: BaseView {
+final class SetNoticeTimeView: BaseView {
     
     private let divider = UILabel()
     private let titleLabel = UILabel()
@@ -60,7 +60,7 @@ final class SetAlarmTimeView: BaseView {
     }
 }
 
-extension SetAlarmTimeView {
+extension SetNoticeTimeView {
     
     func updateHiddenState(isSelectedUseTime: Bool) {
         self.isHidden = isSelectedUseTime ? false : true

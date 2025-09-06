@@ -52,7 +52,7 @@ final class TopNavigationView: BaseView {
     override func setLayout() {
         containerView.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide.snp.top)
-            $0.width.equalTo(375.adjustedW)
+            $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(48.adjustedH)
         }
         backButton.snp.makeConstraints {
