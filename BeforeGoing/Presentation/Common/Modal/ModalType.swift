@@ -17,7 +17,7 @@ enum ModalType {
                 mainTitle: "로그인이 만료되었어요",
                 description: "더 안전한 앱 사용을 위해\n다시 로그인 해주세요:)",
                 dismissTitle: "취소",
-                actionTitle: "삭제하기"
+                actionTitle: "확인"
             )
         case .withdraw:
             return .init(
