@@ -15,7 +15,7 @@ final class NicknameView: BaseView {
     private let necessaryLabel = UILabel()
     private(set) var nicknameTextField = TextField(type: .nicknameField)
     private(set) var deleteButton = UIButton()
-    private let startButton = CustomButton(state: .disableLongButton, title: "시작하기")
+    private(set) var startButton = CustomButton(state: .disableLongButton, title: "시작하기")
     
     override func setStyle() {
         backgroundImageView.do {
