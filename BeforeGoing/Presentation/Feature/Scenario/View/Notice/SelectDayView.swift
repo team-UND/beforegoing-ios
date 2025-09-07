@@ -34,6 +34,7 @@ final class SelectDayView: BaseView {
         }
         weekStackView.do {
             $0.axis = .horizontal
+            $0.spacing = 2
             $0.distribution = .fillEqually
             $0.alignment = .center
         }
@@ -97,6 +98,8 @@ final class SelectDayView: BaseView {
             $0.textAlignment = .center
             $0.textColor = .gray400
             $0.font = .custom(.bodyLGMedium)
+            $0.layer.cornerRadius = 14
+            $0.clipsToBounds = true
         }
     }
     
@@ -115,7 +118,10 @@ extension SelectDayView {
         
         dayOfWeeksState[dayText]?.toggle()
         if let isSelected = dayOfWeeksState[dayText] {
-            dayOfWeekLabels[index].textColor = isSelected ? .blue400 : .gray400
+            dayOfWeekLabels[index].do {
+                $0.textColor = isSelected ? .blue700 : .gray400
+                $0.backgroundColor = isSelected ? .blue100 : .clear
+            }
         }
     }
     
@@ -123,7 +129,10 @@ extension SelectDayView {
         dayOfWeeks.forEach { dayOfWeeksState[$0] = condition }
         weekStackView.arrangedSubviews.forEach {
             let label = $0 as! UILabel
-            label.textColor = condition ? .blue400 : .gray400
+            label.do {
+                $0.textColor = condition ? .blue700 : .gray400
+                $0.backgroundColor = condition ? .blue100 : .clear
+            }
         }
     }
     
