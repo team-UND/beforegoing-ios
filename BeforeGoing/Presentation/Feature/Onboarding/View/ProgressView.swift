@@ -55,15 +55,16 @@ final class ProgressView: BaseView {
 extension ProgressView {
     
     func updateUI(step: OnboardingStep) {
-        if step == . end {
+        if step == .end {
             indicatorStackView.isHidden = true
             return
         }
         
-        let index = step.rawValue
-        if index > 0 {
-            indicatorStackView.arrangedSubviews[index - 1].backgroundColor = .gray200
+        indicatorStackView.isHidden = false
+        let currentIndex = step.rawValue
+        
+        indicatorStackView.arrangedSubviews.enumerated().forEach { index, view in
+            view.backgroundColor = index == currentIndex ? .blue400 : .gray200
         }
-        indicatorStackView.arrangedSubviews[index].backgroundColor = .blue400
     }
 }

@@ -14,4 +14,13 @@ final class SplashViewController: BaseViewController {
     override func loadView() {
         view = rootView
     }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            let viewController = AgreeTermsViewController(viewModel: AgreeItemViewModel())
+            viewController.navigationItem.hidesBackButton = true
+            self.navigationController?.pushViewController(viewController, animated: true)
+        }
+    }
 }

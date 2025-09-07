@@ -10,12 +10,18 @@ import UIKit
 final class ScenarioListView: BaseView {
     
     private let backgroundImageView = UIImageView()
-    private let topNavigationView = TopNavigationView(title: "MY 시나리오")
+    private let titleLabel = UILabel()
     private(set) var addScenarioButton = CustomButton(state: .addScenarioButton, title: "+ 시나리오 추가")
     private(set) var scenarioListTableView = UITableView()
     
     override func setStyle() {
         backgroundImageView.image = .bgTop
+        titleLabel.do {
+            $0.text = "MY 시나리오"
+            $0.font = .custom(.headingH3)
+            $0.textColor = .black
+            $0.textAlignment = .left
+        }
         scenarioListTableView.do {
             $0.separatorStyle = .none
             $0.dragInteractionEnabled = true
@@ -25,7 +31,7 @@ final class ScenarioListView: BaseView {
     override func setUI() {
         addSubviews(
             backgroundImageView,
-            topNavigationView,
+            titleLabel,
             addScenarioButton,
             scenarioListTableView
         )
@@ -35,13 +41,13 @@ final class ScenarioListView: BaseView {
         backgroundImageView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-        topNavigationView.snp.makeConstraints {
+        titleLabel.snp.makeConstraints {
             $0.top.equalTo(self.safeAreaLayoutGuide.snp.top)
-            $0.horizontalEdges.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview().inset(20.adjustedW)
             $0.height.equalTo(48.adjustedH)
         }
         addScenarioButton.snp.makeConstraints {
-            $0.top.equalTo(topNavigationView.snp.bottom).offset(16.adjustedH)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(16.adjustedH)
             $0.centerX.equalToSuperview()
         }
         scenarioListTableView.snp.makeConstraints {

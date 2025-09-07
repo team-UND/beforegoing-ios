@@ -104,11 +104,5 @@ final class ModalView: BaseView {
             $0.bottom.equalToSuperview().inset(4.adjustedH)
             $0.height.equalTo(48.adjustedH)
         }
-        dismissButton.snp.makeConstraints {
-            $0.width.equalTo(150.adjustedW)
-        }
-        actionButton.snp.makeConstraints {
-            $0.width.equalTo(150.adjustedW)
-        }
     }
 }

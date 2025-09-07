@@ -60,7 +60,7 @@ extension OnboardingContentView {
     }
     
     private func setImageLayout(step: OnboardingStep) {
-        imageView.snp.makeConstraints {
+        imageView.snp.remakeConstraints {
             switch step {
             case .first, .end:
                 $0.top.equalTo(safeAreaLayoutGuide.snp.bottom).offset(213.adjustedH)

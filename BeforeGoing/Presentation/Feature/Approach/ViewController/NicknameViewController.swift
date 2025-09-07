@@ -38,6 +38,11 @@ final class NicknameViewController: BaseViewController {
             action: #selector(deleteButtonDidTap),
             for: .touchUpInside
         )
+        nicknameView.startButton.addTarget(
+            self,
+            action: #selector(startButtonDidTap),
+            for: .touchUpInside
+        )
     }
 }
 
@@ -72,6 +77,13 @@ extension NicknameViewController {
     private func deleteButtonDidTap() {
         nicknameView.nicknameTextField.text = ""
         textFieldDidChange()
+    }
+    
+    @objc
+    private func startButtonDidTap() {
+        let viewController = OnboardingViewController()
+        viewController.navigationItem.hidesBackButton = true
+        self.navigationController?.pushViewController(viewController, animated: false)
     }
     
     private func trimText(_ text: String) -> String {
