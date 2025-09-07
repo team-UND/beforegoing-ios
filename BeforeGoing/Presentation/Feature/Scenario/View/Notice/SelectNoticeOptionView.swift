@@ -46,7 +46,7 @@ extension SelectNoticeOptionView {
     
     func toggleOption(selectedView: NoticeOptionView) {
         optionStackView.arrangedSubviews.forEach {
-            let optionView = $0 as! NoticeOptionView
+            guard let optionView = $0 as? NoticeOptionView else { return }
             if !optionView.equalTo(selectedView) {
                 optionView.updateUI(isSelected: false)
             }
