@@ -9,23 +9,34 @@ import UIKit
 
 final class HomeHeaderView: BaseView {
     
-    private let dateStacView = UIStackView()
+    private let dateStackView = UIStackView()
     private let dateLabel = UILabel()
     private(set) var viewCalendarButton = UIButton()
     private let bubbleView = UIView()
     private let wordLabel = UILabel()
     private let tipView = UIView()
     private let circleView = UIView()
+    private let path = UIBezierPath()
+    private let shadowLayer = CAShapeLayer()
     
     override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        // circleView shadowPath 설정
         circleView.layer.shadowPath = UIBezierPath(
             roundedRect: circleView.bounds,
             cornerRadius: circleView.layer.cornerRadius
         ).cgPath
+        
+        // bubbleView shadowPath 설정
+        bubbleView.layer.shadowPath = UIBezierPath(
+            roundedRect: bubbleView.bounds,
+            cornerRadius: bubbleView.layer.cornerRadius
+        ).cgPath
     }
     
     override func setStyle() {
-        dateStacView.do {
+        dateStackView.do {
             $0.axis = .horizontal
             $0.spacing = 2.adjustedW
             $0.alignment = .center
@@ -53,31 +64,36 @@ final class HomeHeaderView: BaseView {
             $0.text = "서울시 날씨 좋은데?"
             $0.font = .custom(.bodyMDRegular)
         }
-        tipView.do {
-            $0.backgroundColor = .white
-
+        path.do {
             let width = 18.adjustedW
-            let height = 18.adjustedH
             let radius = width / 2
 
-            let path = UIBezierPath()
-            path.move(to: CGPoint(x: 0, y: 0))
-            path.addArc(
+            $0.move(to: CGPoint(x: 0, y: 0))
+            $0.addArc(
                 withCenter: CGPoint(x: width / 2, y: 0),
                 radius: radius,
                 startAngle: 0,
                 endAngle: .pi,
                 clockwise: true
             )
-            path.close()
-
-            let shapeLayer = CAShapeLayer()
-            shapeLayer.path = path.cgPath
-            shapeLayer.frame = CGRect(x: 0, y: 0, width: width, height: height)
-            shapeLayer.fillColor = UIColor.white.cgColor
-            shapeLayer.strokeColor = UIColor.borderBlue.cgColor
-            shapeLayer.lineWidth = 1
-            $0.layer.addSublayer(shapeLayer)
+            $0.close()
+        }
+        shadowLayer.do {
+            $0.path = path.cgPath
+            $0.fillColor = UIColor.white.cgColor
+            $0.strokeColor = UIColor.borderBlue.cgColor
+            $0.lineWidth = 1
+            $0.shadowColor = UIColor.black.cgColor
+            $0.shadowOpacity = 0.1
+            $0.shadowOffset = CGSize(width: 0, height: 2)
+            $0.shadowRadius = 4
+            $0.shadowPath = path.cgPath
+            $0.shouldRasterize = true
+            $0.rasterizationScale = UIScreen.main.scale
+        }
+        tipView.do {
+            $0.backgroundColor = .clear
+            $0.layer.addSublayer(shadowLayer)
         }
         circleView.do {
             $0.backgroundColor = .white
@@ -93,13 +109,13 @@ final class HomeHeaderView: BaseView {
     }
     
     override func setUI() {
-        dateStacView.addArrangedSubviews(
+        dateStackView.addArrangedSubviews(
             dateLabel,
             viewCalendarButton
         )
         bubbleView.addSubview(wordLabel)
         addSubviews(
-            dateStacView,
+            dateStackView,
             bubbleView,
             tipView,
             circleView
@@ -107,21 +123,23 @@ final class HomeHeaderView: BaseView {
     }
     
     override func setLayout() {
-        dateStacView.snp.makeConstraints {
+        dateStackView.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide.snp.top)
             $0.centerX.equalToSuperview()
             $0.width.equalTo(120.adjustedW)
         }
         dateLabel.snp.makeConstraints {
-            $0.top.equalTo(dateStacView.snp.top)
-            $0.leading.equalTo(dateStacView.snp.leading)
+            $0.top.equalTo(dateStackView.snp.top)
+            $0.leading.equalTo(dateStackView.snp.leading)
+            $0.width.equalTo(95.adjustedW)
         }
         viewCalendarButton.snp.makeConstraints {
-            $0.top.equalTo(dateStacView.snp.top)
-            $0.trailing.equalTo(dateStacView.snp.trailing)
+            $0.top.equalTo(dateStackView.snp.top)
+            $0.trailing.equalTo(dateStackView.snp.trailing)
+            $0.size.equalTo(16.adjustedW)
         }
         bubbleView.snp.makeConstraints {
-            $0.top.equalTo(dateStacView.snp.bottom).offset(16.adjustedH)
+            $0.top.equalTo(dateStackView.snp.bottom).offset(16.adjustedH)
             $0.leading.equalToSuperview().inset(30.adjustedW)
             $0.trailing.equalToSuperview().inset(20.adjustedW)
             $0.width.equalTo(334.adjustedW)
@@ -133,11 +151,13 @@ final class HomeHeaderView: BaseView {
         tipView.snp.makeConstraints {
             $0.top.equalTo(bubbleView.snp.top).offset(62.adjustedH)
             $0.leading.equalToSuperview().inset(90.adjustedW)
+            $0.width.equalTo(18.adjustedW)
         }
         circleView.snp.makeConstraints {
             $0.top.equalTo(tipView.snp.bottom).offset(12.adjustedH)
             $0.leading.equalToSuperview().inset(85.adjustedW)
             $0.size.equalTo(8.adjustedW)
+            $0.bottom.equalToSuperview().inset(66.adjustedH)
         }
     }
 }

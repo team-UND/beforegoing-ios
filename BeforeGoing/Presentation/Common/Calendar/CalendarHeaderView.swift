@@ -41,10 +41,12 @@ final class CalendarHeaderView: BaseView {
         previousButton.snp.makeConstraints {
             $0.leading.equalTo(self.snp.leading).offset(12.adjustedW)
             $0.size.equalTo(19.adjustedW)
+$0.centerY.equalToSuperview()
         }
         nextButton.snp.makeConstraints {
             $0.trailing.equalTo(self.snp.trailing).offset(-12.adjustedW)
             $0.size.equalTo(19.adjustedW)
+$0.centerY.equalToSuperview()
         }
     }
 }

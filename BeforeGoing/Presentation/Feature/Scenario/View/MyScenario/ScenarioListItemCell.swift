@@ -16,6 +16,7 @@ final class ScenarioListItemCell: UITableViewCell {
         
         setStyle()
         setUI()
+        setLayout()
     }
     
     required init?(coder: NSCoder) {
@@ -28,6 +29,12 @@ final class ScenarioListItemCell: UITableViewCell {
     
     private func setUI() {
         addSubview(scenarioItemView)
+    }
+    
+    private func setLayout() {
+        scenarioItemView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
     }
 }
 
