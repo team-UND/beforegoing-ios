@@ -46,7 +46,7 @@ $0.centerY.equalToSuperview()
         nextButton.snp.makeConstraints {
             $0.trailing.equalTo(self.snp.trailing).offset(-12.adjustedW)
             $0.size.equalTo(19.adjustedW)
-            $0.verticalEdges.equalToSuperview()
+$0.centerY.equalToSuperview()
         }
     }
 }
