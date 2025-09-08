@@ -101,7 +101,7 @@ extension HomeViewController {
         clearTaskTextField()
         items.insert((title: task, state: .today, beforeState: .today), at: 0)
         homeView.modalView.listTableView.reloadData()
-        self.view.endEditing(false)
+        self.view.endEditing(true)
     }
 }
 
