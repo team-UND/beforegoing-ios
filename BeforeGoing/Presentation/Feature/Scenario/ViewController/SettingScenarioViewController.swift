@@ -25,6 +25,11 @@ final class SettingScenarioViewController: BaseViewController {
         )
     }
     
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        self.view.endEditing(true)
+    }
+    
     override func setAction() {
         rootView.inputScenarioView.textField.addTarget(
             self,
@@ -163,6 +168,7 @@ extension SettingScenarioViewController {
             with: .automatic
         )
         checkNextButtonState()
+        self.view.endEditing(false)
     }
     
     @objc

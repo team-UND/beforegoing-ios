@@ -23,6 +23,11 @@ final class HomeViewController: BaseViewController {
         view = homeView
     }
     
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        self.view.endEditing(true)
+    }
+    
     override func setAction() {
         homeView.headerView.viewCalendarButton.addTarget(
             self,
@@ -96,6 +101,7 @@ extension HomeViewController {
         clearTaskTextField()
         items.insert((title: task, state: .today, beforeState: .today), at: 0)
         homeView.modalView.listTableView.reloadData()
+        self.view.endEditing(true)
     }
 }
 

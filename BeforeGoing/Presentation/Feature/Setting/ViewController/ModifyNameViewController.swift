@@ -22,6 +22,11 @@ final class ModifyNameViewController: BaseViewController {
             for: .editingChanged
         )
     }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        self.view.endEditing(true)
+    }
 }
 
 extension ModifyNameViewController: Backable {
