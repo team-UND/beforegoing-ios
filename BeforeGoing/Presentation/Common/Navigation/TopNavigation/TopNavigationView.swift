@@ -56,8 +56,8 @@ final class TopNavigationView: BaseView {
             $0.height.equalTo(48.adjustedH)
         }
         backButton.snp.makeConstraints {
-            $0.top.equalTo(containerView.snp.top)
-            $0.width.height.equalTo(48.adjustedW)
+            $0.verticalEdges.equalTo(containerView.snp.verticalEdges)
+            $0.leading.equalToSuperview()
         }
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(backButton.snp.top).offset(10.adjustedH)

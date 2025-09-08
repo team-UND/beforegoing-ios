@@ -56,17 +56,37 @@ extension OnboardingContentView {
         descriptionLabel.text = component.description
         imageView.image = component.image
         
-        setImageLayout(step: step)
+        setLayout(step: step)
     }
     
-    private func setImageLayout(step: OnboardingStep) {
-        imageView.snp.remakeConstraints {
-            switch step {
-            case .first, .end:
-                $0.top.equalTo(safeAreaLayoutGuide.snp.bottom).offset(213.adjustedH)
+    private func setLayout(step: OnboardingStep) {
+        switch step {
+        case .first, .end:
+            titleLabel.snp.remakeConstraints {
+                $0.top.equalToSuperview()
+                $0.centerX.equalToSuperview()
+            }
+            descriptionLabel.snp.remakeConstraints {
+                $0.top.equalTo(titleLabel.snp.bottom).offset(8.adjustedH)
+                $0.centerX.equalToSuperview()
+            }
+            imageView.snp.remakeConstraints {
+                $0.top.equalTo(descriptionLabel.snp.bottom).offset(94.adjustedH)
                 $0.centerX.equalToSuperview()
                 $0.size.equalTo(260.adjustedH)
-            case .second, .third, .fourth, .fifth:
+            }
+        case .second, .third, .fourth, .fifth:
+            titleLabel.snp.remakeConstraints {
+                $0.top.equalToSuperview()
+                $0.centerX.equalToSuperview()
+                $0.height.equalTo(26.adjustedH)
+            }
+            descriptionLabel.snp.remakeConstraints {
+                $0.top.equalTo(titleLabel.snp.bottom).offset(8.adjustedH)
+                $0.centerX.equalToSuperview()
+                $0.height.equalTo(44.adjustedH)
+            }
+            imageView.snp.remakeConstraints {
                 $0.top.equalTo(descriptionLabel.snp.bottom).offset(34.adjustedH)
                 $0.centerX.equalToSuperview()
                 $0.bottom.equalToSuperview()

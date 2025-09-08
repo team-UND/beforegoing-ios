@@ -42,11 +42,13 @@ final class OnboardingView: BaseView {
         progressView.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide.snp.top).offset(40.adjustedH)
             $0.centerX.equalToSuperview()
+            $0.width.equalTo(72.adjustedW)
             $0.height.equalTo(8.adjustedH)
         }
         contentView.snp.makeConstraints {
             $0.top.equalTo(progressView.snp.bottom).offset(55.adjustedH)
-            $0.centerX.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview()
+            $0.bottom.equalTo(bottomButton.snp.top)
         }
         bottomButton.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(20.adjustedW)
