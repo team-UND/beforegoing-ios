@@ -27,7 +27,7 @@ final class SettingScenarioViewController: BaseViewController {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
-        self.view.endEditing(false)
+        self.view.endEditing(true)
     }
     
     override func setAction() {
