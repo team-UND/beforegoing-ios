@@ -16,6 +16,11 @@ final class NicknameViewController: BaseViewController {
         self.navigationItem.hidesBackButton = true
     }
     
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        self.view.endEditing(false)
+    }
+    
     override func setView() {
         TopNavigationBar.makeNavigationBar(
             navigationController: self.navigationController,
