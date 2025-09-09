@@ -57,6 +57,9 @@ extension NoticeViewController {
         let isSelectedSetAlarmOption = rootView.selectNoticeOptionView.isSelectedSetAlarmOption(optionView)
         rootView.setNoticeTimeView.updateHiddenState(isSelectedUseTime: isSelectedSetAlarmOption)
         rootView.updateButtonState(isNeededChange: isSelectedSetAlarmOption)
+        if isSelectedSetAlarmOption {
+            rootView.updateNextButtonState()
+        }
     }
     
     @objc
@@ -68,6 +71,7 @@ extension NoticeViewController {
             $0.updateDayOfWeekState(dayText: dayText)
             $0.checkAllSelected()
         }
+        rootView.updateNextButtonState()
     }
     
     @objc
@@ -75,6 +79,7 @@ extension NoticeViewController {
         let state = rootView.setNoticeTimeView.selectDayView.everydayButton.toggle()
         let condition = state.matchState()
         rootView.setNoticeTimeView.selectDayView.updateAllDay(condition: condition)
+        rootView.updateNextButtonState()
     }
     
     @objc

@@ -7,13 +7,21 @@
 
 import UIKit
 
+enum NoticeBottomButtonTitle: String {
+    case save = "저장하기"
+    case next = "다음"
+}
+
 final class NoticeView: BaseView {
     
     private let backgroundImageView = UIImageView()
     private let navigationView = TopNavigationView(title: "알림 설정")
     private(set) var selectNoticeOptionView = SelectNoticeOptionView()
     private(set) var setNoticeTimeView = SetNoticeTimeView()
-    private(set) var saveNextButton = CustomButton(state: .enableLongButton, title: "저장하기")
+    private(set) var saveNextButton = CustomButton(
+        state: .enableLongButton,
+        title: NoticeBottomButtonTitle.save.rawValue
+    )
     
     override func setStyle() {
         backgroundImageView.image = .bgTop
@@ -57,6 +65,14 @@ final class NoticeView: BaseView {
 extension NoticeView {
     
     func updateButtonState(isNeededChange: Bool) {
-        isNeededChange ? saveNextButton.updateTitle("다음") : saveNextButton.updateTitle("저장하기")
+        isNeededChange ? saveNextButton.updateTitle(NoticeBottomButtonTitle.next.rawValue) : saveNextButton.updateTitle(NoticeBottomButtonTitle.save.rawValue)
+        if !isNeededChange {
+            saveNextButton.currentState = .enableLongButton
+        }
+    }
+    
+    func updateNextButtonState() {
+        let isCheckedDay = setNoticeTimeView.selectDayView.isCheckedDay
+        saveNextButton.reverseState(isEnabled: isCheckedDay)
     }
 }
