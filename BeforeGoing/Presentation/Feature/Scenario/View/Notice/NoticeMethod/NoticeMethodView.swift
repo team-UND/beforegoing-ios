@@ -9,7 +9,7 @@ import UIKit
 
 final class NoticeMethodView: BaseView {
     
-    private let imageView = UIImageView()
+    private(set) var imageView = UIImageView()
     private let methodNameLabel = UILabel()
     private let methodType: NoticeMethodType
     private(set) var radioButton: RadioButton
