@@ -16,6 +16,8 @@ final class NoticeViewController: BaseViewController {
     }
     
     override func setAction() {
+        setGesture()
+        
         [rootView.selectNoticeOptionView.noAlarmView, rootView.selectNoticeOptionView.setTimeAlarmView].forEach {
             $0.radioButton.addTarget(self, action: #selector(radioButtonDidTap), for: .touchUpInside)
         }
@@ -35,6 +37,14 @@ final class NoticeViewController: BaseViewController {
             for: .touchUpInside
         )
     }
+    
+    private func setGesture() {
+        [rootView.selectNoticeOptionView.noAlarmView, rootView.selectNoticeOptionView.setTimeAlarmView].forEach {
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(alarmViewDidTap))
+            $0.isUserInteractionEnabled = true
+            $0.addGestureRecognizer(tapGesture)
+        }
+    }
 }
 
 extension NoticeViewController: Backable {
@@ -45,6 +55,14 @@ extension NoticeViewController: Backable {
 }
 
 extension NoticeViewController {
+    
+    @objc
+    private func alarmViewDidTap(_ gesture: UITapGestureRecognizer) {
+        guard let optionView = gesture.view as? NoticeOptionView else { return }
+
+        let radioButton = optionView.radioButton
+        radioButtonDidTap(radioButton)
+    }
     
     @objc
     private func radioButtonDidTap(_ sender: RadioButton) {
