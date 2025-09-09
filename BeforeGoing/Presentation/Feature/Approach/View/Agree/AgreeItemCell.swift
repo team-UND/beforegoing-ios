@@ -77,7 +77,16 @@ final class AgreeItemCell: UITableViewCell {
     }
     
     private func setAction() {
+        setGesture()
         checkBox.addTarget(self, action: #selector(checkBoxDidTap), for: .touchUpInside)
+    }
+    
+    private func setGesture() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(checkBoxDidTap))
+        titleLabel.do {
+            $0.isUserInteractionEnabled = true
+            $0.addGestureRecognizer(tapGesture)
+        }
     }
 }
 
