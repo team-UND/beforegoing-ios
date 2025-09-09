@@ -9,6 +9,8 @@ import UIKit
 
 final class ModifyNameView: BaseView {
     
+    private let maxLength = 8
+    
     private let navigationView = TopNavigationView(title: "이름을 입력해주세요")
     private let nameLabel = UILabel()
     private(set) var letterCountLabel = UILabel()
@@ -78,7 +80,7 @@ extension ModifyNameView {
     
     func configureName(_ name: String) {
         nameTextField.text = name
-        letterCountLabel.text = "\(name.count)/8"
+        letterCountLabel.text = "\(name.count)/\(maxLength)"
     }
     
     func updateDeleteButtonState(condition: Bool) {
@@ -86,7 +88,7 @@ extension ModifyNameView {
     }
     
     func updateNameCount(_ count: Int) {
-        letterCountLabel.text = "\(count)/8"
+        letterCountLabel.text = "\(count)/\(maxLength)"
     }
     
     func updateConfirmButtonState(condition: Bool) {
