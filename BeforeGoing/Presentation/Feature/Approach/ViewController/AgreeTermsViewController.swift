@@ -122,6 +122,6 @@ extension AgreeTermsViewController: UITableViewDataSource {
     }
     
     private func updateCheckBoxState() {
-        rootView.checkBox.currentState = viewModel.isAllChecked ? .checked : .unchecked
+        rootView.checkBox.updateState(isEnabled: viewModel.isAllChecked)
     }
 }

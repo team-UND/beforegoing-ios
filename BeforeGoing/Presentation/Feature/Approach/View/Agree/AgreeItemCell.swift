@@ -118,7 +118,7 @@ extension AgreeItemCell {
     }
     
     private func bindCheckBox(state: CheckBoxState) {
-        checkBox.currentState = state
+        checkBox.updateState(state)
     }
 }
 
