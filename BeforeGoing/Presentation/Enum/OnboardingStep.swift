@@ -50,9 +50,9 @@ enum OnboardingStep: Int, CaseIterable {
     private var image: UIImage {
         switch self {
         case .first: return .worryOnboarding
-        case .second: return .alarmBlue
-        case .third: return .alarmBlue
-        case .fourth: return .alarmBlue
+        case .second: return .onboardingFirst
+        case .third: return .onboardingSecond
+        case .fourth: return .onboardingThird
         case .fifth: return .alarmBlue
         case .end: return .worryOnboarding
         }

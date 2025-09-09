@@ -89,7 +89,8 @@ extension OnboardingContentView {
             imageView.snp.remakeConstraints {
                 $0.top.equalTo(descriptionLabel.snp.bottom).offset(34.adjustedH)
                 $0.centerX.equalToSuperview()
-                $0.bottom.equalToSuperview()
+                $0.width.equalTo(292.adjustedW)
+                $0.height.equalTo(607.adjustedH)
             }
         }
     }
