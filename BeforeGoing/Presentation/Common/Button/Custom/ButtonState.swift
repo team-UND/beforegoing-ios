@@ -23,7 +23,8 @@ enum ButtonState {
                 width: 350.adjustedW,
                 height: 48.adjustedH,
                 cornerRadius: 14,
-                font: .custom(.bodyLGSemiBold)
+                font: .custom(.bodyLGSemiBold),
+                isEnabled: true
             )
         case .disableLongButton:
             return ButtonComponent(
@@ -32,7 +33,8 @@ enum ButtonState {
                 width: 350.adjustedW,
                 height: 48.adjustedH,
                 cornerRadius: 14,
-                font: .custom(.bodyLGSemiBold)
+                font: .custom(.bodyLGSemiBold),
+                isEnabled: false
             )
         case .enableShortButton:
             return ButtonComponent(
@@ -41,7 +43,8 @@ enum ButtonState {
                 width: 168.adjustedW,
                 height: 41.adjustedH,
                 cornerRadius: 20.5,
-                font: .custom(.bodyMDSemiBold)
+                font: .custom(.bodyMDSemiBold),
+                isEnabled: true
             )
         case .disableShortButton:
             return ButtonComponent(
@@ -52,7 +55,8 @@ enum ButtonState {
                 width: 168.adjustedW,
                 height: 41.adjustedH,
                 cornerRadius: 20.5,
-                font: .custom(.bodyMDSemiBold)
+                font: .custom(.bodyMDSemiBold),
+                isEnabled: false
             )
         case .addScenarioButton:
             return ButtonComponent(
@@ -63,7 +67,8 @@ enum ButtonState {
                 width: 350.adjustedW,
                 height: 48.adjustedH,
                 cornerRadius: 14,
-                font: .custom(.bodyLGSemiBold)
+                font: .custom(.bodyLGSemiBold),
+                isEnabled: true
             )
         }
     }

@@ -16,4 +16,5 @@ struct ButtonComponent {
     let height: CGFloat
     let cornerRadius: CGFloat
     let font: UIFont
+    let isEnabled: Bool
 }
