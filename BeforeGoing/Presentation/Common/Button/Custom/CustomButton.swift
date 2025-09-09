@@ -56,18 +56,12 @@ final class CustomButton: UIButton {
 extension CustomButton {
     
     func reverseState(isEnabled: Bool) {
-        if isEnabled {
-            if currentState == .disableLongButton {
-                currentState = .enableLongButton
-            } else if currentState == .disableShortButton {
-                currentState = .enableShortButton
-            }
+        if isEnabled && currentState == .disableLongButton {
+            currentState = .enableLongButton
             return
         }
-        if currentState == .enableLongButton {
+        if !isEnabled && currentState == .enableLongButton {
             currentState = .disableLongButton
-        } else if currentState == .enableShortButton {
-            currentState = .enableShortButton
         }
     }
     

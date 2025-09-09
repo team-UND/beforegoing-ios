@@ -10,8 +10,8 @@ import UIKit
 struct ButtonComponent {
     let backgroundColor: UIColor
     let textColor: UIColor
-    var borderColor: CGColor = UIColor.clear.cgColor
-    var borderWidth: CGFloat = 0
+    var borderColor: CGColor?
+    var borderWidth: CGFloat
     let width: CGFloat
     let height: CGFloat
     let cornerRadius: CGFloat
