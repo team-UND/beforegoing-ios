@@ -9,14 +9,14 @@ import UIKit
 
 final class AgreeTermsView: BaseView {
     
-    let topNavigationView = TopNavigationView(title: "약관동의")
+    private let topNavigationView = TopNavigationView(title: "약관동의")
     private let backgroundImageView = UIImageView()
-    let checkBox = CheckBox()
-    private let agreeToAllLabel = UILabel()
+    private(set) var checkBox = CheckBox()
+    private(set) var agreeToAllLabel = UILabel()
     private let dividerLabel = UILabel()
-    let tableView = UITableView()
+    private(set) var tableView = UITableView()
     private let introduceLabel = UILabel()
-    let agreeButton = CustomButton(state: .disableLongButton, title: "동의하기")
+    private(set) var agreeButton = CustomButton(state: .disableLongButton, title: "동의하기")
             
     override func setStyle() {
         backgroundImageView.do {

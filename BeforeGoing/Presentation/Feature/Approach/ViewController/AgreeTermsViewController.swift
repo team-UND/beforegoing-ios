@@ -10,7 +10,7 @@ import UIKit
 final class AgreeTermsViewController: BaseViewController {
     
     private let topNavigationView = TopNavigationView(title: "약관동의")
-    private let agreeTermsView = AgreeTermsView()
+    private let rootView = AgreeTermsView()
     private let viewModel: AgreeItemViewModel
     
     init(viewModel: AgreeItemViewModel) {
@@ -35,24 +35,36 @@ final class AgreeTermsViewController: BaseViewController {
             navigationController: self.navigationController,
             type: .clear
         )
-        view.addSubview(agreeTermsView)
-        agreeTermsView.snp.makeConstraints {
+        view.addSubview(rootView)
+        rootView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
     }
     
     override func setAction() {
-        agreeTermsView.do {
+        setGesture()
+        rootView.do {
             $0.checkBox.addTarget(self, action: #selector(mainCheckBoxDidTap), for: .touchUpInside)
             $0.agreeButton.addTarget(self, action: #selector(agreeButtonDidTap), for: .touchUpInside)
         }
     }
     
     override func setDelegate() {
-        agreeTermsView.tableView.do {
+        rootView.tableView.do {
             $0.dataSource = self
             $0.register(AgreeItemCell.self, forCellReuseIdentifier: AgreeItemCell.identifier)
             $0.reloadData()
+        }
+    }
+    
+    private func setGesture() {
+        let mainTapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(mainCheckBoxDidTap)
+        )
+        rootView.agreeToAllLabel.do {
+            $0.isUserInteractionEnabled = true
+            $0.addGestureRecognizer(mainTapGesture)
         }
     }
 }
@@ -61,11 +73,11 @@ extension AgreeTermsViewController {
     
     @objc
     private func mainCheckBoxDidTap() {
-        let checkBoxState = agreeTermsView.checkBox.toggle()
+        let checkBoxState = rootView.checkBox.toggle()
         
         viewModel.toggleAllItems(checkBoxState: checkBoxState)
-        viewModel.isAllNecssaryChecked ? agreeTermsView.enableAgreement() : agreeTermsView.disableAgreement()
-        agreeTermsView.tableView.reloadData()
+        viewModel.isAllNecssaryChecked ? rootView.enableAgreement() : rootView.disableAgreement()
+        rootView.tableView.reloadData()
     }
     
     @objc
@@ -106,10 +118,10 @@ extension AgreeTermsViewController: UITableViewDataSource {
     }
     
     private func updateAgreementButtonState() {
-        viewModel.isAllNecssaryChecked ? agreeTermsView.enableAgreement() : agreeTermsView.disableAgreement()
+        viewModel.isAllNecssaryChecked ? rootView.enableAgreement() : rootView.disableAgreement()
     }
     
     private func updateCheckBoxState() {
-        agreeTermsView.checkBox.currentState = viewModel.isAllChecked ? .checked : .unchecked
+        rootView.checkBox.currentState = viewModel.isAllChecked ? .checked : .unchecked
     }
 }
