@@ -17,7 +17,7 @@ final class AgreeTermsView: BaseView {
     private(set) var tableView = UITableView()
     private let introduceLabel = UILabel()
     private(set) var agreeButton = CustomButton(state: .disableLongButton, title: "동의하기")
-            
+    
     override func setStyle() {
         backgroundImageView.do {
             $0.image = .bgTop
@@ -100,13 +100,8 @@ final class AgreeTermsView: BaseView {
 
 extension AgreeTermsView {
     
-    func enableAgreement() {
-        introduceLabel.isHidden = true
-        agreeButton.currentState = .enableLongButton
-    }
-    
-    func disableAgreement() {
-        introduceLabel.isHidden = false
-        agreeButton.currentState = .disableLongButton
+    func updateAgreement(isEnabled: Bool) {
+        introduceLabel.isHidden = isEnabled
+        agreeButton.currentState = isEnabled ? .enableLongButton : .disableLongButton
     }
 }

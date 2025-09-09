@@ -76,7 +76,7 @@ extension AgreeTermsViewController {
         let checkBoxState = rootView.checkBox.toggle()
         
         viewModel.toggleAllItems(checkBoxState: checkBoxState)
-        viewModel.isAllNecssaryChecked ? rootView.enableAgreement() : rootView.disableAgreement()
+        rootView.updateAgreement(isEnabled: viewModel.isAllNecssaryChecked)
         rootView.tableView.reloadData()
     }
     
@@ -118,7 +118,7 @@ extension AgreeTermsViewController: UITableViewDataSource {
     }
     
     private func updateAgreementButtonState() {
-        viewModel.isAllNecssaryChecked ? rootView.enableAgreement() : rootView.disableAgreement()
+        rootView.updateAgreement(isEnabled: viewModel.isAllNecssaryChecked)
     }
     
     private func updateCheckBoxState() {
