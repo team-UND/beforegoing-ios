@@ -14,7 +14,7 @@ final class ModifyNameView: BaseView {
     private(set) var letterCountLabel = UILabel()
     private(set) var nameTextField = TextField(type: .nicknameField)
     private let deleteButton = UIButton()
-    private(set) var confirmButton = CustomButton(state: .disableLongButton, title: "확인")
+    private(set) var confirmButton = CustomButton(state: .enableLongButton, title: "확인")
     
     override func setStyle() {
         nameLabel.do {
