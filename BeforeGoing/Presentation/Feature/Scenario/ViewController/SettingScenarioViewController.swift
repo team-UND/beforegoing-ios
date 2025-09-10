@@ -239,6 +239,7 @@ extension SettingScenarioViewController: UITableViewDataSource {
         ) { [weak self] (_, view, completion) in
             self?.missions.remove(at: indexPath.section)
             tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
+            self?.checkNextButtonState()
             completion(true)
         }
     }
