@@ -16,6 +16,8 @@ final class NoticeViewController: BaseViewController {
     }
     
     override func setAction() {
+        setGesture()
+        
         [rootView.selectNoticeOptionView.noAlarmView, rootView.selectNoticeOptionView.setTimeAlarmView].forEach {
             $0.radioButton.addTarget(self, action: #selector(radioButtonDidTap), for: .touchUpInside)
         }
@@ -35,6 +37,14 @@ final class NoticeViewController: BaseViewController {
             for: .touchUpInside
         )
     }
+    
+    private func setGesture() {
+        [rootView.selectNoticeOptionView.noAlarmView, rootView.selectNoticeOptionView.setTimeAlarmView].forEach {
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(alarmViewDidTap))
+            $0.isUserInteractionEnabled = true
+            $0.addGestureRecognizer(tapGesture)
+        }
+    }
 }
 
 extension NoticeViewController: Backable {
@@ -47,6 +57,14 @@ extension NoticeViewController: Backable {
 extension NoticeViewController {
     
     @objc
+    private func alarmViewDidTap(_ gesture: UITapGestureRecognizer) {
+        guard let optionView = gesture.view as? NoticeOptionView else { return }
+
+        let radioButton = optionView.radioButton
+        radioButtonDidTap(radioButton)
+    }
+    
+    @objc
     private func radioButtonDidTap(_ sender: RadioButton) {
         guard let optionView = sender.superview as? NoticeOptionView else { return }
         
@@ -57,6 +75,9 @@ extension NoticeViewController {
         let isSelectedSetAlarmOption = rootView.selectNoticeOptionView.isSelectedSetAlarmOption(optionView)
         rootView.setNoticeTimeView.updateHiddenState(isSelectedUseTime: isSelectedSetAlarmOption)
         rootView.updateButtonState(isNeededChange: isSelectedSetAlarmOption)
+        if isSelectedSetAlarmOption {
+            rootView.updateNextButtonState()
+        }
     }
     
     @objc
@@ -68,6 +89,7 @@ extension NoticeViewController {
             $0.updateDayOfWeekState(dayText: dayText)
             $0.checkAllSelected()
         }
+        rootView.updateNextButtonState()
     }
     
     @objc
@@ -75,6 +97,7 @@ extension NoticeViewController {
         let state = rootView.setNoticeTimeView.selectDayView.everydayButton.toggle()
         let condition = state.matchState()
         rootView.setNoticeTimeView.selectDayView.updateAllDay(condition: condition)
+        rootView.updateNextButtonState()
     }
     
     @objc

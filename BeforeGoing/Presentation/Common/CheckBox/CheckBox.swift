@@ -9,7 +9,7 @@ import UIKit
 
 final class CheckBox: UIButton {
     
-    var currentState: CheckBoxState = .unchecked {
+    private var currentState: CheckBoxState = .unchecked {
         didSet {
             setStyle()
         }
@@ -42,6 +42,14 @@ final class CheckBox: UIButton {
         self.snp.makeConstraints {
             $0.size.equalTo(16.adjustedW)
         }
+    }
+    
+    func updateState(isEnabled: Bool) {
+        currentState = isEnabled ? .checked : .unchecked
+    }
+    
+    func updateState(_ state: CheckBoxState) {
+        currentState = state
     }
     
     func toggle() -> CheckBoxState {

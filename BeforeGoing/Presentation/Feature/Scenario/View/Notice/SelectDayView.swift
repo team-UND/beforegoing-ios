@@ -113,26 +113,31 @@ final class SelectDayView: BaseView {
 
 extension SelectDayView {
     
+    var isCheckedDay: Bool {
+        let isChecked = dayOfWeeksState.contains(where: { $1 == true })
+        return isChecked
+    }
+    
     func updateDayOfWeekState(dayText: String) {
         guard let index = dayOfWeeks.firstIndex(of: dayText) else { return }
         
         dayOfWeeksState[dayText]?.toggle()
         if let isSelected = dayOfWeeksState[dayText] {
-            dayOfWeekLabels[index].do {
-                $0.textColor = isSelected ? .blue700 : .gray400
-                $0.backgroundColor = isSelected ? .blue100 : .clear
-            }
+            updateUI(index: index, condition: isSelected)
         }
     }
     
     func updateAllDay(condition: Bool) {
-        dayOfWeeks.forEach { dayOfWeeksState[$0] = condition }
-        weekStackView.arrangedSubviews.forEach {
-            let label = $0 as! UILabel
-            label.do {
-                $0.textColor = condition ? .blue700 : .gray400
-                $0.backgroundColor = condition ? .blue100 : .clear
-            }
+        for (index, day) in dayOfWeeks.enumerated() {
+            dayOfWeeksState[day] = condition
+            updateUI(index: index, condition: condition)
+        }
+    }
+    
+    private func updateUI(index: Int, condition: Bool) {
+        dayOfWeekLabels[index].do {
+            $0.textColor = condition ? .blue700 : .gray400
+            $0.backgroundColor = condition ? .blue100 : .clear
         }
     }
     

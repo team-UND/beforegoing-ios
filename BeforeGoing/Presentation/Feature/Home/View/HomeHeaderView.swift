@@ -22,13 +22,11 @@ final class HomeHeaderView: BaseView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        // circleView shadowPath 설정
         circleView.layer.shadowPath = UIBezierPath(
             roundedRect: circleView.bounds,
             cornerRadius: circleView.layer.cornerRadius
         ).cgPath
         
-        // bubbleView shadowPath 설정
         bubbleView.layer.shadowPath = UIBezierPath(
             roundedRect: bubbleView.bounds,
             cornerRadius: bubbleView.layer.cornerRadius

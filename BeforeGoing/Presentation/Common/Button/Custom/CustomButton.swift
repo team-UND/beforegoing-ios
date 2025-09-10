@@ -32,27 +32,38 @@ final class CustomButton: UIButton {
     }
     
     private func setStyle() {
-        let compoonent = currentState.component
+        let component = currentState.component
         self.do {
-            $0.backgroundColor = compoonent.backgroundColor
-            $0.setTitleColor(compoonent.textColor, for: .normal)
-            $0.titleLabel?.font = compoonent.font
-            $0.layer.borderColor = compoonent.borderColor
-            $0.layer.borderWidth = compoonent.borderWidth
-            $0.layer.cornerRadius = compoonent.cornerRadius
+            $0.backgroundColor = component.backgroundColor
+            $0.setTitleColor(component.textColor, for: .normal)
+            $0.titleLabel?.font = component.font
+            $0.layer.borderColor = component.borderColor
+            $0.layer.borderWidth = component.borderWidth
+            $0.layer.cornerRadius = component.cornerRadius
+            $0.isEnabled = component.isEnabled
         }
     }
     
     private func setLayout(state: ButtonState) {
-        let compoonent = state.component
+        let component = state.component
         self.snp.makeConstraints {
-            $0.width.equalTo(compoonent.width)
-            $0.height.equalTo(compoonent.height)
+            $0.width.equalTo(component.width)
+            $0.height.equalTo(component.height)
         }
     }
 }
 
 extension CustomButton {
+    
+    func reverseState(isEnabled: Bool) {
+        if isEnabled && currentState == .disableLongButton {
+            currentState = .enableLongButton
+            return
+        }
+        if !isEnabled && currentState == .enableLongButton {
+            currentState = .disableLongButton
+        }
+    }
     
     func updateTitle(_ title: String) {
         self.setTitle(title, for: .normal)

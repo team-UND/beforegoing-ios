@@ -94,19 +94,51 @@ extension MyScenarioViewController: UITableViewDataSource {
         return cell
     }
     
-    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath)
+    func tableView(_ tableView: UITableView,
+                   trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath)
     -> UISwipeActionsConfiguration? {
         
-        let deleteAction = UIContextualAction(style: .destructive, title: "") { [weak self] _, _, completionHandler in
+        let deleteAction = createDeleteAction(tableView: tableView, indexPath: indexPath)
+        let largeConfig = createLargeConfig()
+        setDeleteActionStyle(deleteAction: deleteAction, largeConfig: largeConfig)
+        
+        let config = createSwipeAction(deleteAction: deleteAction)
+        
+        return config
+    }
+    
+    private func createDeleteAction(tableView: UITableView, indexPath: IndexPath) -> UIContextualAction {
+        return UIContextualAction(
+            style: .normal,
+            title: nil
+        ) { [weak self] (_, view, completion) in
             self?.scenarios.remove(at: indexPath.section)
             tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
-            completionHandler(true)
+            completion(true)
         }
-        
-        deleteAction.image = .trash.withTintColor(.white)
-        deleteAction.backgroundColor = .red
-        
-        return UISwipeActionsConfiguration(actions: [deleteAction])
+    }
+    
+    private func createLargeConfig() -> UIImage.SymbolConfiguration {
+        return UIImage.SymbolConfiguration(pointSize: 12.0, weight: .bold, scale: .large)
+    }
+    
+    private func setDeleteActionStyle(
+        deleteAction: UIContextualAction,
+        largeConfig: UIImage.SymbolConfiguration
+    ) {
+        deleteAction.do {
+            $0.backgroundColor = .white
+            $0.image = UIImage(
+                systemName: "trash",
+                withConfiguration: largeConfig
+            )?.withTintColor(.white, renderingMode: .alwaysTemplate).addBackgroundCircle(.warning600)
+        }
+    }
+    
+    private func createSwipeAction(deleteAction: UIContextualAction) -> UISwipeActionsConfiguration {
+        let config = UISwipeActionsConfiguration(actions: [deleteAction])
+        config.performsFirstActionWithFullSwipe = false
+        return config
     }
 }
 

@@ -18,6 +18,10 @@ final class SetNoticeMethodViewController: BaseViewController {
     override func setAction() {
         [rootView.selectNoticeMethodView.pushNoticeView, rootView.selectNoticeMethodView.alarmView].forEach {
             $0.radioButton.addTarget(self, action: #selector(radioButtonDidTap), for: .touchUpInside)
+            
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(imageViewDidTap))
+            $0.imageView.addGestureRecognizer(tapGesture)
+            $0.imageView.isUserInteractionEnabled = true
         }
         rootView.saveButton.addTarget(
             self,
@@ -35,6 +39,16 @@ extension SetNoticeMethodViewController: Backable {
 }
 
 extension SetNoticeMethodViewController {
+    
+    @objc
+    private func imageViewDidTap(_ sender: UITapGestureRecognizer) {
+        guard
+            let imageView = sender.view as? UIImageView,
+            let methodView = imageView.superview as? NoticeMethodView
+        else { return }
+        
+        rootView.selectNoticeMethodView.toggleMethod(selectedView: methodView)
+    }
     
     @objc
     private func radioButtonDidTap(_ sender: UIButton) {
