@@ -16,7 +16,7 @@ final class MockUserAPI: UserAPIProtocol {
     var loginPerformed = false
     var shouldFailedWithKakaoLogin = true
     var user: KakaoSDKUser.User?
-    var userInfoError: KakaoLoginError?
+    var userInfoError: BeforeGoingError?
     let tokenData = """
         {
             "appId": 1234,
@@ -40,16 +40,16 @@ final class MockUserAPI: UserAPIProtocol {
                 loginPerformed = true
                 return
             }
-            completion(nil, KakaoLoginError.invalidToken)
+            completion(nil, BeforeGoingError.invalidToken)
             return
         }
         let tokenInfo = try! JSONDecoder().decode(AccessTokenInfo.self, from: tokenData)
         completion(tokenInfo, nil)
     }
     
-    func logout(completion: @escaping (KakaoLoginError?) -> Void) {
+    func logout(completion: @escaping (BeforeGoingError?) -> Void) {
         if logoutFailed {
-            completion(KakaoLoginError.logoutFailed)
+            completion(BeforeGoingError.logoutFailed)
             return
         }
         completion(nil)
@@ -61,13 +61,13 @@ final class MockUserAPI: UserAPIProtocol {
     
     func loginWithKakaoTalk(nonce: String, completion: @escaping (KakaoSDKAuth.OAuthToken?, Error?) -> Void) {
         if shouldFailedWithKakaoLogin {
-            completion(nil, KakaoLoginError.loginFailed)
+            completion(nil, BeforeGoingError.loginFailed)
             return
         }
         completion(oauthToken, nil)
     }
     
-    func me(completion: @escaping (KakaoSDKUser.User?, KakaoLoginError?) -> Void) {
+    func me(completion: @escaping (KakaoSDKUser.User?, BeforeGoingError?) -> Void) {
         if isFetchUserErrorOccured {
             completion(nil, .userInfoRequestFailed)
             return
