@@ -11,8 +11,12 @@ protocol APIManaging {
 
 final class NetworkService: APIManaging {
     
+    private let interceptor: NetworkInterceptor
+    
     static let shared = NetworkService()
-    private init() {}
+    private init() {
+        self.interceptor = NetworkInterceptor(keyChainService: KeyChainService())
+    }
     
     func request<T: Decodable>(
         endPoint: any EndPoint,
@@ -23,14 +27,20 @@ final class NetworkService: APIManaging {
             method: endPoint.method,
             parameters: endPoint.bodyParameters,
             encoding: endPoint.parameterEncoding,
-            headers: endPoint.headers
+            headers: endPoint.headers,
+            interceptor: interceptor
         )
             .validate()
         
         let response = try await dataRequest.serializingDecodable(T.self).value
+        
+        writeLog(response: response)
+        return response
+    }
+    
+    private func writeLog<T: Decodable>(response: T) {
         BeforeGoingLogger.network(response)
         BeforeGoingLogger.data(response)
-        return response
     }
     
     @MainActor
