@@ -21,12 +21,10 @@ struct KakaoLoginUseCase {
         self.repository = repository
     }
     
-    func execute(provider: String) async throws -> LoginEntity {
+    func execute(provider: String) async throws {
         let nonce = try await requestNonce(provider: provider)
         let idToken = try await repository.requestIDToken(nonce: nonce)
-        let loginEntity = try await requestKakaoLogin(provider: provider, idToken: idToken)
-        
-        return loginEntity
+        try await requestKakaoLogin(provider: provider, idToken: idToken)        
     }
     
     private func requestNonce(provider: String) async throws -> String {
@@ -36,10 +34,8 @@ struct KakaoLoginUseCase {
         return nonceEntity.nonce
     }
     
-    private func requestKakaoLogin(provider: String, idToken: String) async throws -> LoginEntity {
+    private func requestKakaoLogin(provider: String, idToken: String) async throws {
         let loginRequest = loginRequestMapper.map((provider, idToken))
-        let loginEntity = try await repository.requestKakaoLogin(dto: loginRequest)
-        
-        return loginEntity
+        try await repository.requestKakaoLogin(dto: loginRequest)
     }
 }

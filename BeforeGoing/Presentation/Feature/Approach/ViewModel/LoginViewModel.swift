@@ -19,14 +19,14 @@ final class LoginViewModel: ViewModeling {
     }
     
     enum Output {
-        case kakaoLoginResult(LoginEntity)
+        case kakaoLoginResult
     }
     
     func action(input: Input) async throws -> Output {
         switch input {
         case .kakaoLoginDidTap:
-            let result = try await kakaoLoginUseCase.execute(provider: Provider.kakao.rawValue)
-            return .kakaoLoginResult(result)
+            try await kakaoLoginUseCase.execute(provider: Provider.kakao.rawValue)
+            return .kakaoLoginResult
         }
     }
 }
