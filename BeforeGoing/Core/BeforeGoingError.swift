@@ -5,4 +5,5 @@ enum BeforeGoingError: Error {
     case invalidToken
     case logoutFailed
     case userInfoRequestFailed
+    case autoLoginFailed
 }
