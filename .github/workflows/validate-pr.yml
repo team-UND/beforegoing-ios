@@ -55,6 +55,11 @@ jobs:
       - name: Bundle Install
         run: bundle install --deployment --jobs 4 --retry 3 --path vendor/bundle
 
+      - name: Set Fastlane Xcodebuild Timeout
+        run: |
+          echo "FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT=60" >> $GITHUB_ENV
+          echo "FASTLANE_XCODEBUILD_SETTINGS_RETRIES=5" >> $GITHUB_ENV
+
       - name: Run Fastlane
         run: bundle exec fastlane test
 
