@@ -3,10 +3,10 @@ import KakaoSDKAuth
 
 protocol UserAPIProtocol {
     func accessTokenInfo(completion: @escaping (AccessTokenInfo?, Error?) -> Void)
-    func logout(completion: @escaping (KakaoLoginError?) -> Void)
+    func logout(completion: @escaping (BeforeGoingError?) -> Void)
     func isKakaoTalkLoginAvailable() -> Bool
     func loginWithKakaoTalk(nonce: String, completion: @escaping (OAuthToken?, Error?) -> Void)
-    func me(completion: @escaping (KakaoSDKUser.User?, KakaoLoginError?) -> Void)
+    func me(completion: @escaping (KakaoSDKUser.User?, BeforeGoingError?) -> Void)
 }
 
 struct UserAPIWrapper: UserAPIProtocol {
@@ -14,9 +14,9 @@ struct UserAPIWrapper: UserAPIProtocol {
         UserApi.shared.accessTokenInfo(completion: completion)
     }
     
-    func logout(completion: @escaping (KakaoLoginError?) -> Void) {
+    func logout(completion: @escaping (BeforeGoingError?) -> Void) {
         UserApi.shared.logout { error in
-            completion(error as? KakaoLoginError)
+            completion(error as? BeforeGoingError)
         }
     }
     
@@ -28,9 +28,9 @@ struct UserAPIWrapper: UserAPIProtocol {
         UserApi.shared.loginWithKakaoTalk(nonce: nonce, completion: completion)
     }
     
-    func me(completion: @escaping (KakaoSDKUser.User?, KakaoLoginError?) -> Void) {
+    func me(completion: @escaping (KakaoSDKUser.User?, BeforeGoingError?) -> Void) {
         UserApi.shared.me { user, error in
-            completion(user, error as? KakaoLoginError)
+            completion(user, error as? BeforeGoingError)
         }
     }
     

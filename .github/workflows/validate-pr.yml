@@ -37,7 +37,7 @@ jobs:
       - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: latest-stable
+          xcode-version: 16.4.0
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -54,6 +54,9 @@ jobs:
 
       - name: Bundle Install
         run: bundle install --deployment --jobs 4 --retry 3 --path vendor/bundle
+
+      - name: List available devices
+        run: xcrun simctl list devices
 
       - name: Run Fastlane
         run: bundle exec fastlane test

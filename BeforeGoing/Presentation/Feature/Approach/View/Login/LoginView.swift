@@ -13,8 +13,8 @@ final class LoginView: BaseView {
     private let appIconImageView = UIImageView()
     private let subtitleLabel = UILabel()
     private let mainTitleLabel = UILabel()
-    let kakaoLoginButton = UIButton()
-    let appleLoginButton = UIButton()
+    private(set) var kakaoLoginButton = UIButton()
+    private(set) var appleLoginButton = UIButton()
     private var buttonConfiguration = UIButton.Configuration.plain()
     
     override func setStyle() {

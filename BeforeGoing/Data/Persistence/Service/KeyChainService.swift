@@ -4,7 +4,7 @@ protocol KeyChainProtocol {
     func load(key: String) -> String?
 }
 
-struct KeyChainWrapper: KeyChainProtocol {
+struct KeyChainService: KeyChainProtocol {
     func save(_ value: String, forKey key: String) {
         KeyChainHelper.save(value, forKey: key)
     }

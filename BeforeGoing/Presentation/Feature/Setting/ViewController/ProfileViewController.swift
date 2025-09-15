@@ -10,6 +10,16 @@ import UIKit
 final class ProfileViewController: BaseViewController {
     
     private let rootView = ProfileView()
+    private let viewModel: ProfileViewModel
+    
+    init(viewModel: ProfileViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         view = rootView
@@ -53,7 +63,15 @@ extension ProfileViewController {
     
     @objc
     private func logoutButtonDidTap() {
-        
+        Task {
+            do {
+                try await viewModel.action(input: .logoutButtonDidTap)
+                let loginViewController = ViewControllerFactory.shared.makeLoginViewController()
+                ViewControllerUtil.shared.replaceRootViewController(to: loginViewController)
+            } catch {
+                BeforeGoingLogger.error(BeforeGoingError.logoutFailed)
+            }
+        }
     }
     
     @objc
