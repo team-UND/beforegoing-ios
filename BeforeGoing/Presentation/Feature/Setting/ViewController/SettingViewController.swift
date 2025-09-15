@@ -53,7 +53,7 @@ extension SettingViewController {
     
     @objc
     private func profileButtonDidTap() {
-        let viewController = ProfileViewController()
+        let viewController = ViewControllerFactory.shared.makeProfileViewController()
         viewController.navigationItem.hidesBackButton = true
         viewController.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(viewController, animated: false)

@@ -25,4 +25,12 @@ final class ViewControllerFactory {
         }
         return LoginViewController(viewModel: loginViewModel)
     }
+    
+    func makeProfileViewController() -> ProfileViewController {
+        guard let profileViewModel: ProfileViewModel = DIContainer.shared.resolve() else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        return ProfileViewController(viewModel: profileViewModel)
+    }
 }
