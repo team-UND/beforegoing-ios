@@ -22,7 +22,20 @@ final class NetworkService: APIManaging {
         endPoint: any EndPoint,
         responseType: T.Type
     ) async throws -> T {
-        let dataRequest = AF.request(
+        let dataRequest = createDataRequest(endPoint: endPoint)
+        let response = try await dataRequest.serializingDecodable(T.self).value
+        writeLog(response: response)
+        return response
+    }
+    
+    func request(endPoint: any EndPoint) async throws  {
+        let dataRequest = createDataRequest(endPoint: endPoint)
+        let response = try await dataRequest.serializingDecodable(EmptyDTO.self).value
+        writeLog(response: response)
+    }
+    
+    private func createDataRequest(endPoint: EndPoint) -> DataRequest {
+        return AF.request(
             endPoint.url,
             method: endPoint.method,
             parameters: endPoint.bodyParameters,
@@ -30,18 +43,16 @@ final class NetworkService: APIManaging {
             headers: endPoint.headers,
             interceptor: interceptor
         )
-            .validate()
-        
-        let response = try await dataRequest.serializingDecodable(T.self).value
-        
-        writeLog(response: response)
-        return response
+        .validate()
     }
     
     private func writeLog<T: Decodable>(response: T) {
         BeforeGoingLogger.network(response)
         BeforeGoingLogger.data(response)
     }
+}
+
+extension NetworkService {
     
     @MainActor
     func requestKakaoIDToken(nonce: String?) async throws -> String {
