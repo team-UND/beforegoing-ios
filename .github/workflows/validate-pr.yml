@@ -58,11 +58,6 @@ jobs:
       - name: List available devices
         run: xcrun simctl list devices
 
-      - name: Set Xcodebuild Timeout
-        run: |
-          export FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT=120
-          export FASTLANE_XCODEBUILD_SETTINGS_RETRIES=5
-
       - name: Run Fastlane
         run: bundle exec fastlane test
 
