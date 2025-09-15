@@ -6,4 +6,6 @@ enum BeforeGoingError: Error {
     case logoutFailed
     case userInfoRequestFailed
     case autoLoginFailed
+    case diContainerError
+    case reissueTokenFailed
 }
