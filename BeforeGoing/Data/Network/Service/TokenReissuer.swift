@@ -16,18 +16,19 @@ struct TokenReissuer {
     }
     
     func reissue() async throws {
-        if let accessToken = keyChainService.load(key: KeyChainKey.accessToken.rawValue),
-           let refreshToken = keyChainService.load(key: KeyChainKey.refreshToken.rawValue) {
-            
-            let endPoint = readyToRequestTokens(accessToken: accessToken, refreshToken: refreshToken)
-            do {
-                let dataRequest = createDataRequest(endPoint: endPoint)
-                let response = try await dataRequest.serializingDecodable(TokensResponseDTO.self).value
-                saveNewTokens(response: response)
-            } catch(let error) {
-                BeforeGoingLogger.error(error)
-                throw error
-            }
+        guard let accessToken = keyChainService.load(key: KeyChainKey.accessToken.rawValue),
+           let refreshToken = keyChainService.load(key: KeyChainKey.refreshToken.rawValue) else {
+            throw BeforeGoingError.reissueTokenFailed
+        }
+        
+        let endPoint = readyToRequestTokens(accessToken: accessToken, refreshToken: refreshToken)
+        do {
+            let dataRequest = createDataRequest(endPoint: endPoint)
+            let response = try await dataRequest.serializingDecodable(TokensResponseDTO.self).value
+            saveNewTokens(response: response)
+        } catch(let error) {
+            BeforeGoingLogger.error(error)
+            throw error
         }
     }
     
