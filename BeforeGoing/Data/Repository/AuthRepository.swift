@@ -51,7 +51,22 @@ struct AuthRepository: AuthInterface {
             
             return false
         }
-        try await tokenReissuer.reissue()
-        return true
+        do {
+            try await tokenReissuer.reissue()
+            return true
+        } catch {
+            BeforeGoingLogger.error(BeforeGoingError.reissueTokenFailed)
+            return false
+        }
+    }
+    
+    func logout() async throws {
+        try await networkService.request(endPoint: AuthAPI.logout)
+        deleteUserInformation()
+    }
+    
+    func deleteUserInformation() {
+        keyChainService.delete(key: KeyChainKey.accessToken.rawValue)
+        keyChainService.delete(key: KeyChainKey.refreshToken.rawValue)
     }
 }
