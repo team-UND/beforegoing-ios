@@ -28,41 +28,35 @@ final class SplashViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
                 
-        Task {
-            do {
-                var viewController: UIViewController
-                let output = try await viewModel.action(input: .viewDidLoad)
-                
-                switch output {
-                case .autoLogin(let isSucceedAutoLogin):
-                    if isSucceedAutoLogin {
-                        viewController = BottomNavigationViewController()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            ViewControllerUtil.shared.replaceRootViewController(to: viewController)
-                        }
-                    } else {
-                        viewController = LoginViewController(
-                            viewModel: LoginViewModel(
-                                kakaoLoginUseCase: KakaoLoginUseCase(
-                                    nonceRequestMapper: NonceRequestMapper(),
-                                    loginRequestMapper: LoginRequestMapper(),
-                                    repository: AuthRepository(
-                                        networkService: NetworkService.shared,
-                                        tokenReissuer: TokenReissuer(keyChainService: KeyChainService()),
-                                        keyChainService: KeyChainService()
-                                    )
-                                )
-                            )
-                        )
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            viewController.navigationItem.hidesBackButton = true
-                            self.navigationController?.pushViewController(viewController, animated: true)
-                        }
-                    }
-                }
-            } catch {
-                BeforeGoingLogger.error(BeforeGoingError.autoLoginFailed)
-            }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            let viewController = ViewControllerFactory.shared.makeLoginViewController()
+            viewController.navigationItem.hidesBackButton = true
+            self.navigationController?.pushViewController(viewController, animated: true)
         }
+        // 추후 주석 제거 예정
+//        Task {
+//            do {
+//                var viewController: UIViewController
+//                let output = try await viewModel.action(input: .viewDidLoad)
+//                
+//                switch output {
+//                case .autoLogin(let isSucceedAutoLogin):
+//                    if isSucceedAutoLogin {
+//                        viewController = BottomNavigationViewController()
+//                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+//                            ViewControllerUtil.shared.replaceRootViewController(to: viewController)
+//                        }
+//                    } else {
+//                        viewController = ViewControllerFactory.shared.makeLoginViewController()
+//                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+//                            viewController.navigationItem.hidesBackButton = true
+//                            self.navigationController?.pushViewController(viewController, animated: true)
+//                        }
+//                    }
+//                }
+//            } catch {
+//                BeforeGoingLogger.error(BeforeGoingError.autoLoginFailed)
+//            }
+//        }
     }
 }
