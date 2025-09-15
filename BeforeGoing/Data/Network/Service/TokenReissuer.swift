@@ -19,25 +19,37 @@ struct TokenReissuer {
         if let accessToken = keyChainService.load(key: KeyChainKey.accessToken.rawValue),
            let refreshToken = keyChainService.load(key: KeyChainKey.refreshToken.rawValue) {
             
-            let tokensRequestDTO = TokensRequestDTO(accessToken: accessToken, refreshToken: refreshToken)
-            let endPoint = AuthAPI.tokens(dto: tokensRequestDTO)
-            
+            let endPoint = readyToRequestTokens(accessToken: accessToken, refreshToken: refreshToken)
             do {
-                let dataRequest = AF.request(
-                    endPoint.url,
-                    method: endPoint.method,
-                    parameters: endPoint.bodyParameters,
-                    encoding: endPoint.parameterEncoding,
-                    headers: endPoint.headers
-                )
-                    .validate()
-                
+                let dataRequest = createDataRequest(endPoint: endPoint)
                 let response = try await dataRequest.serializingDecodable(TokensResponseDTO.self).value
-                keyChainService.save(response.accessToken, forKey: KeyChainKey.accessToken.rawValue)
-                keyChainService.save(response.refreshToken, forKey: KeyChainKey.refreshToken.rawValue)
+                saveNewTokens(response: response)
             } catch(let error) {
                 BeforeGoingLogger.error(error)
+                throw error
             }
         }
+    }
+    
+    private func readyToRequestTokens(accessToken: String, refreshToken: String) -> EndPoint {
+        let tokensRequestDTO = TokensRequestDTO(accessToken: accessToken, refreshToken: refreshToken)
+        let endPoint = AuthAPI.tokens(dto: tokensRequestDTO)
+        return endPoint
+    }
+    
+    private func createDataRequest(endPoint: EndPoint) -> DataRequest {
+        return AF.request(
+            endPoint.url,
+            method: endPoint.method,
+            parameters: endPoint.bodyParameters,
+            encoding: endPoint.parameterEncoding,
+            headers: endPoint.headers
+        )
+            .validate()
+    }
+    
+    private func saveNewTokens(response: TokensResponseDTO) {
+        keyChainService.save(response.accessToken, forKey: KeyChainKey.accessToken.rawValue)
+        keyChainService.save(response.refreshToken, forKey: KeyChainKey.refreshToken.rawValue)
     }
 }
