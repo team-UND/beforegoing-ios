@@ -13,6 +13,9 @@ import KakaoSDKAuth
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
+        DIContainer.shared.injectDependency()
+        
         if let appKey = Bundle.main.object(forInfoDictionaryKey: "KAKAO_NATIVE_APP_KEY") as? String {
             KakaoSDK.initSDK(appKey: appKey)
         } else {
