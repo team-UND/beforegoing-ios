@@ -13,8 +13,8 @@ struct PresentationDependencyAssembler: DependencyAssembler {
         self.domainDependencyAssembler = preAssembler
     }
     
-    func resemble() {
-        domainDependencyAssembler.resemble()
+    func assemble() {
+        domainDependencyAssembler.assemble()
         
         guard let kakaoLoginUseCase: KakaoLoginUseCase = DIContainer.shared.resolve() else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)

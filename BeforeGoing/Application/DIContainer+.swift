@@ -13,6 +13,6 @@ extension DIContainer {
         let presentationDependencyAssembler = PresentationDependencyAssembler(
             preAssembler: domainDependencyAssembler
         )
-        presentationDependencyAssembler.resemble()
+        presentationDependencyAssembler.assemble()
     }
 }

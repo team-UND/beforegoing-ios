@@ -17,7 +17,7 @@ struct DataDependencyAssembler: DependencyAssembler {
         self.tokenReissuer = TokenReissuer(keyChainService: keyChainService)
     }
     
-    func resemble() {
+    func assemble() {
         DIContainer.shared.register(nonceRequestMapper)
         DIContainer.shared.register(loginRequestMapper)
         DIContainer.shared.register(

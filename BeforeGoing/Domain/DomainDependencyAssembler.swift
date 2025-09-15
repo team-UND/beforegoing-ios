@@ -13,8 +13,8 @@ final class DomainDependencyAssembler: DependencyAssembler {
         self.dataDependencyAssembler = preAssembler
     }
     
-    func resemble() {
-        dataDependencyAssembler.resemble()
+    func assemble() {
+        dataDependencyAssembler.assemble()
         
         guard let nonceRequestMapper: NonceRequestMapper = DIContainer.shared.resolve() else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
