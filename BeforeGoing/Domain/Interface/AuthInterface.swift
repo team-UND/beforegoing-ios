@@ -11,4 +11,5 @@ protocol AuthInterface {
     func requestIDToken(nonce: String?) async throws -> String
     func requestKakaoLogin(dto: LoginRequestDTO) async throws
     func autoLogin() async throws -> Bool
+    func logout() async throws
 }
