@@ -90,7 +90,7 @@ extension AgreeTermsViewController {
         switch output {
         case .agreeTermsResult(let isSucceed):
             if isSucceed {
-                let nicknameViewController = NicknameViewController()
+                let nicknameViewController = ViewControllerFactory.shared.makeNicknameViewController()
                 self.navigationController?.pushViewController(nicknameViewController, animated: false)
                 return
             }

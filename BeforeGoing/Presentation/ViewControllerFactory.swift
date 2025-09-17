@@ -41,4 +41,16 @@ final class ViewControllerFactory {
         }
         return AgreeTermsViewController(viewModel: agreeTermsViewModel)
     }
+    
+    func makeNicknameViewController() -> NicknameViewController {
+        guard let nicknameViewModel: NicknameViewModel = DIContainer.shared.resolve() else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        return NicknameViewController(viewModel: nicknameViewModel)
+    }
+    
+    func makeOnboardingViewController() -> OnboardingViewController {
+        return OnboardingViewController()
+    }
 }
