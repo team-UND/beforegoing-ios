@@ -7,9 +7,9 @@
 
 struct AgreeTermsUseCase {
     
-    private let repository: MemberRepository
+    private let repository: MemberInterface
     
-    init(repository: MemberRepository) {
+    init(repository: MemberInterface) {
         self.repository = repository
     }
     
