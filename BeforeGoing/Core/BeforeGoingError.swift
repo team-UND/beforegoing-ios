@@ -9,4 +9,5 @@ enum BeforeGoingError: Error {
     case diContainerError
     case reissueTokenFailed
     case agreeTermsFailed
+    case updateNicknameFailed
 }
