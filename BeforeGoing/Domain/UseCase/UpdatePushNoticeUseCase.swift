@@ -7,9 +7,9 @@
 
 struct UpdatePushNoticeUseCase {
     
-    private let repository: MemberInterface
+    private let repository: TermsInterface
     
-    init(repository: MemberInterface) {
+    init(repository: TermsInterface) {
         self.repository = repository
     }
     

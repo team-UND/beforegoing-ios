@@ -21,6 +21,11 @@ final class DomainDependencyAssembler: DependencyAssembler {
             return
         }
         
+        guard let termsRepository: TermsRepository = DIContainer.shared.resolve() else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            return
+        }
+        
         guard let memberRepository: MemberRepository = DIContainer.shared.resolve() else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             return
