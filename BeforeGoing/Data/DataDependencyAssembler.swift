@@ -13,6 +13,7 @@ struct DataDependencyAssembler: DependencyAssembler {
     private let nonceRequestMapper = NonceRequestMapper()
     private let loginRequestMapper = LoginRequestMapper()
     private let termsRequestMapper = TermsRequestMapper()
+    private let updateTermRequestMapper = UpdateTermRequestMapper()
     
     init() {
         self.tokenReissuer = TokenReissuer(keyChainService: keyChainService)
@@ -31,10 +32,11 @@ struct DataDependencyAssembler: DependencyAssembler {
             )
         )
         DIContainer.shared.register(
-            MemberRepository(
+            TermsRepository(
                 networkService: networkService,
                 keyChainService: keyChainService,
-                termsRequestMapper: termsRequestMapper
+                termsRequestMapper: termsRequestMapper,
+                updateTermRequestMapper: updateTermRequestMapper
             )
         )
     }
