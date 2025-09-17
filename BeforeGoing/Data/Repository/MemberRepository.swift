@@ -9,12 +9,12 @@ struct MemberRepository: MemberInterface {
     
     private let networkService: NetworkService
     private let keyChainService: KeyChainService
-    private let termsMapper: TermsMapper
+    private let termsRequestMapper: TermsRequestMapper
     
-    init(networkService: NetworkService, keyChainService: KeyChainService, termsMapper: TermsMapper) {
+    init(networkService: NetworkService, keyChainService: KeyChainService, termsRequestMapper: TermsRequestMapper) {
         self.networkService = networkService
         self.keyChainService = keyChainService
-        self.termsMapper = termsMapper
+        self.termsRequestMapper = termsRequestMapper
     }
     
     func sendAgreementTerms(
@@ -23,7 +23,7 @@ struct MemberRepository: MemberInterface {
         isOver14: Bool,
         eventPushAgreed: Bool
     ) async throws {
-        let requestDTO = termsMapper.map(
+        let requestDTO = termsRequestMapper.map(
             (
                 termsOfServiceAgreed: termsOfServiceAgreed,
                 privacyPolicyAgreed: privacyPolicyAgreed,

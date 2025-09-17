@@ -12,7 +12,7 @@ struct DataDependencyAssembler: DependencyAssembler {
     private let tokenReissuer: TokenReissuer
     private let nonceRequestMapper = NonceRequestMapper()
     private let loginRequestMapper = LoginRequestMapper()
-    private let termsMapper = TermsMapper()
+    private let termsRequestMapper = TermsRequestMapper()
     
     init() {
         self.tokenReissuer = TokenReissuer(keyChainService: keyChainService)

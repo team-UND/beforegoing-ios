@@ -5,7 +5,7 @@
 //  Created by APPLE on 9/17/25.
 //
 
-struct TermsMapper: Mapper {
+struct TermsRequestMapper: Mapper {
     
     typealias Input = (termsOfServiceAgreed: Bool,
                        privacyPolicyAgreed: Bool,
