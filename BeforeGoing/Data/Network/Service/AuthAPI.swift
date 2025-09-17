@@ -70,4 +70,13 @@ extension AuthAPI: EndPoint {
             return nil
         }
     }
+    
+    var isNeedReissue: Bool {
+        switch self {
+        case .nonce, .kakaoLogin:
+            return false
+        case .tokens, .logout:
+            return true
+        }
+    }
 }

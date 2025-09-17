@@ -41,7 +41,7 @@ final class NetworkService: APIManaging {
             parameters: endPoint.bodyParameters,
             encoding: endPoint.parameterEncoding,
             headers: endPoint.headers,
-            interceptor: interceptor
+            interceptor: endPoint.isNeedReissue ? nil : interceptor
         )
         .validate()
     }

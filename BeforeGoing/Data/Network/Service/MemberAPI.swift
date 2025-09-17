@@ -64,5 +64,9 @@ extension MemberAPI: EndPoint {
             return try? dto.toBodyParameters()
         }
     }
+    
+    var isNeedReissue: Bool {
+        return true
+    }
 }
 
