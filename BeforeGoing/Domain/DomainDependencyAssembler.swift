@@ -16,16 +16,6 @@ final class DomainDependencyAssembler: DependencyAssembler {
     func assemble() {
         dataDependencyAssembler.assemble()
         
-        guard let nonceRequestMapper: NonceRequestMapper = DIContainer.shared.resolve() else {
-            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            return
-        }
-        
-        guard let loginRequestMapper: LoginRequestMapper = DIContainer.shared.resolve() else {
-            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            return
-        }
-        
         guard let authrepository: AuthRepository = DIContainer.shared.resolve() else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             return
