@@ -11,6 +11,6 @@ struct LoginRequestMapper: Mapper {
     typealias Output = LoginRequestDTO
 
     func map(_ input: Input) -> Output {
-        return Output(provider: input.provider, idToken: input.idToken)
+        return .init(provider: input.provider, idToken: input.idToken)
     }
 }

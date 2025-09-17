@@ -11,6 +11,6 @@ struct NonceRequestMapper: Mapper {
     typealias Output = NonceRequestDTO
     
     func map(_ provider: String) -> NonceRequestDTO {
-        return NonceRequestDTO(provider: provider)
+        return .init(provider: provider)
     }
 }

@@ -21,7 +21,7 @@ struct TermsRequestMapper: Mapper {
             eventPushAgreed: Bool
         )
     ) -> TermsRequestDTO {
-        return TermsRequestDTO(
+        return .init(
             termsOfServiceAgreed: input.termsOfServiceAgreed,
             privacyPolicyAgreed: input.privacyPolicyAgreed,
             isOver14: input.isOver14,

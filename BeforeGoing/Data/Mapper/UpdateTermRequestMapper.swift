@@ -11,7 +11,6 @@ struct UpdateTermRequestMapper: Mapper {
     typealias Output = UpdateTermRequestDTO
     
     func map(_ input: Bool) -> UpdateTermRequestDTO {
-        let requestDTO = UpdateTermRequestDTO(eventPushAgreed: input)
-        return requestDTO
+        return .init(eventPushAgreed: input)
     }
 }
