@@ -13,4 +13,5 @@ protocol MemberInterface {
         isOver14: Bool,
         eventPushAgreed: Bool
     ) async throws
+    func updateAgreementTerm(eventPushAgreed: Bool) async throws
 }

@@ -10,11 +10,18 @@ struct MemberRepository: MemberInterface {
     private let networkService: NetworkService
     private let keyChainService: KeyChainService
     private let termsRequestMapper: TermsRequestMapper
+    private let updateTermRequestMapper: UpdateTermRequestMapper
     
-    init(networkService: NetworkService, keyChainService: KeyChainService, termsRequestMapper: TermsRequestMapper) {
+    init(
+        networkService: NetworkService,
+        keyChainService: KeyChainService,
+        termsRequestMapper: TermsRequestMapper,
+        updateTermRequestMapper: UpdateTermRequestMapper
+    ) {
         self.networkService = networkService
         self.keyChainService = keyChainService
         self.termsRequestMapper = termsRequestMapper
+        self.updateTermRequestMapper = updateTermRequestMapper
     }
     
     func sendAgreementTerms(
@@ -34,6 +41,15 @@ struct MemberRepository: MemberInterface {
         let accessToken = keyChainService.load(key: "accessToken") ?? ""
         let _ = try await networkService.request(
             endPoint: MemberAPI.terms(accessToken: accessToken, dto: requestDTO),
+            responseType: TermsResponseDTO.self
+        )
+    }
+    
+    func updateAgreementTerm(eventPushAgreed: Bool) async throws {
+        let requestDTO = updateTermRequestMapper.map(eventPushAgreed)
+        let accessToken = keyChainService.load(key: "accessToken") ?? ""
+        let _ = try await networkService.request(
+            endPoint: MemberAPI.updateTerm(accessToken: accessToken, dto: requestDTO),
             responseType: TermsResponseDTO.self
         )
     }
