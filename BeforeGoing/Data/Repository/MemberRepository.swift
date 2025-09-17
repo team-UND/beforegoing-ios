@@ -9,48 +9,25 @@ struct MemberRepository: MemberInterface {
     
     private let networkService: NetworkService
     private let keyChainService: KeyChainService
-    private let termsRequestMapper: TermsRequestMapper
-    private let updateTermRequestMapper: UpdateTermRequestMapper
+    private let updateNicknameRequestMapper: UpdateNicknameRequestMapper
     
     init(
         networkService: NetworkService,
         keyChainService: KeyChainService,
-        termsRequestMapper: TermsRequestMapper,
-        updateTermRequestMapper: UpdateTermRequestMapper
+        updateNicknameRequestMapper: UpdateNicknameRequestMapper
     ) {
         self.networkService = networkService
         self.keyChainService = keyChainService
-        self.termsRequestMapper = termsRequestMapper
-        self.updateTermRequestMapper = updateTermRequestMapper
+        self.updateNicknameRequestMapper = updateNicknameRequestMapper
     }
     
-    func sendAgreementTerms(
-        termsOfServiceAgreed: Bool,
-        privacyPolicyAgreed: Bool,
-        isOver14: Bool,
-        eventPushAgreed: Bool
-    ) async throws {
-        let requestDTO = termsRequestMapper.map(
-            (
-                termsOfServiceAgreed: termsOfServiceAgreed,
-                privacyPolicyAgreed: privacyPolicyAgreed,
-                isOver14: isOver14,
-                eventPushAgreed: eventPushAgreed
-            )
-        )
+    func updateNickname(nickname: String) async throws {
+        let requestDTO = updateNicknameRequestMapper.map(nickname)
         let accessToken = keyChainService.load(key: "accessToken") ?? ""
-        let _ = try await networkService.request(
-            endPoint: MemberAPI.terms(accessToken: accessToken, dto: requestDTO),
-            responseType: TermsResponseDTO.self
+        let responseDTO = try await networkService.request(
+            endPoint: MemberAPI.updateNickname(accessToken: accessToken, dto: requestDTO),
+            responseType: MemberResponseDTO.self
         )
-    }
-    
-    func updateAgreementTerm(eventPushAgreed: Bool) async throws {
-        let requestDTO = updateTermRequestMapper.map(eventPushAgreed)
-        let accessToken = keyChainService.load(key: "accessToken") ?? ""
-        let _ = try await networkService.request(
-            endPoint: MemberAPI.updateTerm(accessToken: accessToken, dto: requestDTO),
-            responseType: TermsResponseDTO.self
-        )
+        // UserDefault에 저장
     }
 }

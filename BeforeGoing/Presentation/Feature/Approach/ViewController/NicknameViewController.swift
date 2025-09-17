@@ -11,6 +11,16 @@ final class NicknameViewController: BaseViewController {
     
     private let nicknameView = NicknameView()
     private static let maxNumberOfCharacters = 8
+    private let viewModel: NicknameViewModel
+    
+    init(viewModel: NicknameViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewWillAppear(_ animated: Bool) {
         self.navigationItem.hidesBackButton = true
@@ -86,9 +96,26 @@ extension NicknameViewController {
     
     @objc
     private func startButtonDidTap() {
-        let viewController = OnboardingViewController()
-        viewController.navigationItem.hidesBackButton = true
-        self.navigationController?.pushViewController(viewController, animated: false)
+        guard let nickname = nicknameView.nicknameTextField.text,
+              !nickname.isEmpty else {
+            return
+        }
+        
+        var result: NicknameViewModel.Output = .updateNicknameResult(false)
+        Task {
+            result = try await viewModel.action(input: .startButtonDidTap(nickname: nickname))
+        }
+        
+        switch result {
+        case .updateNicknameResult(let isNicknameUpdated):
+            if isNicknameUpdated {
+                let viewController = ViewControllerFactory.shared.makeOnboardingViewController()
+                viewController.navigationItem.hidesBackButton = true
+                self.navigationController?.pushViewController(viewController, animated: false)
+                return
+            }
+            BeforeGoingLogger.error(BeforeGoingError.updateNicknameFailed)
+        }
     }
     
     private func trimText(_ text: String) -> String {

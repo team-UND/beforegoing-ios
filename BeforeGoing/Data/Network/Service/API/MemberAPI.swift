@@ -8,30 +8,27 @@
 import Alamofire
 
 enum MemberAPI {
-    case terms(accessToken: String, dto: TermsRequestDTO)
-    case updateTerm(accessToken: String, dto: UpdateTermRequestDTO)
+    case updateNickname(accessToken: String, dto: UpdateNicknameRequestDTO)
 }
 
 extension MemberAPI: EndPoint {
     
     var basePath: String {
-        "/v1/terms"
+        "/v1/member"
     }
     
     var url: String {
         let basePath = Environment.baseURL + basePath
         
         switch self {
-        case .terms, .updateTerm:
-            return basePath
+        case .updateNickname:
+            return basePath + "/nickname"
         }
     }
     
     var method: HTTPMethod {
         switch self {
-        case .terms:
-            return .post
-        case .updateTerm:
+        case .updateNickname:
             return .patch
         }
     }
@@ -42,7 +39,7 @@ extension MemberAPI: EndPoint {
 
     var headers: HTTPHeaders? {
         switch self {
-        case .terms(let accessToken, _), .updateTerm(let accessToken, _):
+        case .updateNickname(let accessToken, _):
             return [
                 "Content-Type": "application/json",
                 "Authorization": "Bearer \(accessToken)"
@@ -52,7 +49,7 @@ extension MemberAPI: EndPoint {
 
     var parameterEncoding: any ParameterEncoding {
         switch self {
-        case .terms, .updateTerm:
+        case .updateNickname:
             return JSONEncoding.default
         }
     }
@@ -63,9 +60,7 @@ extension MemberAPI: EndPoint {
 
     var bodyParameters: Parameters? {
         switch self {
-        case .terms(_, let dto):
-            return try? dto.toBodyParameters()
-        case .updateTerm(_, let dto):
+        case .updateNickname(_, let dto):
             return try? dto.toBodyParameters()
         }
     }
@@ -74,4 +69,3 @@ extension MemberAPI: EndPoint {
         return true
     }
 }
-

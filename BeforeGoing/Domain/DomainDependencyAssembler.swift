@@ -29,6 +29,10 @@ final class DomainDependencyAssembler: DependencyAssembler {
         DIContainer.shared.register(AutoLoginUseCase(repository: authrepository))
         DIContainer.shared.register(KakaoLoginUseCase(repository: authrepository))
         DIContainer.shared.register(LogoutUseCase(repository: authrepository))
-        DIContainer.shared.register(AgreeTermsUseCase(repository: memberRepository))
+        
+        DIContainer.shared.register(AgreeTermsUseCase(repository: termsRepository))
+        DIContainer.shared.register(UpdatePushNoticeUseCase(repository: termsRepository))
+        
+        DIContainer.shared.register(UpdateNicknameUseCase(repository: memberRepository))
     }
 }

@@ -7,11 +7,5 @@
 
 protocol MemberInterface {
     
-    func sendAgreementTerms(
-        termsOfServiceAgreed: Bool,
-        privacyPolicyAgreed: Bool,
-        isOver14: Bool,
-        eventPushAgreed: Bool
-    ) async throws
-    func updateAgreementTerm(eventPushAgreed: Bool) async throws
+    func updateNickname(nickname: String) async throws
 }
