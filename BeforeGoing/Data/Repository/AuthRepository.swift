@@ -10,16 +10,27 @@ struct AuthRepository: AuthInterface {
     private let networkService: NetworkService
     private let tokenReissuer: TokenReissuer
     private let keyChainService: KeyChainService
+    private let nonceRequestMapper: NonceRequestMapper
+    private let loginRequestMapper: LoginRequestMapper
     
-    init(networkService: NetworkService, tokenReissuer: TokenReissuer, keyChainService: KeyChainService) {
+    init(
+        networkService: NetworkService,
+        tokenReissuer: TokenReissuer,
+        keyChainService: KeyChainService,
+        nonceRequestMapper: NonceRequestMapper,
+        loginRequestMapper: LoginRequestMapper
+    ) {
         self.networkService = networkService
         self.tokenReissuer = tokenReissuer
         self.keyChainService = keyChainService
+        self.nonceRequestMapper = nonceRequestMapper
+        self.loginRequestMapper = loginRequestMapper
     }
     
-    func requestNonce(dto: NonceRequestDTO) async throws -> NonceEntity {
+    func requestNonce(provider: String) async throws -> NonceEntity {
+        let nonceRequestDTO = nonceRequestMapper.map(provider)
         let response = try await networkService.request(
-            endPoint: AuthAPI.nonce(dto: dto),
+            endPoint: AuthAPI.nonce(dto: nonceRequestDTO),
             responseType: NonceResponseDTO.self
         )
         return response.toEntity()
@@ -29,9 +40,10 @@ struct AuthRepository: AuthInterface {
         return try await networkService.requestKakaoIDToken(nonce: nonce)
     }
     
-    func requestKakaoLogin(dto: LoginRequestDTO) async throws {
+    func requestKakaoLogin(provider: String, idToken: String) async throws {
+        let requestDTO = loginRequestMapper.map((provider, idToken))
         let response = try await networkService.request(
-            endPoint: AuthAPI.kakaoLogin(dto: dto),
+            endPoint: AuthAPI.kakaoLogin(dto: requestDTO),
             responseType: LoginResponseDTO.self
         )
         // 기존 가입 여부에 따른 분기 처리

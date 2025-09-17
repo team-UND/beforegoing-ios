@@ -25,14 +25,16 @@ struct DataDependencyAssembler: DependencyAssembler {
             AuthRepository(
                 networkService: networkService,
                 tokenReissuer: tokenReissuer,
-                keyChainService: keyChainService
+                keyChainService: keyChainService,
+                nonceRequestMapper: nonceRequestMapper,
+                loginRequestMapper: loginRequestMapper
             )
         )
         DIContainer.shared.register(
             MemberRepository(
                 networkService: networkService,
                 keyChainService: keyChainService,
-                termsMapper: termsMapper
+                termsRequestMapper: termsRequestMapper
             )
         )
     }
