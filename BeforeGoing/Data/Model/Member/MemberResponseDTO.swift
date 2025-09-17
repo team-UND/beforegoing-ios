@@ -8,8 +8,8 @@
 struct MemberResponseDTO: Decodable {
     let id: Int
     let nickname: String
-    let kakaoId: String
-    let appleId: String
+    let kakaoId: String?
+    let appleId: String?
     let createdAt: String
     let updatedAt: String
 }
