@@ -52,9 +52,9 @@ final class AgreeItemViewModel: ViewModeling {
             do {
                 try await useCase.execute(
                     termsOfServiceAgreed: checkBoxStates[.isTermsOfServiceAgreed] == .some(.checked) ? true : false,
-                    privacyPolicyAgreed: true,
-                    isOver14: true,
-                    eventPushAgreed: true
+                    privacyPolicyAgreed: checkBoxStates[.isPrivacyPolicyAgreed] == .some(.checked) ? true : false,
+                    isOver14: checkBoxStates[.isOverFourteen] == .some(.checked) ? true : false,
+                    eventPushAgreed: checkBoxStates[.isPushAgreed] == .some(.checked) ? true : false
                 )
                 return .agreeTermsResult(true)
             }
