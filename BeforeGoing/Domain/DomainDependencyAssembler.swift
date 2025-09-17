@@ -31,6 +31,11 @@ final class DomainDependencyAssembler: DependencyAssembler {
             return
         }
         
+        guard let memberRepository: MemberRepository = DIContainer.shared.resolve() else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            return
+        }
+        
         DIContainer.shared.register(AutoLoginUseCase(repository: authrepository))
         DIContainer.shared.register(KakaoLoginUseCase(
             nonceRequestMapper: nonceRequestMapper,
@@ -38,5 +43,6 @@ final class DomainDependencyAssembler: DependencyAssembler {
             repository: authrepository
         ))
         DIContainer.shared.register(LogoutUseCase(repository: authrepository))
+        DIContainer.shared.register(AgreeTermsUseCase(repository: memberRepository))
     }
 }
