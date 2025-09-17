@@ -33,4 +33,12 @@ final class ViewControllerFactory {
         }
         return ProfileViewController(viewModel: profileViewModel)
     }
+    
+    func makeAgreeTermsViewController() -> AgreeTermsViewController {
+        guard let agreeTermsViewModel: AgreeItemViewModel = DIContainer.shared.resolve() else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        return AgreeTermsViewController(viewModel: agreeTermsViewModel)
+    }
 }

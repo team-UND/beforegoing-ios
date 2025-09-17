@@ -42,7 +42,7 @@ extension LoginViewController {
                 try await viewModel.action(input: .kakaoLoginDidTap)
                 // 이미 있는 회원이라면 홈
                 // 첫 회원가입이라면 약관동의로 이동
-                let viewController = AgreeTermsViewController(viewModel: AgreeItemViewModel())
+                let viewController = ViewControllerFactory.shared.makeAgreeTermsViewController()
                 viewController.navigationItem.hidesBackButton = true
                 self.navigationController?.pushViewController(viewController, animated: true)
             } catch(let error) {
