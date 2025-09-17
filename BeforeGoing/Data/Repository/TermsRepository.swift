@@ -30,6 +30,8 @@ struct TermsRepository: TermsInterface {
         isOver14: Bool,
         eventPushAgreed: Bool
     ) async throws {
+        guard let accessToken = keyChainService.load(key: .accessToken) else { return }
+        
         let requestDTO = termsRequestMapper.map(
             (
                 termsOfServiceAgreed: termsOfServiceAgreed,
@@ -38,7 +40,6 @@ struct TermsRepository: TermsInterface {
                 eventPushAgreed: eventPushAgreed
             )
         )
-        let accessToken = keyChainService.load(key: "accessToken") ?? ""
         let _ = try await networkService.request(
             endPoint: TermsAPI.terms(accessToken: accessToken, dto: requestDTO),
             responseType: TermsResponseDTO.self
@@ -46,8 +47,9 @@ struct TermsRepository: TermsInterface {
     }
     
     func updateAgreementTerm(eventPushAgreed: Bool) async throws {
+        guard let accessToken = keyChainService.load(key: .accessToken) else { return }
+        
         let requestDTO = updateTermRequestMapper.map(eventPushAgreed)
-        let accessToken = keyChainService.load(key: "accessToken") ?? ""
         let _ = try await networkService.request(
             endPoint: TermsAPI.updateTerm(accessToken: accessToken, dto: requestDTO),
             responseType: TermsResponseDTO.self

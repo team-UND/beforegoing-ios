@@ -51,13 +51,13 @@ struct AuthRepository: AuthInterface {
     }
     
     private func saveKeyChain(response: LoginResponseDTO) {
-        keyChainService.save(response.accessToken, forKey: KeyChainKey.accessToken.rawValue)
-        keyChainService.save(response.refreshToken, forKey: KeyChainKey.refreshToken.rawValue)
+        keyChainService.save(response.accessToken, forKey: .accessToken)
+        keyChainService.save(response.refreshToken, forKey: .refreshToken)
     }
     
     func autoLogin() async throws -> Bool {
-        guard let accessToken = keyChainService.load(key: KeyChainKey.accessToken.rawValue),
-              let refreshToken = keyChainService.load(key: KeyChainKey.refreshToken.rawValue),
+        guard let accessToken = keyChainService.load(key: .accessToken),
+              let refreshToken = keyChainService.load(key: .refreshToken),
               !accessToken.isEmpty,
               !refreshToken.isEmpty else {
             
@@ -78,7 +78,7 @@ struct AuthRepository: AuthInterface {
     }
     
     func deleteUserInformation() {
-        keyChainService.delete(key: KeyChainKey.accessToken.rawValue)
-        keyChainService.delete(key: KeyChainKey.refreshToken.rawValue)
+        keyChainService.delete(key: .accessToken)
+        keyChainService.delete(key: .refreshToken)
     }
 }

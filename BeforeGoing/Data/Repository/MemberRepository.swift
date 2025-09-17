@@ -25,12 +25,37 @@ struct MemberRepository: MemberInterface {
     }
     
     func updateNickname(nickname: String) async throws {
+        guard let accessToken = keyChainService.load(key: .accessToken) else { return }
+        
         let requestDTO = updateNicknameRequestMapper.map(nickname)
-        let accessToken = keyChainService.load(key: "accessToken") ?? ""
         let responseDTO = try await networkService.request(
             endPoint: MemberAPI.updateNickname(accessToken: accessToken, dto: requestDTO),
             responseType: MemberResponseDTO.self
         )
         let _ = userDefaultsService.save(responseDTO.nickname, key: .memberName)
+    }
+    
+    func withdrawMember() async throws {
+        guard let accessToken = keyChainService.load(key: .accessToken) else { return }
+        
+        try await networkService.request(endPoint: MemberAPI.withdraw(accessToken: accessToken))
+        removeMemberInfo()
+    }
+    
+    private func removeMemberInfo() {
+        removeKeyChainInfo()
+        removeUserDefaultsInfo()
+    }
+    
+    private func removeKeyChainInfo() {
+        for key in KeyChainKey.allCases {
+            keyChainService.delete(key: key)
+        }
+    }
+    
+    private func removeUserDefaultsInfo() {
+        for key in UserDefaultsKey.allCases {
+            let _ = userDefaultsService.delete(key: key)
+        }
     }
 }

@@ -1,3 +1,3 @@
-enum KeyChainKey: String {
+enum KeyChainKey: CaseIterable {
     case accessToken, refreshToken
 }

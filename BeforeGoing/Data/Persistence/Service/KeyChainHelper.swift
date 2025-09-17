@@ -2,7 +2,7 @@ import UIKit
 
 enum KeyChainHelper {
     
-    static func save(_ value: String, forKey key: String) {
+    static func save(_ value: String, forKey key: KeyChainKey) {
         let data = Data(value.utf8)
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
@@ -13,7 +13,7 @@ enum KeyChainHelper {
         SecItemAdd(query as CFDictionary, nil)
     }
     
-    static func load(key: String) -> String? {
+    static func load(key: KeyChainKey) -> String? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrAccount as String: key,
@@ -29,7 +29,7 @@ enum KeyChainHelper {
         return nil
     }
     
-    static func delete(key: String) {
+    static func delete(key: KeyChainKey) {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrAccount as String: key
