@@ -101,20 +101,19 @@ extension NicknameViewController {
             return
         }
         
-        var result: NicknameViewModel.Output = .updateNicknameResult(false)
         Task {
-            result = try await viewModel.action(input: .startButtonDidTap(nickname: nickname))
-        }
-        
-        switch result {
-        case .updateNicknameResult(let isNicknameUpdated):
-            if isNicknameUpdated {
-                let viewController = ViewControllerFactory.shared.makeOnboardingViewController()
-                viewController.navigationItem.hidesBackButton = true
-                self.navigationController?.pushViewController(viewController, animated: false)
-                return
+            let result = try await viewModel.action(input: .startButtonDidTap(nickname: nickname))
+            
+            switch result {
+            case .updateNicknameResult(let isNicknameUpdated):
+                if isNicknameUpdated {
+                    let viewController = ViewControllerFactory.shared.makeOnboardingViewController()
+                    viewController.navigationItem.hidesBackButton = true
+                    self.navigationController?.pushViewController(viewController, animated: false)
+                    return
+                }
+                BeforeGoingLogger.error(BeforeGoingError.updateNicknameFailed)
             }
-            BeforeGoingLogger.error(BeforeGoingError.updateNicknameFailed)
         }
     }
     
