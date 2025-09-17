@@ -9,15 +9,18 @@ struct MemberRepository: MemberInterface {
     
     private let networkService: NetworkService
     private let keyChainService: KeyChainService
+    private let userDefaultsService: UserDefaultsService
     private let updateNicknameRequestMapper: UpdateNicknameRequestMapper
     
     init(
         networkService: NetworkService,
         keyChainService: KeyChainService,
+        userDefaultsService: UserDefaultsService,
         updateNicknameRequestMapper: UpdateNicknameRequestMapper
     ) {
         self.networkService = networkService
         self.keyChainService = keyChainService
+        self.userDefaultsService = userDefaultsService
         self.updateNicknameRequestMapper = updateNicknameRequestMapper
     }
     
@@ -28,6 +31,6 @@ struct MemberRepository: MemberInterface {
             endPoint: MemberAPI.updateNickname(accessToken: accessToken, dto: requestDTO),
             responseType: MemberResponseDTO.self
         )
-        // UserDefault에 저장
+        let _ = userDefaultsService.save(responseDTO.nickname, key: .memberName)
     }
 }
