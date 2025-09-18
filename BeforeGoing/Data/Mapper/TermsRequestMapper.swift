@@ -14,12 +14,7 @@ struct TermsRequestMapper: Mapper {
     typealias Output = TermsRequestDTO
     
     func map(
-        _ input: (
-            termsOfServiceAgreed: Bool,
-            privacyPolicyAgreed: Bool,
-            isOver14: Bool,
-            eventPushAgreed: Bool
-        )
+        _ input: Input
     ) -> TermsRequestDTO {
         return .init(
             termsOfServiceAgreed: input.termsOfServiceAgreed,
