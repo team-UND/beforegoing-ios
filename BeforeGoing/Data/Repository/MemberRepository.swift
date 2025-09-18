@@ -32,7 +32,10 @@ struct MemberRepository: MemberInterface {
     }
     
     func updateNickname(nickname: String) async throws {
-        guard let accessToken = keyChainService.load(key: .accessToken) else { return }
+        guard let accessToken = keyChainService.load(key: .accessToken) else {
+            BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
+            return
+        }
         
         let requestDTO = updateNicknameRequestMapper.map(nickname)
         let responseDTO = try await networkService.request(
@@ -43,7 +46,10 @@ struct MemberRepository: MemberInterface {
     }
     
     func withdrawMember() async throws {
-        guard let accessToken = keyChainService.load(key: .accessToken) else { return }
+        guard let accessToken = keyChainService.load(key: .accessToken) else {
+            BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
+            return
+        }
         
         try await networkService.request(endPoint: MemberAPI.withdraw(accessToken: accessToken))
         removeMemberInfo()

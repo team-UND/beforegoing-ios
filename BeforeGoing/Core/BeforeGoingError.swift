@@ -12,4 +12,5 @@ enum BeforeGoingError: Error {
     case updateNicknameFailed
     case updatePushAgreedFailed
     case eventPushAgreedNotFound
+    case accessTokenMissing
 }
