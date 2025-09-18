@@ -24,6 +24,13 @@ struct MemberRepository: MemberInterface {
         self.updateNicknameRequestMapper = updateNicknameRequestMapper
     }
     
+    func getMemberName() -> String? {
+        guard let name: String? = userDefaultsService.load(key: .memberName) else {
+            return nil
+        }
+        return name
+    }
+    
     func updateNickname(nickname: String) async throws {
         guard let accessToken = keyChainService.load(key: .accessToken) else { return }
         

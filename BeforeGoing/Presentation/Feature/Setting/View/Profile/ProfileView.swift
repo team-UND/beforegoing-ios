@@ -22,7 +22,6 @@ final class ProfileView: BaseView {
             $0.image = .profile
         }
         nameLabel.do {
-            $0.text = "허승준"    // 추후 변경
             $0.textColor = .gray900
             $0.font = .custom(.headingH4)
         }
@@ -88,7 +87,7 @@ final class ProfileView: BaseView {
 
 extension ProfileView {
     
-    func getUserName() -> String {
-        nameLabel.text ?? ""
+    func bind(name: String) {
+        nameLabel.text = name
     }
 }
