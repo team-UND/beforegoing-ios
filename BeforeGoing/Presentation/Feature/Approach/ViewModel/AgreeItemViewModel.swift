@@ -51,10 +51,10 @@ final class AgreeItemViewModel: ViewModeling {
         case .nextButtonDidTap:
             do {
                 try await useCase.execute(
-                    termsOfServiceAgreed: checkBoxStates[.isTermsOfServiceAgreed] == .some(.checked) ? true : false,
-                    privacyPolicyAgreed: checkBoxStates[.isPrivacyPolicyAgreed] == .some(.checked) ? true : false,
-                    isOver14: checkBoxStates[.isOverFourteen] == .some(.checked) ? true : false,
-                    eventPushAgreed: checkBoxStates[.isPushAgreed] == .some(.checked) ? true : false
+                    termsOfServiceAgreed: matchState(item: .isTermsOfServiceAgreed),
+                    privacyPolicyAgreed: matchState(item: .isPrivacyPolicyAgreed),
+                    isOver14: matchState(item: .isOverFourteen),
+                    eventPushAgreed: matchState(item: .isPushAgreed)
                 )
                 return .agreeTermsResult(true)
             }
@@ -63,5 +63,10 @@ final class AgreeItemViewModel: ViewModeling {
                 return .agreeTermsResult(false)
             }
         }
+    }
+    
+    private func matchState(item: AgreeItem) -> Bool {
+        let state = getState(item: item)
+        return (state == .checked) ? true : false
     }
 }
