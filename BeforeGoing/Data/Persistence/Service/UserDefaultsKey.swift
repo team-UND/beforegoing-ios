@@ -5,6 +5,6 @@
 //  Created by APPLE on 9/17/25.
 //
 
-enum UserDefaultsKey: String {
+enum UserDefaultsKey: String, CaseIterable {
     case memberName
 }
