@@ -12,27 +12,27 @@ final class ViewControllerFactory {
     
     func makeSplashViewController() -> SplashViewController {
         let viewModel = resolveViewModel(SplashViewModel.self)
-        return SplashViewController(viewModel: viewModel)
+        return .init(viewModel: viewModel)
     }
     
     func makeLoginViewController() -> LoginViewController {
         let viewModel = resolveViewModel(LoginViewModel.self)
-        return LoginViewController(viewModel: viewModel)
+        return .init(viewModel: viewModel)
     }
     
     func makeProfileViewController() -> ProfileViewController {
         let viewModel = resolveViewModel(ProfileViewModel.self)
-        return ProfileViewController(viewModel: viewModel)
+        return .init(viewModel: viewModel)
     }
     
     func makeAgreeTermsViewController() -> AgreeTermsViewController {
         let viewModel = resolveViewModel(AgreeItemViewModel.self)
-        return AgreeTermsViewController(viewModel: viewModel)
+        return .init(viewModel: viewModel)
     }
     
     func makeNicknameViewController() -> NicknameViewController {
         let viewModel = resolveViewModel(NicknameViewModel.self)
-        return NicknameViewController(viewModel: viewModel)
+        return .init(viewModel: viewModel)
     }
     
     func makeOnboardingViewController() -> OnboardingViewController {
