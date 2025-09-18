@@ -17,19 +17,16 @@ final class SettingViewModel: ViewModeling {
         case switchButtonDidTap(Bool)
     }
     
-    enum Output {
-        case eventPushAgreedResult(Bool)
-    }
+    typealias Output = Void
     
     func action(input: Input) async throws -> Output {
         switch input {
         case .switchButtonDidTap(let eventPushAgreed):
             do {
                 try await useCase.execute(eventPushAgreed: eventPushAgreed)
-                return .eventPushAgreedResult(true)
+                return
             } catch (let error) {
                 BeforeGoingLogger.error(error)
-                return .eventPushAgreedResult(false)
             }
         }
     }
