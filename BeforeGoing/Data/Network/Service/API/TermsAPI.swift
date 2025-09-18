@@ -8,7 +8,7 @@
 import Alamofire
 
 enum TermsAPI {
-    case terms(accessToken: String, dto: TermsRequestDTO)
+    case sendTerms(accessToken: String, dto: TermsRequestDTO)
     case updateTerm(accessToken: String, dto: UpdateTermRequestDTO)
 }
 
@@ -22,14 +22,14 @@ extension TermsAPI: EndPoint {
         let basePath = Environment.baseURL + basePath
         
         switch self {
-        case .terms, .updateTerm:
+        case .sendTerms, .updateTerm:
             return basePath
         }
     }
     
     var method: HTTPMethod {
         switch self {
-        case .terms:
+        case .sendTerms:
             return .post
         case .updateTerm:
             return .patch
@@ -42,7 +42,7 @@ extension TermsAPI: EndPoint {
 
     var headers: HTTPHeaders? {
         switch self {
-        case .terms(let accessToken, _), .updateTerm(let accessToken, _):
+        case .sendTerms(let accessToken, _), .updateTerm(let accessToken, _):
             return [
                 "Content-Type": "application/json",
                 "Authorization": "Bearer \(accessToken)"
@@ -52,7 +52,7 @@ extension TermsAPI: EndPoint {
 
     var parameterEncoding: any ParameterEncoding {
         switch self {
-        case .terms, .updateTerm:
+        case .sendTerms, .updateTerm:
             return JSONEncoding.default
         }
     }
@@ -63,7 +63,7 @@ extension TermsAPI: EndPoint {
 
     var bodyParameters: Parameters? {
         switch self {
-        case .terms(_, let dto):
+        case .sendTerms(_, let dto):
             return try? dto.toBodyParameters()
         case .updateTerm(_, let dto):
             return try? dto.toBodyParameters()

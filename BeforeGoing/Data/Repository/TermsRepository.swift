@@ -41,7 +41,7 @@ struct TermsRepository: TermsInterface {
             )
         )
         let _ = try await networkService.request(
-            endPoint: TermsAPI.terms(accessToken: accessToken, dto: requestDTO),
+            endPoint: TermsAPI.sendTerms(accessToken: accessToken, dto: requestDTO),
             responseType: TermsResponseDTO.self
         )
     }
