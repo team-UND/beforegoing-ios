@@ -25,8 +25,8 @@ final class SettingViewController: BaseViewController {
         view = rootView
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    override func viewDidLoad() {
+        super.viewDidLoad()
         Task {
             guard let result = try await viewModel.action(
                 input: .viewWillAppear
