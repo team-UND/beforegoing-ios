@@ -46,11 +46,19 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
+        guard let getMemberNameUseCase: GetMemberNameUseCase = DIContainer.shared.resolve() else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
         DIContainer.shared.register(AgreeItemViewModel(useCase: agreeTermsUseCase))
         DIContainer.shared.register(LoginViewModel(kakaoLoginUseCase: kakaoLoginUseCase))
         DIContainer.shared.register(SplashViewModel(useCase: autoLoginUseCase))
-        DIContainer.shared.register(ProfileViewModel(logoutUseCase: logoutUseCase))
+        DIContainer.shared.register(
+            ProfileViewModel(getMemberNameUseCase: getMemberNameUseCase, logoutUseCase: logoutUseCase)
+        )
         DIContainer.shared.register(SettingViewModel(useCase: updatePushNoticeUseCase))
         DIContainer.shared.register(NicknameViewModel(useCase: updateNicknameUseCase))
+        DIContainer.shared.register(ModifyNicknameViewModel(useCase: updateNicknameUseCase))
     }
 }
