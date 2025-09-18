@@ -81,7 +81,9 @@ extension ProfileViewController {
     @objc
     private func logoutButtonDidTap() {
         Task {
-            let result = try await viewModel.action(input: .logoutButtonDidTap) as! ProfileViewModel.LogoutOutput
+            guard let result = try await viewModel.action(input: .logoutButtonDidTap) as? ProfileViewModel.LogoutOutput else {
+                return
+            }
             if result.isSucceedLogout {
                 let loginViewController = ViewControllerFactory.shared.makeLoginViewController()
                 ViewControllerUtil.shared.replaceRootViewController(to: loginViewController)
@@ -95,7 +97,21 @@ extension ProfileViewController {
     private func withdrawButtonDidTap() {
         let viewController = ModalViewController(
             modalView: ModalView(type: .withdraw),
-            action: nil
+            action: {
+                Task {
+                    guard let result = try await self.viewModel.action(
+                        input: .withdrawButtonDidTap
+                    ) as? ProfileViewModel.WithdrawOutput else {
+                        return
+                    }
+                    if result.isSucceedWithdraw {
+                        self.dismiss(animated: false)
+                        let viewController = ViewControllerFactory.shared.makeLoginViewController()
+                        ViewControllerUtil.shared.replaceRootViewController(to: viewController)
+                        return
+                    }
+                }
+            }
         )
         viewController.modalPresentationStyle = .overFullScreen
         self.present(viewController, animated: true)

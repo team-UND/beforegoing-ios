@@ -11,10 +11,16 @@ final class ProfileViewModel: ViewModeling {
     
     private let getMemberNameUseCase: GetMemberNameUseCase
     private let logoutUseCase: LogoutUseCase
+    private let withdrawUseCase: MemberWithdrawUseCase
     
-    init(getMemberNameUseCase: GetMemberNameUseCase, logoutUseCase: LogoutUseCase) {
+    init(
+        getMemberNameUseCase: GetMemberNameUseCase,
+        logoutUseCase: LogoutUseCase,
+        withdrawUseCase: MemberWithdrawUseCase
+    ) {
         self.getMemberNameUseCase = getMemberNameUseCase
         self.logoutUseCase = logoutUseCase
+        self.withdrawUseCase = withdrawUseCase
     }
     
     enum Input {
@@ -51,7 +57,13 @@ final class ProfileViewModel: ViewModeling {
                 return LogoutOutput(isSucceedLogout: false)
             }
         case .withdrawButtonDidTap:
-            return WithdrawOutput(isSucceedWithdraw: true)
+            do {
+                try await withdrawUseCase.execute()
+                return WithdrawOutput(isSucceedWithdraw: true)
+            } catch(let error) {
+                BeforeGoingLogger.error(error)
+                return WithdrawOutput(isSucceedWithdraw: false)
+            }
         }
     }
 }

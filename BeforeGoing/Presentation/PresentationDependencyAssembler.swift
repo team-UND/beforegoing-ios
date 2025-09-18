@@ -51,11 +51,20 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
+        guard let withdrawUseCase: MemberWithdrawUseCase = DIContainer.shared.resolve() else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
         DIContainer.shared.register(AgreeItemViewModel(useCase: agreeTermsUseCase))
         DIContainer.shared.register(LoginViewModel(kakaoLoginUseCase: kakaoLoginUseCase))
         DIContainer.shared.register(SplashViewModel(useCase: autoLoginUseCase))
         DIContainer.shared.register(
-            ProfileViewModel(getMemberNameUseCase: getMemberNameUseCase, logoutUseCase: logoutUseCase)
+            ProfileViewModel(
+                getMemberNameUseCase: getMemberNameUseCase,
+                logoutUseCase: logoutUseCase,
+                withdrawUseCase: withdrawUseCase
+            )
         )
         DIContainer.shared.register(SettingViewModel(useCase: updatePushNoticeUseCase))
         DIContainer.shared.register(NicknameViewModel(useCase: updateNicknameUseCase))

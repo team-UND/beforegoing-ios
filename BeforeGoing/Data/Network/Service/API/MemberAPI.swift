@@ -9,6 +9,7 @@ import Alamofire
 
 enum MemberAPI {
     case updateNickname(accessToken: String, dto: UpdateNicknameRequestDTO)
+    case withdraw(accessToken: String)
 }
 
 extension MemberAPI: EndPoint {
@@ -23,6 +24,8 @@ extension MemberAPI: EndPoint {
         switch self {
         case .updateNickname:
             return basePath + "/nickname"
+        case .withdraw:
+            return basePath
         }
     }
     
@@ -30,6 +33,8 @@ extension MemberAPI: EndPoint {
         switch self {
         case .updateNickname:
             return .patch
+        case .withdraw:
+            return .delete
         }
     }
 
@@ -39,7 +44,7 @@ extension MemberAPI: EndPoint {
 
     var headers: HTTPHeaders? {
         switch self {
-        case .updateNickname(let accessToken, _):
+        case .updateNickname(let accessToken, _), .withdraw(let accessToken):
             return [
                 "Content-Type": "application/json",
                 "Authorization": "Bearer \(accessToken)"
@@ -51,6 +56,8 @@ extension MemberAPI: EndPoint {
         switch self {
         case .updateNickname:
             return JSONEncoding.default
+        case .withdraw:
+            return URLEncoding.default
         }
     }
 
@@ -62,6 +69,8 @@ extension MemberAPI: EndPoint {
         switch self {
         case .updateNickname(_, let dto):
             return try? dto.toBodyParameters()
+        case .withdraw:
+            return nil
         }
     }
     

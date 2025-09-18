@@ -40,5 +40,6 @@ final class DomainDependencyAssembler: DependencyAssembler {
         
         DIContainer.shared.register(UpdateNicknameUseCase(repository: memberRepository))
         DIContainer.shared.register(GetMemberNameUseCase(repository: memberRepository))
+        DIContainer.shared.register(MemberWithdrawUseCase(repository: memberRepository))
     }
 }
