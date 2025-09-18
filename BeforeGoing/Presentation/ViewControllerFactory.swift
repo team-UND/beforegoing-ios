@@ -11,46 +11,47 @@ final class ViewControllerFactory {
     private init() {}
     
     func makeSplashViewController() -> SplashViewController {
-        guard let splashViewModel: SplashViewModel = DIContainer.shared.resolve() else {
-            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            fatalError()
-        }
-        return SplashViewController(viewModel: splashViewModel)
+        let viewModel = resolveViewModel(SplashViewModel.self)
+        return SplashViewController(viewModel: viewModel)
     }
     
     func makeLoginViewController() -> LoginViewController {
-        guard let loginViewModel: LoginViewModel = DIContainer.shared.resolve() else {
-            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            fatalError()
-        }
-        return LoginViewController(viewModel: loginViewModel)
+        let viewModel = resolveViewModel(LoginViewModel.self)
+        return LoginViewController(viewModel: viewModel)
     }
     
     func makeProfileViewController() -> ProfileViewController {
-        guard let profileViewModel: ProfileViewModel = DIContainer.shared.resolve() else {
-            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            fatalError()
-        }
-        return ProfileViewController(viewModel: profileViewModel)
+        let viewModel = resolveViewModel(ProfileViewModel.self)
+        return ProfileViewController(viewModel: viewModel)
     }
     
     func makeAgreeTermsViewController() -> AgreeTermsViewController {
-        guard let agreeTermsViewModel: AgreeItemViewModel = DIContainer.shared.resolve() else {
-            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            fatalError()
-        }
-        return AgreeTermsViewController(viewModel: agreeTermsViewModel)
+        let viewModel = resolveViewModel(AgreeItemViewModel.self)
+        return AgreeTermsViewController(viewModel: viewModel)
     }
     
     func makeNicknameViewController() -> NicknameViewController {
-        guard let nicknameViewModel: NicknameViewModel = DIContainer.shared.resolve() else {
-            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            fatalError()
-        }
-        return NicknameViewController(viewModel: nicknameViewModel)
+        let viewModel = resolveViewModel(NicknameViewModel.self)
+        return NicknameViewController(viewModel: viewModel)
     }
     
     func makeOnboardingViewController() -> OnboardingViewController {
         return OnboardingViewController()
+    }
+    
+    func makeModifyNicknameViewController() -> ModifyNameViewController {
+        let viewModel = resolveViewModel(ModifyNicknameViewModel.self)
+        return ModifyNameViewController(viewModel: viewModel)
+    }
+}
+
+extension ViewControllerFactory {
+    
+    private func resolveViewModel<T: ViewModeling>(_ type: T.Type) -> T {
+        guard let viewModel: T = DIContainer.shared.resolve() else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        return viewModel
     }
 }
