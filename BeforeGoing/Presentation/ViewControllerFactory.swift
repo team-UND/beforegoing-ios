@@ -41,7 +41,20 @@ final class ViewControllerFactory {
     
     func makeModifyNicknameViewController() -> ModifyNameViewController {
         let viewModel = resolveViewModel(ModifyNicknameViewModel.self)
-        return ModifyNameViewController(viewModel: viewModel)
+        return .init(viewModel: viewModel)
+    }
+    
+    func makeHomeViewController() -> HomeViewController {
+        return HomeViewController()
+    }
+    
+    func makeMyScenarioViewController() -> MyScenarioViewController {
+        return MyScenarioViewController()
+    }
+    
+    func makeSettingViewController() -> SettingViewController {
+        let viewModel = resolveViewModel(SettingViewModel.self)
+        return .init(viewModel: viewModel)
     }
 }
 
