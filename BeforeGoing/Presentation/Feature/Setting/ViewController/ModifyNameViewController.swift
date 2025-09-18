@@ -10,6 +10,16 @@ import UIKit
 final class ModifyNameViewController: BaseViewController {
     
     private let rootView = ModifyNameView()
+    private let viewModel: ModifyNicknameViewModel
+    
+    init(viewModel: ModifyNicknameViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         view = rootView
@@ -20,6 +30,11 @@ final class ModifyNameViewController: BaseViewController {
             self,
             action: #selector(nameTextFieldDidChange),
             for: .editingChanged
+        )
+        rootView.confirmButton.addTarget(
+            self,
+            action: #selector(confirmButtonDidTap),
+            for: .touchUpInside
         )
     }
     
@@ -50,6 +65,25 @@ extension ModifyNameViewController {
             let trimmedText = trimText(text)
             rootView.updateNameCount(trimmedText.count)
             rootView.updateConfirmButtonState(condition: trimmedText.isValidNickname)
+        }
+    }
+    
+    @objc
+    private func confirmButtonDidTap() {
+        guard let nickname = rootView.nameTextField.text,
+              !nickname.isEmpty else {
+            return
+        }
+        Task {
+            let result = try await viewModel.action(input: .confirmButtonDidTap(nickname: nickname))
+            switch result {
+            case .updateNicknameResult(let isSucceedUpdateNickname):
+                if isSucceedUpdateNickname {
+                    self.navigationController?.popViewController(animated: true)
+                    return
+                }
+                BeforeGoingLogger.error(BeforeGoingError.updateNicknameFailed)
+            }
         }
     }
     
