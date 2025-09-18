@@ -6,14 +6,14 @@ protocol KeyChainProtocol {
 
 struct KeyChainService: KeyChainProtocol {
     func save(_ value: String, forKey key: KeyChainKey) {
-        KeyChainHelper.save(value, forKey: key)
+        KeyChainHelper.save(value, forKey: key.rawValue)
     }
     
     func delete(key: KeyChainKey) {
-        KeyChainHelper.delete(key: key)
+        KeyChainHelper.delete(key: key.rawValue)
     }
     
     func load(key: KeyChainKey) -> String? {
-        return KeyChainHelper.load(key: key)
+        return KeyChainHelper.load(key: key.rawValue)
     }
 }
