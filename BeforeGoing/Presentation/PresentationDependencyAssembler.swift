@@ -31,7 +31,7 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
-        guard let agreeTermsUseCase: AgreeTermsUseCase = DIContainer.shared.resolve() else {
+        guard let agreeTermsUseCase: SendAgreeTermsUseCase = DIContainer.shared.resolve() else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
         }

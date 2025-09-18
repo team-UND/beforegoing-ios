@@ -5,7 +5,7 @@
 //  Created by APPLE on 9/17/25.
 //
 
-struct AgreeTermsUseCase {
+struct SendAgreeTermsUseCase {
     
     private let repository: TermsInterface
     
