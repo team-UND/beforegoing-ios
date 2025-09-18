@@ -97,7 +97,8 @@ extension ProfileViewController {
     private func withdrawButtonDidTap() {
         let viewController = ModalViewController(
             modalView: ModalView(type: .withdraw),
-            action: {
+            action: { [weak self] in
+                guard let self = self else { return }
                 Task {
                     guard let result = try await self.viewModel.action(
                         input: .withdrawButtonDidTap
