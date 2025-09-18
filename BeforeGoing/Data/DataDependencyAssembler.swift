@@ -28,7 +28,7 @@ struct DataDependencyAssembler: DependencyAssembler {
         DIContainer.shared.register(updateTermRequestMapper)
         DIContainer.shared.register(updateNicknameRequestMapper)
         
-        DIContainer.shared.register(
+        DIContainer.shared.register(type: AuthInterface.self) { _ in
             AuthRepository(
                 networkService: networkService,
                 tokenReissuer: tokenReissuer,
@@ -36,22 +36,22 @@ struct DataDependencyAssembler: DependencyAssembler {
                 nonceRequestMapper: nonceRequestMapper,
                 loginRequestMapper: loginRequestMapper
             )
-        )
-        DIContainer.shared.register(
+        }
+        DIContainer.shared.register(type: TermsInterface.self) { _ in
             TermsRepository(
                 networkService: networkService,
                 keyChainService: keyChainService,
                 termsRequestMapper: termsRequestMapper,
                 updateTermRequestMapper: updateTermRequestMapper
             )
-        )
-        DIContainer.shared.register(
+        }
+        DIContainer.shared.register(type: MemberInterface.self) { _ in
             MemberRepository(
                 networkService: networkService,
                 keyChainService: keyChainService,
                 userDefaultsService: userDefaultsService,
                 updateNicknameRequestMapper: updateNicknameRequestMapper
             )
-        )
+        }
     }
 }

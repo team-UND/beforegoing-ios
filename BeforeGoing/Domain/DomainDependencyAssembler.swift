@@ -16,17 +16,17 @@ final class DomainDependencyAssembler: DependencyAssembler {
     func assemble() {
         dataDependencyAssembler.assemble()
         
-        guard let authrepository: AuthRepository = DIContainer.shared.resolve() else {
+        guard let authrepository = DIContainer.shared.resolve(type: AuthInterface.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             return
         }
         
-        guard let termsRepository: TermsRepository = DIContainer.shared.resolve() else {
+        guard let termsRepository = DIContainer.shared.resolve(type: TermsInterface.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             return
         }
         
-        guard let memberRepository: MemberRepository = DIContainer.shared.resolve() else {
+        guard let memberRepository = DIContainer.shared.resolve(type: MemberInterface.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             return
         }
