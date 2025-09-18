@@ -107,7 +107,8 @@ extension ProfileViewController {
                     if result.isSucceedWithdraw {
                         self.dismiss(animated: false)
                         let viewController = ViewControllerFactory.shared.makeLoginViewController()
-                        ViewControllerUtil.shared.replaceRootViewController(to: viewController)
+                        let navigationController = UINavigationController(rootViewController: viewController)
+                        ViewControllerUtil.shared.replaceRootViewController(to: navigationController)
                         return
                     }
                 }
