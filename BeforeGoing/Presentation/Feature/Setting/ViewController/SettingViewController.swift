@@ -25,6 +25,23 @@ final class SettingViewController: BaseViewController {
         view = rootView
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        Task {
+            guard let result = try await viewModel.action(
+                input: .viewWillAppear
+            ) as? SettingViewModel.EventPushAgreedOutput else {
+                return
+            }
+            switch result.isEventPushAgreed {
+            case .success(let eventPushAgreed):
+                rootView.settingNoticeView.basicPushNoticeView.updateButtonState(condition: eventPushAgreed)
+            case .failure(let error):
+                BeforeGoingLogger.error(error)
+            }
+        }
+    }
+    
     override func setAction() {
         rootView.accountView.seemoreView.moveButton.addTarget(
             self,

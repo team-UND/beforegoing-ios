@@ -56,6 +56,11 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
+        guard let fetchAgreeTermsUseCase: FetchAgreeTermsUseCase = DIContainer.shared.resolve() else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
         DIContainer.shared.register(AgreeItemViewModel(useCase: agreeTermsUseCase))
         DIContainer.shared.register(LoginViewModel(kakaoLoginUseCase: kakaoLoginUseCase))
         DIContainer.shared.register(SplashViewModel(useCase: autoLoginUseCase))
@@ -66,7 +71,12 @@ struct PresentationDependencyAssembler: DependencyAssembler {
                 withdrawUseCase: withdrawUseCase
             )
         )
-        DIContainer.shared.register(SettingViewModel(useCase: updatePushNoticeUseCase))
+        DIContainer.shared.register(
+            SettingViewModel(
+                fetchAgreeTermsUseCase: fetchAgreeTermsUseCase,
+                updatePushNoticeUseCase: updatePushNoticeUseCase
+            )
+        )
         DIContainer.shared.register(NicknameViewModel(useCase: updateNicknameUseCase))
         DIContainer.shared.register(ModifyNicknameViewModel(useCase: updateNicknameUseCase))
     }

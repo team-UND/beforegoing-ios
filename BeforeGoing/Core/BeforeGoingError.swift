@@ -10,4 +10,6 @@ enum BeforeGoingError: Error {
     case reissueTokenFailed
     case agreeTermsFailed
     case updateNicknameFailed
+    case updatePushAgreedFailed
+    case eventPushAgreedNotFound
 }

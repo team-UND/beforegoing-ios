@@ -24,6 +24,16 @@ struct TermsRepository: TermsInterface {
         self.updateTermRequestMapper = updateTermRequestMapper
     }
     
+    func getAgreementTerms() async throws -> TermsEntity? {
+        guard let accessToken = keyChainService.load(key: .accessToken) else { return nil }
+        
+        let responseDTO = try await networkService.request(
+            endPoint: TermsAPI.getTerms(accessToken: accessToken),
+            responseType: TermsResponseDTO.self
+        )
+        return responseDTO.toEntity()
+    }
+    
     func sendAgreementTerms(
         termsOfServiceAgreed: Bool,
         privacyPolicyAgreed: Bool,

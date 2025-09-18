@@ -7,6 +7,7 @@
 
 protocol TermsInterface {
     
+    func getAgreementTerms() async throws -> TermsEntity?
     func sendAgreementTerms(
         termsOfServiceAgreed: Bool,
         privacyPolicyAgreed: Bool,
