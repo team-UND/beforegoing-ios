@@ -15,16 +15,18 @@ struct TokenValidator {
         return dateFormatter
     }()
     
-    func isTokenValid(accessTokenExpirationDate: String, refreshTokenExpirationDate: String) -> Bool {
-        guard let accessTokenExpirationDate = toDate(accessTokenExpirationDate),
-              let refreshTokenExpirationDate = toDate(refreshTokenExpirationDate) else {
+    func isAccessTokenValid(expirationDate: String) -> Bool {
+        guard let date = toDate(expirationDate) else {
             return false
         }
-        
-        return !isTokensExpired(
-            accessTokenExpirationDate: accessTokenExpirationDate,
-            refreshTokenExpirationDate: refreshTokenExpirationDate
-        )
+        return date > Date()
+    }
+    
+    func isRefreshTokenValid(expirationDate: String) -> Bool {
+        guard let date = toDate(expirationDate) else {
+            return false
+        }
+        return date > Date()
     }
     
     func calculateExpirationDate(expiresIn: Int) -> String {
@@ -36,10 +38,5 @@ struct TokenValidator {
     
     private func toDate(_ dateString: String) -> Date? {
         dateFormatter.date(from: dateString)
-    }
-    
-    private func isTokensExpired(accessTokenExpirationDate: Date, refreshTokenExpirationDate: Date) -> Bool {
-        let currentDate = Date()
-        return accessTokenExpirationDate < currentDate && refreshTokenExpirationDate < currentDate
     }
 }

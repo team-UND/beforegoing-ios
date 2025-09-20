@@ -65,10 +65,10 @@ struct AuthRepository: AuthInterface {
             return false
         }
         
-        if !tokenValidator.isTokenValid(
-            accessTokenExpirationDate: accessTokenExpirationDate,
-            refreshTokenExpirationDate: refreshTokenExpirationDate
-        ) {
+        if !tokenValidator.isAccessTokenValid(expirationDate: accessTokenExpirationDate) {
+            guard tokenValidator.isRefreshTokenValid(expirationDate: refreshTokenExpirationDate) else {
+                return false
+            }
             try await tokenReissuer.reissue()
         }
         return true
