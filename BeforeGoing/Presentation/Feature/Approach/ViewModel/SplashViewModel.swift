@@ -7,9 +7,9 @@
 
 final class SplashViewModel: ViewModeling {
     
-    private let useCase: AutoLoginUseCase
+    private let useCase: AutoLoginType
     
-    init(useCase: AutoLoginUseCase) {
+    init(useCase: AutoLoginType) {
         self.useCase = useCase
     }
     

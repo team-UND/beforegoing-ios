@@ -21,7 +21,7 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
-        guard let autoLoginUseCase: AutoLoginUseCase = DIContainer.shared.resolve() else {
+        guard let autoLoginUseCase = DIContainer.shared.resolve(type: AutoLoginType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
         }

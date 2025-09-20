@@ -5,6 +5,8 @@
 //  Created by APPLE on 9/14/25.
 //
 
+import Foundation
+
 final class DomainDependencyAssembler: DependencyAssembler {
     
     private let dataDependencyAssembler: DataDependencyAssembler
@@ -31,7 +33,17 @@ final class DomainDependencyAssembler: DependencyAssembler {
             return
         }
         
-        DIContainer.shared.register(AutoLoginUseCase(repository: authrepository))
+        let isUITestWithMock = ProcessInfo.processInfo.environment["USE_MOCK_AUTOLOGIN"] == "true"
+
+        if isUITestWithMock {
+            DIContainer.shared.register(type: AutoLoginType.self) { _ in
+                return MockAutoLoginUseCase()
+            }
+        } else {
+            DIContainer.shared.register(type: AutoLoginType.self) { _ in
+                return AutoLoginUseCase(repository: authrepository)
+            }
+        }
         DIContainer.shared.register(KakaoLoginUseCase(repository: authrepository))
         DIContainer.shared.register(LogoutUseCase(repository: authrepository))
         
