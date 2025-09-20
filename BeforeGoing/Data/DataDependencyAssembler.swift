@@ -16,6 +16,7 @@ struct DataDependencyAssembler: DependencyAssembler {
     private let termsRequestMapper = TermsRequestMapper()
     private let updateTermRequestMapper = UpdateTermRequestMapper()
     private let updateNicknameRequestMapper = UpdateNicknameRequestMapper()
+    private let tokenValidator = TokenValidator()
     
     init() {
         self.tokenReissuer = TokenReissuer(keyChainService: keyChainService)
@@ -33,8 +34,10 @@ struct DataDependencyAssembler: DependencyAssembler {
                 networkService: networkService,
                 tokenReissuer: tokenReissuer,
                 keyChainService: keyChainService,
+                userDefaultsService: userDefaultsService,
                 nonceRequestMapper: nonceRequestMapper,
-                loginRequestMapper: loginRequestMapper
+                loginRequestMapper: loginRequestMapper,
+                tokenValidator: tokenValidator
             )
         }
         DIContainer.shared.register(type: TermsInterface.self) { _ in

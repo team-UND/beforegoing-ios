@@ -1,3 +1,6 @@
 enum KeyChainKey: String, CaseIterable {
-    case accessToken, refreshToken
+    case accessToken
+    case refreshToken
+    case accessTokenExpirationDate
+    case refreshTokenExpirationDate
 }

@@ -28,35 +28,32 @@ final class SplashViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
                 
+        Task {
+            do {
+                let output = try await viewModel.action(input: .viewDidLoad)
+                
+                switch output {
+                case .autoLogin(let isSucceedAutoLogin):
+                    isSucceedAutoLogin ? moveHome() : moveLogin()
+                }
+            } catch {
+                BeforeGoingLogger.error(BeforeGoingError.autoLoginFailed)
+            }
+        }
+    }
+    
+    private func moveHome() {
+        let viewController = BottomNavigationViewController()
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            let viewController = ViewControllerFactory.shared.makeLoginViewController()
+            ViewControllerUtil.shared.replaceRootViewController(to: viewController)
+        }
+    }
+    
+    private func moveLogin() {
+        let viewController = ViewControllerFactory.shared.makeLoginViewController()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             viewController.navigationItem.hidesBackButton = true
             self.navigationController?.pushViewController(viewController, animated: true)
         }
-        // 추후 주석 제거 예정
-//        Task {
-//            do {
-//                var viewController: UIViewController
-//                let output = try await viewModel.action(input: .viewDidLoad)
-//                
-//                switch output {
-//                case .autoLogin(let isSucceedAutoLogin):
-//                    if isSucceedAutoLogin {
-//                        viewController = BottomNavigationViewController()
-//                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-//                            ViewControllerUtil.shared.replaceRootViewController(to: viewController)
-//                        }
-//                    } else {
-//                        viewController = ViewControllerFactory.shared.makeLoginViewController()
-//                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-//                            viewController.navigationItem.hidesBackButton = true
-//                            self.navigationController?.pushViewController(viewController, animated: true)
-//                        }
-//                    }
-//                }
-//            } catch {
-//                BeforeGoingLogger.error(BeforeGoingError.autoLoginFailed)
-//            }
-//        }
     }
 }
