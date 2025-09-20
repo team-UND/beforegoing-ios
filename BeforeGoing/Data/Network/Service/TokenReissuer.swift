@@ -16,8 +16,8 @@ struct TokenReissuer {
     }
     
     func reissue() async throws {
-        guard let accessToken = keyChainService.load(key: KeyChainKey.accessToken.rawValue),
-           let refreshToken = keyChainService.load(key: KeyChainKey.refreshToken.rawValue) else {
+        guard let accessToken = keyChainService.load(key: .accessToken),
+           let refreshToken = keyChainService.load(key: .refreshToken) else {
             throw BeforeGoingError.reissueTokenFailed
         }
         
@@ -50,7 +50,7 @@ struct TokenReissuer {
     }
     
     private func saveNewTokens(response: TokensResponseDTO) {
-        keyChainService.save(response.accessToken, forKey: KeyChainKey.accessToken.rawValue)
-        keyChainService.save(response.refreshToken, forKey: KeyChainKey.refreshToken.rawValue)
+        keyChainService.save(response.accessToken, forKey: .accessToken)
+        keyChainService.save(response.refreshToken, forKey: .refreshToken)
     }
 }

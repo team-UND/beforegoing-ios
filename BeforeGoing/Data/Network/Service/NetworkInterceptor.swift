@@ -23,7 +23,7 @@ struct NetworkInterceptor: RequestInterceptor {
         completion: @escaping (Result<URLRequest, any Error>) -> Void
     ) {
         guard urlRequest.url?.absoluteString.hasPrefix(Environment.baseURL) == true,
-              let accessToken = keyChainService.load(key: KeyChainKey.accessToken.rawValue) else {
+              let accessToken = keyChainService.load(key: .accessToken) else {
             completion(.success(urlRequest))
             return
         }

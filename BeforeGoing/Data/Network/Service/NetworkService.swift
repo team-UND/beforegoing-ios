@@ -30,7 +30,7 @@ final class NetworkService: APIManaging {
     
     func request(endPoint: any EndPoint) async throws  {
         let dataRequest = createDataRequest(endPoint: endPoint)
-        let response = try await dataRequest.serializingDecodable(EmptyDTO.self).value
+        let response = try await dataRequest.serializingData().value
         writeLog(response: response)
     }
     
@@ -41,7 +41,7 @@ final class NetworkService: APIManaging {
             parameters: endPoint.bodyParameters,
             encoding: endPoint.parameterEncoding,
             headers: endPoint.headers,
-            interceptor: interceptor
+            interceptor: endPoint.isNeedReissue ? interceptor : nil
         )
         .validate()
     }

@@ -17,4 +17,5 @@ protocol EndPoint {
     var parameterEncoding: ParameterEncoding { get }
     var queryParameters: [String: String]? { get }
     var bodyParameters: Parameters? { get }
+    var isNeedReissue: Bool { get }
 }

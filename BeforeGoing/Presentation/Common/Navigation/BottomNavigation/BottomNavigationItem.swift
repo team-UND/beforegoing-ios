@@ -14,19 +14,19 @@ enum BottomNavigationItem: CaseIterable {
         switch self {
         case .home:
             return BottomNavigationComponent(
-                viewController: HomeViewController(),
+                viewController: ViewControllerFactory.shared.makeHomeViewController(),
                 title: BottomNavigationLiteral.home.rawValue,
                 image: .home
             )
         case .scenario:
             return BottomNavigationComponent(
-                viewController: MyScenarioViewController(),
+                viewController: ViewControllerFactory.shared.makeMyScenarioViewController(),
                 title: BottomNavigationLiteral.scenario.rawValue,
                 image: .list
             )
         case .setting:
             return BottomNavigationComponent(
-                viewController: SettingViewController(),
+                viewController: ViewControllerFactory.shared.makeSettingViewController(),
                 title: BottomNavigationLiteral.setting.rawValue,
                 image: .settings
             )

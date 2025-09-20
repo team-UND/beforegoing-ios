@@ -10,16 +10,27 @@ struct AuthRepository: AuthInterface {
     private let networkService: NetworkService
     private let tokenReissuer: TokenReissuer
     private let keyChainService: KeyChainService
+    private let nonceRequestMapper: NonceRequestMapper
+    private let loginRequestMapper: LoginRequestMapper
     
-    init(networkService: NetworkService, tokenReissuer: TokenReissuer, keyChainService: KeyChainService) {
+    init(
+        networkService: NetworkService,
+        tokenReissuer: TokenReissuer,
+        keyChainService: KeyChainService,
+        nonceRequestMapper: NonceRequestMapper,
+        loginRequestMapper: LoginRequestMapper
+    ) {
         self.networkService = networkService
         self.tokenReissuer = tokenReissuer
         self.keyChainService = keyChainService
+        self.nonceRequestMapper = nonceRequestMapper
+        self.loginRequestMapper = loginRequestMapper
     }
     
-    func requestNonce(dto: NonceRequestDTO) async throws -> NonceEntity {
+    func requestNonce(provider: String) async throws -> NonceEntity {
+        let nonceRequestDTO = nonceRequestMapper.map(provider)
         let response = try await networkService.request(
-            endPoint: AuthAPI.nonce(dto: dto),
+            endPoint: AuthAPI.nonce(dto: nonceRequestDTO),
             responseType: NonceResponseDTO.self
         )
         return response.toEntity()
@@ -29,9 +40,10 @@ struct AuthRepository: AuthInterface {
         return try await networkService.requestKakaoIDToken(nonce: nonce)
     }
     
-    func requestKakaoLogin(dto: LoginRequestDTO) async throws {
+    func requestKakaoLogin(provider: String, idToken: String) async throws {
+        let requestDTO = loginRequestMapper.map((provider, idToken))
         let response = try await networkService.request(
-            endPoint: AuthAPI.kakaoLogin(dto: dto),
+            endPoint: AuthAPI.kakaoLogin(dto: requestDTO),
             responseType: LoginResponseDTO.self
         )
         // 기존 가입 여부에 따른 분기 처리
@@ -39,13 +51,13 @@ struct AuthRepository: AuthInterface {
     }
     
     private func saveKeyChain(response: LoginResponseDTO) {
-        keyChainService.save(response.accessToken, forKey: KeyChainKey.accessToken.rawValue)
-        keyChainService.save(response.refreshToken, forKey: KeyChainKey.refreshToken.rawValue)
+        keyChainService.save(response.accessToken, forKey: .accessToken)
+        keyChainService.save(response.refreshToken, forKey: .refreshToken)
     }
     
     func autoLogin() async throws -> Bool {
-        guard let accessToken = keyChainService.load(key: KeyChainKey.accessToken.rawValue),
-              let refreshToken = keyChainService.load(key: KeyChainKey.refreshToken.rawValue),
+        guard let accessToken = keyChainService.load(key: .accessToken),
+              let refreshToken = keyChainService.load(key: .refreshToken),
               !accessToken.isEmpty,
               !refreshToken.isEmpty else {
             
@@ -66,7 +78,7 @@ struct AuthRepository: AuthInterface {
     }
     
     func deleteUserInformation() {
-        keyChainService.delete(key: KeyChainKey.accessToken.rawValue)
-        keyChainService.delete(key: KeyChainKey.refreshToken.rawValue)
+        keyChainService.delete(key: .accessToken)
+        keyChainService.delete(key: .refreshToken)
     }
 }

@@ -10,8 +10,12 @@ struct DataDependencyAssembler: DependencyAssembler {
     private let networkService = NetworkService.shared
     private let keyChainService = KeyChainService()
     private let tokenReissuer: TokenReissuer
+    private let userDefaultsService = UserDefaultsService()
     private let nonceRequestMapper = NonceRequestMapper()
     private let loginRequestMapper = LoginRequestMapper()
+    private let termsRequestMapper = TermsRequestMapper()
+    private let updateTermRequestMapper = UpdateTermRequestMapper()
+    private let updateNicknameRequestMapper = UpdateNicknameRequestMapper()
     
     init() {
         self.tokenReissuer = TokenReissuer(keyChainService: keyChainService)
@@ -20,12 +24,34 @@ struct DataDependencyAssembler: DependencyAssembler {
     func assemble() {
         DIContainer.shared.register(nonceRequestMapper)
         DIContainer.shared.register(loginRequestMapper)
-        DIContainer.shared.register(
+        DIContainer.shared.register(termsRequestMapper)
+        DIContainer.shared.register(updateTermRequestMapper)
+        DIContainer.shared.register(updateNicknameRequestMapper)
+        
+        DIContainer.shared.register(type: AuthInterface.self) { _ in
             AuthRepository(
                 networkService: networkService,
                 tokenReissuer: tokenReissuer,
-                keyChainService: keyChainService
+                keyChainService: keyChainService,
+                nonceRequestMapper: nonceRequestMapper,
+                loginRequestMapper: loginRequestMapper
             )
-        )
+        }
+        DIContainer.shared.register(type: TermsInterface.self) { _ in
+            TermsRepository(
+                networkService: networkService,
+                keyChainService: keyChainService,
+                termsRequestMapper: termsRequestMapper,
+                updateTermRequestMapper: updateTermRequestMapper
+            )
+        }
+        DIContainer.shared.register(type: MemberInterface.self) { _ in
+            MemberRepository(
+                networkService: networkService,
+                keyChainService: keyChainService,
+                userDefaultsService: userDefaultsService,
+                updateNicknameRequestMapper: updateNicknameRequestMapper
+            )
+        }
     }
 }

@@ -7,9 +7,9 @@
 
 struct LogoutUseCase {
     
-    private let repository: AuthRepository
+    private let repository: AuthInterface
     
-    init(repository: AuthRepository) {
+    init(repository: AuthInterface) {
         self.repository = repository
     }
     

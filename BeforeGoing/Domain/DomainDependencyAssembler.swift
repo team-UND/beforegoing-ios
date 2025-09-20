@@ -16,27 +16,31 @@ final class DomainDependencyAssembler: DependencyAssembler {
     func assemble() {
         dataDependencyAssembler.assemble()
         
-        guard let nonceRequestMapper: NonceRequestMapper = DIContainer.shared.resolve() else {
+        guard let authrepository = DIContainer.shared.resolve(type: AuthInterface.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             return
         }
         
-        guard let loginRequestMapper: LoginRequestMapper = DIContainer.shared.resolve() else {
+        guard let termsRepository = DIContainer.shared.resolve(type: TermsInterface.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             return
         }
         
-        guard let authrepository: AuthRepository = DIContainer.shared.resolve() else {
+        guard let memberRepository = DIContainer.shared.resolve(type: MemberInterface.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             return
         }
         
         DIContainer.shared.register(AutoLoginUseCase(repository: authrepository))
-        DIContainer.shared.register(KakaoLoginUseCase(
-            nonceRequestMapper: nonceRequestMapper,
-            loginRequestMapper: loginRequestMapper,
-            repository: authrepository
-        ))
+        DIContainer.shared.register(KakaoLoginUseCase(repository: authrepository))
         DIContainer.shared.register(LogoutUseCase(repository: authrepository))
+        
+        DIContainer.shared.register(FetchAgreeTermsUseCase(repository: termsRepository))
+        DIContainer.shared.register(SendAgreeTermsUseCase(repository: termsRepository))
+        DIContainer.shared.register(UpdatePushNoticeUseCase(repository: termsRepository))
+        
+        DIContainer.shared.register(UpdateNicknameUseCase(repository: memberRepository))
+        DIContainer.shared.register(GetMemberNameUseCase(repository: memberRepository))
+        DIContainer.shared.register(MemberWithdrawUseCase(repository: memberRepository))
     }
 }

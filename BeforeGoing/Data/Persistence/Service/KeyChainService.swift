@@ -1,19 +1,19 @@
 protocol KeyChainProtocol {
-    func save(_ value: String, forKey key: String)
-    func delete(key: String)
-    func load(key: String) -> String?
+    func save(_ value: String, forKey key: KeyChainKey)
+    func delete(key: KeyChainKey)
+    func load(key: KeyChainKey) -> String?
 }
 
 struct KeyChainService: KeyChainProtocol {
-    func save(_ value: String, forKey key: String) {
-        KeyChainHelper.save(value, forKey: key)
+    func save(_ value: String, forKey key: KeyChainKey) {
+        KeyChainHelper.save(value, forKey: key.rawValue)
     }
     
-    func delete(key: String) {
-        KeyChainHelper.delete(key: key)
+    func delete(key: KeyChainKey) {
+        KeyChainHelper.delete(key: key.rawValue)
     }
     
-    func load(key: String) -> String? {
-        return KeyChainHelper.load(key: key)
+    func load(key: KeyChainKey) -> String? {
+        return KeyChainHelper.load(key: key.rawValue)
     }
 }

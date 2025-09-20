@@ -82,8 +82,19 @@ extension AgreeTermsViewController {
     
     @objc
     private func agreeButtonDidTap() {
-        let nicknameViewController = NicknameViewController()
-        self.navigationController?.pushViewController(nicknameViewController, animated: false)
+        Task {
+            let output = try await viewModel.action(input: .nextButtonDidTap)
+            
+            switch output {
+            case .agreeTermsResult(let isSucceed):
+                if isSucceed {
+                    let nicknameViewController = ViewControllerFactory.shared.makeNicknameViewController()
+                    self.navigationController?.pushViewController(nicknameViewController, animated: false)
+                    return
+                }
+                BeforeGoingLogger.error(BeforeGoingError.agreeTermsFailed)
+            }
+        }
     }
 }
 

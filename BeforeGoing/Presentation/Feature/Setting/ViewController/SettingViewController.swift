@@ -10,9 +10,36 @@ import UIKit
 final class SettingViewController: BaseViewController {
     
     private let rootView = SettingView()
+    private let viewModel: SettingViewModel
+    
+    init(viewModel: SettingViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         view = rootView
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        Task {
+            guard let result = try await viewModel.action(
+                input: .viewWillAppear
+            ) as? SettingViewModel.EventPushAgreedOutput else {
+                return
+            }
+            switch result.isEventPushAgreed {
+            case .success(let eventPushAgreed):
+                rootView.settingNoticeView.basicPushNoticeView.updateButtonState(condition: eventPushAgreed)
+            case .failure(let error):
+                BeforeGoingLogger.error(error)
+            }
+        }
     }
     
     override func setAction() {
@@ -66,7 +93,11 @@ extension SettingViewController {
     
     @objc
     private func pushNoticeButtonDidTap() {
+        let isSwitchedOn = rootView.isSwitchedOn
         
+        Task {
+            try await viewModel.action(input: .switchButtonDidTap(isSwitchedOn))
+        }
     }
     
     @objc

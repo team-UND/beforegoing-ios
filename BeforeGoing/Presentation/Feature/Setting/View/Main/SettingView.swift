@@ -61,3 +61,10 @@ final class SettingView: BaseView {
         }
     }
 }
+
+extension SettingView {
+    
+    var isSwitchedOn: Bool {
+        settingNoticeView.basicPushNoticeView.switchButton.isOn
+    }
+}

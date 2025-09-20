@@ -18,22 +18,66 @@ struct PresentationDependencyAssembler: DependencyAssembler {
         
         guard let kakaoLoginUseCase: KakaoLoginUseCase = DIContainer.shared.resolve() else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            return
+            fatalError()
         }
         
         guard let autoLoginUseCase: AutoLoginUseCase = DIContainer.shared.resolve() else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            return
+            fatalError()
         }
         
         guard let logoutUseCase: LogoutUseCase = DIContainer.shared.resolve() else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            return
+            fatalError()
         }
         
-        DIContainer.shared.register(AgreeItemViewModel())
+        guard let agreeTermsUseCase: SendAgreeTermsUseCase = DIContainer.shared.resolve() else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
+        guard let updatePushNoticeUseCase: UpdatePushNoticeUseCase = DIContainer.shared.resolve() else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
+        guard let updateNicknameUseCase: UpdateNicknameUseCase = DIContainer.shared.resolve() else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
+        guard let getMemberNameUseCase: GetMemberNameUseCase = DIContainer.shared.resolve() else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
+        guard let withdrawUseCase: MemberWithdrawUseCase = DIContainer.shared.resolve() else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
+        guard let fetchAgreeTermsUseCase: FetchAgreeTermsUseCase = DIContainer.shared.resolve() else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
+        DIContainer.shared.register(AgreeItemViewModel(useCase: agreeTermsUseCase))
         DIContainer.shared.register(LoginViewModel(kakaoLoginUseCase: kakaoLoginUseCase))
         DIContainer.shared.register(SplashViewModel(useCase: autoLoginUseCase))
-        DIContainer.shared.register(ProfileViewModel(logoutUseCase: logoutUseCase))
+        DIContainer.shared.register(
+            ProfileViewModel(
+                getMemberNameUseCase: getMemberNameUseCase,
+                logoutUseCase: logoutUseCase,
+                withdrawUseCase: withdrawUseCase
+            )
+        )
+        DIContainer.shared.register(
+            SettingViewModel(
+                fetchAgreeTermsUseCase: fetchAgreeTermsUseCase,
+                updatePushNoticeUseCase: updatePushNoticeUseCase
+            )
+        )
+        DIContainer.shared.register(NicknameViewModel(useCase: updateNicknameUseCase))
+        DIContainer.shared.register(ModifyNicknameViewModel(useCase: updateNicknameUseCase))
     }
 }

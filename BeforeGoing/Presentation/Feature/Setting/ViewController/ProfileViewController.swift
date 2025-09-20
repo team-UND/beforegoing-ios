@@ -11,6 +11,7 @@ final class ProfileViewController: BaseViewController {
     
     private let rootView = ProfileView()
     private let viewModel: ProfileViewModel
+    private var memberName: String?
     
     init(viewModel: ProfileViewModel) {
         self.viewModel = viewModel
@@ -23,6 +24,18 @@ final class ProfileViewController: BaseViewController {
     
     override func loadView() {
         view = rootView
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        Task {
+            guard let result = try await viewModel.action(
+                input: .viewWillAppear
+            ) as? ProfileViewModel.MemberNameOutput else { return}
+            
+            memberName = result.name
+            rootView.bind(name: result.name)
+        }
     }
     
     override func setAction() {
@@ -55,22 +68,28 @@ extension ProfileViewController {
     
     @objc
     private func modifyNameButtonDidTap() {
-        let viewController = ModifyNameViewController()
-        viewController.navigationItem.hidesBackButton = true
-        viewController.configure(rootView.getUserName())
+        guard let memberName = memberName else { return }
+        
+        let viewController = ViewControllerFactory.shared.makeModifyNicknameViewController()
+        viewController.do {
+            $0.navigationItem.hidesBackButton = true
+            $0.configure(memberName)
+        }
         self.navigationController?.pushViewController(viewController, animated: false)
     }
     
     @objc
     private func logoutButtonDidTap() {
         Task {
-            do {
-                try await viewModel.action(input: .logoutButtonDidTap)
+            guard let result = try await viewModel.action(input: .logoutButtonDidTap) as? ProfileViewModel.LogoutOutput else {
+                return
+            }
+            if result.isSucceedLogout {
                 let loginViewController = ViewControllerFactory.shared.makeLoginViewController()
                 ViewControllerUtil.shared.replaceRootViewController(to: loginViewController)
-            } catch {
-                BeforeGoingLogger.error(BeforeGoingError.logoutFailed)
+                return
             }
+            BeforeGoingLogger.error(BeforeGoingError.logoutFailed)
         }
     }
     
@@ -78,7 +97,23 @@ extension ProfileViewController {
     private func withdrawButtonDidTap() {
         let viewController = ModalViewController(
             modalView: ModalView(type: .withdraw),
-            action: nil
+            action: { [weak self] in
+                guard let self = self else { return }
+                Task {
+                    guard let result = try await self.viewModel.action(
+                        input: .withdrawButtonDidTap
+                    ) as? ProfileViewModel.WithdrawOutput else {
+                        return
+                    }
+                    if result.isSucceedWithdraw {
+                        self.dismiss(animated: false)
+                        let viewController = ViewControllerFactory.shared.makeLoginViewController()
+                        let navigationController = UINavigationController(rootViewController: viewController)
+                        ViewControllerUtil.shared.replaceRootViewController(to: navigationController)
+                        return
+                    }
+                }
+            }
         )
         viewController.modalPresentationStyle = .overFullScreen
         self.present(viewController, animated: true)

@@ -72,3 +72,10 @@ final class SettingPushNoticeView: BaseView {
         }
     }
 }
+
+extension SettingPushNoticeView {
+    
+    func updateButtonState(condition: Bool) {
+        switchButton.isOn = condition
+    }
+}

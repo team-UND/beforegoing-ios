@@ -7,9 +7,9 @@
 
 protocol AuthInterface {
     
-    func requestNonce(dto: NonceRequestDTO) async throws -> NonceEntity
+    func requestNonce(provider: String) async throws -> NonceEntity
     func requestIDToken(nonce: String?) async throws -> String
-    func requestKakaoLogin(dto: LoginRequestDTO) async throws
+    func requestKakaoLogin(provider: String, idToken: String) async throws
     func autoLogin() async throws -> Bool
     func logout() async throws
 }

@@ -8,4 +8,9 @@ enum BeforeGoingError: Error {
     case autoLoginFailed
     case diContainerError
     case reissueTokenFailed
+    case agreeTermsFailed
+    case updateNicknameFailed
+    case updatePushAgreedFailed
+    case eventPushAgreedNotFound
+    case accessTokenMissing
 }
