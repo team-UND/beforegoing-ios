@@ -39,12 +39,8 @@ extension LoginViewController {
     func kakaoLoginButtonDidTap() {
         Task {
             do {
-                try await viewModel.action(input: .kakaoLoginDidTap)
-                // 이미 있는 회원이라면 홈
-                // 첫 회원가입이라면 약관동의로 이동
-                let viewController = ViewControllerFactory.shared.makeAgreeTermsViewController()
-                viewController.navigationItem.hidesBackButton = true
-                self.navigationController?.pushViewController(viewController, animated: true)
+                let output = try await viewModel.action(input: .kakaoLoginDidTap)
+                output.result ? moveHome() : moveTerms()
             } catch(let error) {
                 BeforeGoingLogger.error(error)
             }
@@ -54,5 +50,16 @@ extension LoginViewController {
     @objc
     func appleLoginButtonDidTap() {
         print("Apple Did Tap")
+    }
+    
+    private func moveHome() {
+        let viewController = BottomNavigationViewController()
+        ViewControllerUtil.shared.replaceRootViewController(to: viewController)
+    }
+    
+    private func moveTerms() {
+        let viewController = ViewControllerFactory.shared.makeAgreeTermsViewController()
+        viewController.navigationItem.hidesBackButton = true
+        self.navigationController?.pushViewController(viewController, animated: true)
     }
 }
