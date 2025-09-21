@@ -26,7 +26,7 @@ final class BeforeGoingUITests: XCTestCase {
     func testExample() throws {
         // UI tests must launch the application that they test.
         let app = XCUIApplication()
-        app.launchEnvironment = ["USE_MOCK_AUTOLOGIN": "true"]
+        app.launchEnvironment = ["USE_MOCK": "true"]
         app.launch()
         
         // Use XCTAssert and related functions to verify your tests produce the correct results.
@@ -38,7 +38,7 @@ final class BeforeGoingUITests: XCTestCase {
             // This measures how long it takes to launch your application.
             measure(metrics: [XCTApplicationLaunchMetric()]) {
                 let app = XCUIApplication()
-                app.launchEnvironment = ["USE_MOCK_AUTOLOGIN": "true"]
+                app.launchEnvironment = ["USE_MOCK": "true"]
                 app.launch()
             }
         }

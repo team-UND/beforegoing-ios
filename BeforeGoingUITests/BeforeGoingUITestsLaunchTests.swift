@@ -20,7 +20,7 @@ final class BeforeGoingUITestsLaunchTests: XCTestCase {
     @MainActor
     func testLaunch() throws {
         let app = XCUIApplication()
-        app.launchEnvironment = ["USE_MOCK_AUTOLOGIN": "true"]
+        app.launchEnvironment = ["USE_MOCK": "true"]
         app.launch()
 
         // Insert steps here to perform after app launch but before taking a screenshot,
