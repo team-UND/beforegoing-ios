@@ -80,42 +80,71 @@ extension ProfileViewController {
     
     @objc
     private func logoutButtonDidTap() {
-        Task {
-            guard let result = try await viewModel.action(input: .logoutButtonDidTap) as? ProfileViewModel.LogoutOutput else {
-                return
-            }
-            if result.isSucceedLogout {
-                let loginViewController = ViewControllerFactory.shared.makeLoginViewController()
-                ViewControllerUtil.shared.replaceRootViewController(to: loginViewController)
-                return
-            }
-            BeforeGoingLogger.error(BeforeGoingError.logoutFailed)
-        }
+        presentModal(modalType: .logout)
     }
     
     @objc
     private func withdrawButtonDidTap() {
+        presentModal(modalType: .withdraw)
+    }
+    
+    private func presentModal(modalType: ModalType) {
+        var action: () -> Void
+        
+        switch modalType {
+        case .expirationLogin:
+            action = {}
+        case .logout:
+            action = defineLogout()
+        case .withdraw:
+            action = defineWithdrawal()
+        }
+        
         let viewController = ModalViewController(
-            modalView: ModalView(type: .withdraw),
-            action: { [weak self] in
-                guard let self = self else { return }
-                Task {
-                    guard let result = try await self.viewModel.action(
-                        input: .withdrawButtonDidTap
-                    ) as? ProfileViewModel.WithdrawOutput else {
-                        return
-                    }
-                    if result.isSucceedWithdraw {
-                        self.dismiss(animated: false)
-                        let viewController = ViewControllerFactory.shared.makeLoginViewController()
-                        let navigationController = UINavigationController(rootViewController: viewController)
-                        ViewControllerUtil.shared.replaceRootViewController(to: navigationController)
-                        return
-                    }
-                }
-            }
+            modalView: ModalView(type: modalType),
+            action: action
         )
         viewController.modalPresentationStyle = .overFullScreen
         self.present(viewController, animated: true)
+    }
+    
+    private func defineLogout() -> () -> Void {
+        return { [weak self] in
+            guard let self = self else { return }
+            Task {
+                guard let result = try await self.viewModel.action(
+                    input: .logoutButtonDidTap
+                ) as? ProfileViewModel.LogoutOutput else {
+                    return
+                }
+                if result.isSucceedLogout {
+                    let loginViewController = ViewControllerFactory.shared.makeLoginViewController()
+                    ViewControllerUtil.shared.replaceRootViewController(to: loginViewController)
+                    return
+                }
+                BeforeGoingLogger.error(BeforeGoingError.logoutFailed)
+            }
+        }
+    }
+    
+    private func defineWithdrawal() -> () -> Void {
+        return { [weak self] in
+            guard let self = self else { return }
+            Task {
+                guard let result = try await self.viewModel.action(
+                    input: .withdrawButtonDidTap
+                ) as? ProfileViewModel.WithdrawOutput else {
+                    return
+                }
+                if result.isSucceedWithdraw {
+                    self.dismiss(animated: false)
+                    
+                    let viewController = ViewControllerFactory.shared.makeLoginViewController()
+                    let navigationController = UINavigationController(rootViewController: viewController)
+                    ViewControllerUtil.shared.replaceRootViewController(to: navigationController)
+                    return
+                }
+            }
+        }
     }
 }
