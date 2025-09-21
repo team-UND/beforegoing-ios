@@ -16,7 +16,7 @@ struct PresentationDependencyAssembler: DependencyAssembler {
     func assemble() {
         domainDependencyAssembler.assemble()
         
-        guard let kakaoLoginUseCase: KakaoLoginUseCase = DIContainer.shared.resolve() else {
+        guard let kakaoLoginUseCase = DIContainer.shared.resolve(type: KakaoLoginType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
         }
@@ -26,37 +26,37 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
-        guard let logoutUseCase: LogoutUseCase = DIContainer.shared.resolve() else {
+        guard let logoutUseCase = DIContainer.shared.resolve(type: LogoutType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
         }
         
-        guard let agreeTermsUseCase: SendAgreeTermsUseCase = DIContainer.shared.resolve() else {
+        guard let agreeTermsUseCase = DIContainer.shared.resolve(type: SendAgreeTermsType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
         }
         
-        guard let updatePushNoticeUseCase: UpdatePushNoticeUseCase = DIContainer.shared.resolve() else {
+        guard let updatePushNoticeUseCase = DIContainer.shared.resolve(type: UpdatePushNoticeType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
         }
         
-        guard let updateNicknameUseCase: UpdateNicknameUseCase = DIContainer.shared.resolve() else {
+        guard let updateNicknameUseCase = DIContainer.shared.resolve(type: UpdateNicknameType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
         }
         
-        guard let getMemberNameUseCase: GetMemberNameUseCase = DIContainer.shared.resolve() else {
+        guard let getMemberNameUseCase = DIContainer.shared.resolve(type: GetMemberNameType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
         }
         
-        guard let withdrawUseCase: MemberWithdrawUseCase = DIContainer.shared.resolve() else {
+        guard let withdrawUseCase = DIContainer.shared.resolve(type: MemberWithdrawType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
         }
         
-        guard let fetchAgreeTermsUseCase: FetchAgreeTermsUseCase = DIContainer.shared.resolve() else {
+        guard let fetchAgreeTermsUseCase = DIContainer.shared.resolve(type: FetchAgreeTermsType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
         }

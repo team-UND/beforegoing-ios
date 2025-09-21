@@ -7,9 +7,9 @@
 
 final class LoginViewModel: ViewModeling {
     
-    private let kakaoLoginUseCase: KakaoLoginUseCase
+    private let kakaoLoginUseCase: KakaoLoginType
     
-    init(kakaoLoginUseCase: KakaoLoginUseCase) {
+    init(kakaoLoginUseCase: KakaoLoginType) {
         self.kakaoLoginUseCase = kakaoLoginUseCase
     }
     

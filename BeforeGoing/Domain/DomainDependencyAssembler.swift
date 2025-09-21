@@ -33,26 +33,52 @@ final class DomainDependencyAssembler: DependencyAssembler {
             return
         }
         
-        let isUITestWithMock = ProcessInfo.processInfo.environment["USE_MOCK_AUTOLOGIN"] == "true"
-
+        let isUITestWithMock = ProcessInfo.processInfo.environment["USE_MOCK"] == "true"
+        
         if isUITestWithMock {
-            DIContainer.shared.register(type: AutoLoginType.self) { _ in
-                return MockAutoLoginUseCase()
-            }
-        } else {
-            DIContainer.shared.register(type: AutoLoginType.self) { _ in
-                return AutoLoginUseCase(repository: authrepository)
-            }
+            DIContainer.shared.register(type: AutoLoginType.self) { _ in MockAutoLoginUseCase() }
+            DIContainer.shared.register(type: KakaoLoginType.self) { _ in MockKakaoLoginUseCase() }
+            DIContainer.shared.register(type: LogoutType.self) { _ in MockLogoutUseCase() }
+            
+            DIContainer.shared.register(type: FetchAgreeTermsType.self) { _ in MockFetchAgreeTermsUseCase() }
+            DIContainer.shared.register(type: SendAgreeTermsType.self) { _ in MockSendAgreeTermsUseCase() }
+            DIContainer.shared.register(type: UpdatePushNoticeType.self) { _ in MockUpdatePushNoticeUseCase() }
+            
+            DIContainer.shared.register(type: UpdateNicknameType.self) { _ in MockUpdateNicknameUseCase() }
+            DIContainer.shared.register(type: GetMemberNameType.self) { _ in MockGetMemberNameUseCase() }
+            DIContainer.shared.register(type: MemberWithdrawType.self) { _ in MockMemberWithdrawUseCase() }
+            
+            return
         }
-        DIContainer.shared.register(KakaoLoginUseCase(repository: authrepository))
-        DIContainer.shared.register(LogoutUseCase(repository: authrepository))
         
-        DIContainer.shared.register(FetchAgreeTermsUseCase(repository: termsRepository))
-        DIContainer.shared.register(SendAgreeTermsUseCase(repository: termsRepository))
-        DIContainer.shared.register(UpdatePushNoticeUseCase(repository: termsRepository))
+        DIContainer.shared.register(type: AutoLoginType.self) { _ in
+            AutoLoginUseCase(repository: authrepository)
+        }
+        DIContainer.shared.register(type: KakaoLoginType.self) { _ in
+            return KakaoLoginUseCase(repository: authrepository)
+        }
+        DIContainer.shared.register(type: LogoutType.self) { _ in
+            return LogoutUseCase(repository: authrepository)
+        }
         
-        DIContainer.shared.register(UpdateNicknameUseCase(repository: memberRepository))
-        DIContainer.shared.register(GetMemberNameUseCase(repository: memberRepository))
-        DIContainer.shared.register(MemberWithdrawUseCase(repository: memberRepository))
+        DIContainer.shared.register(type: FetchAgreeTermsType.self) { _ in
+            return FetchAgreeTermsUseCase(repository: termsRepository)
+        }
+        DIContainer.shared.register(type: SendAgreeTermsType.self) { _ in
+            return SendAgreeTermsUseCase(repository: termsRepository)
+        }
+        DIContainer.shared.register(type: UpdatePushNoticeType.self) { _ in
+            return UpdatePushNoticeUseCase(repository: termsRepository)
+        }
+        
+        DIContainer.shared.register(type: UpdateNicknameType.self) { _ in
+            return UpdateNicknameUseCase(repository: memberRepository)
+        }
+        DIContainer.shared.register(type: GetMemberNameType.self) { _ in
+            return GetMemberNameUseCase(repository: memberRepository)
+        }
+        DIContainer.shared.register(type: MemberWithdrawType.self) { _ in
+            return MemberWithdrawUseCase(repository: memberRepository)
+        }
     }
 }

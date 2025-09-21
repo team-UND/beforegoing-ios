@@ -9,7 +9,7 @@ final class AgreeItemViewModel: ViewModeling {
     
     private var agreeItems = AgreeItem.allCases
     private var checkBoxStates: [AgreeItem : CheckBoxState] = [:]
-    private let useCase: SendAgreeTermsUseCase
+    private let useCase: SendAgreeTermsType
     
     enum Input {
         case nextButtonDidTap
@@ -18,7 +18,7 @@ final class AgreeItemViewModel: ViewModeling {
         case agreeTermsResult(Bool)
     }
     
-    init(useCase: SendAgreeTermsUseCase) {
+    init(useCase: SendAgreeTermsType) {
         self.useCase = useCase
         agreeItems.forEach { checkBoxStates[$0] = .unchecked }
     }

@@ -5,7 +5,11 @@
 //  Created by APPLE on 9/18/25.
 //
 
-struct FetchAgreeTermsUseCase {
+protocol FetchAgreeTermsType {
+    func execute() async throws -> TermsEntity?
+}
+
+struct FetchAgreeTermsUseCase: FetchAgreeTermsType {
     
     private let repository: TermsInterface
     
@@ -18,5 +22,12 @@ struct FetchAgreeTermsUseCase {
             return nil
         }
         return result
+    }
+}
+
+struct MockFetchAgreeTermsUseCase: FetchAgreeTermsType {
+    
+    func execute() -> TermsEntity? {
+        return .stub()
     }
 }

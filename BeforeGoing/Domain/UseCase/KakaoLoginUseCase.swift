@@ -5,7 +5,11 @@
 //  Created by APPLE on 7/22/25.
 //
 
-struct KakaoLoginUseCase {
+protocol KakaoLoginType {
+    func execute(provider: String) async throws -> Bool
+}
+
+struct KakaoLoginUseCase: KakaoLoginType {
     
     private let repository: AuthInterface
     
@@ -26,5 +30,12 @@ struct KakaoLoginUseCase {
     
     private func requestKakaoLogin(provider: String, idToken: String) async throws -> Bool {
         return try await repository.requestKakaoLogin(provider: provider, idToken: idToken)
+    }
+}
+
+struct MockKakaoLoginUseCase: KakaoLoginType {
+    
+    func execute(provider: String) -> Bool {
+        return true
     }
 }

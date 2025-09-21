@@ -9,10 +9,13 @@ protocol SettingOutput {}
 
 final class SettingViewModel: ViewModeling {
     
-    private let fetchAgreeTermsUseCase: FetchAgreeTermsUseCase
-    private let updatePushNoticeUseCase: UpdatePushNoticeUseCase
+    private let fetchAgreeTermsUseCase: FetchAgreeTermsType
+    private let updatePushNoticeUseCase: UpdatePushNoticeType
     
-    init(fetchAgreeTermsUseCase: FetchAgreeTermsUseCase, updatePushNoticeUseCase: UpdatePushNoticeUseCase) {
+    init(
+        fetchAgreeTermsUseCase: FetchAgreeTermsType,
+        updatePushNoticeUseCase: UpdatePushNoticeType
+    ) {
         self.fetchAgreeTermsUseCase = fetchAgreeTermsUseCase
         self.updatePushNoticeUseCase = updatePushNoticeUseCase
     }

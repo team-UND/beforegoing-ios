@@ -13,3 +13,17 @@ struct TermsEntity {
     let isOver14: Bool
     let eventPushAgreed: Bool
 }
+
+extension TermsEntity {
+    
+    static func stub() -> Self {
+        return TermsEntity(
+            id: 1,
+            memberId: 1,
+            termsOfServiceAgreed: true,
+            privacyPolicyAgreed: true,
+            isOver14: true,
+            eventPushAgreed: true
+        )
+    }
+}

@@ -9,14 +9,14 @@ protocol ProfileOutput {}
 
 final class ProfileViewModel: ViewModeling {
     
-    private let getMemberNameUseCase: GetMemberNameUseCase
-    private let logoutUseCase: LogoutUseCase
-    private let withdrawUseCase: MemberWithdrawUseCase
+    private let getMemberNameUseCase: GetMemberNameType
+    private let logoutUseCase: LogoutType
+    private let withdrawUseCase: MemberWithdrawType
     
     init(
-        getMemberNameUseCase: GetMemberNameUseCase,
-        logoutUseCase: LogoutUseCase,
-        withdrawUseCase: MemberWithdrawUseCase
+        getMemberNameUseCase: GetMemberNameType,
+        logoutUseCase: LogoutType,
+        withdrawUseCase: MemberWithdrawType
     ) {
         self.getMemberNameUseCase = getMemberNameUseCase
         self.logoutUseCase = logoutUseCase
