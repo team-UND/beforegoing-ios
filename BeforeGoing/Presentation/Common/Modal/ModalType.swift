@@ -7,7 +7,7 @@
 
 enum ModalType {
     
-    case expirationLogin, withdraw
+    case expirationLogin, logout, withdraw
     
     var component: ModalComponent {
         switch self {
@@ -16,6 +16,14 @@ enum ModalType {
                 image: .worry,
                 mainTitle: "로그인이 만료되었어요",
                 description: "더 안전한 앱 사용을 위해\n다시 로그인 해주세요:)",
+                dismissTitle: "취소",
+                actionTitle: "확인"
+            )
+        case .logout:
+            return .init(
+                image: .worry,
+                mainTitle: "로그아웃",
+                description: "로그아웃하시겠어요?",
                 dismissTitle: "취소",
                 actionTitle: "확인"
             )
