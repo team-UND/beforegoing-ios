@@ -4,7 +4,7 @@ enum AuthAPI {
     case kakaoLogin(dto: LoginRequestDTO)
     case nonce(dto: NonceRequestDTO)
     case tokens(dto: TokensRequestDTO)
-    case logout
+    case logout(accessToken: String)
 }
 
 extension AuthAPI: EndPoint {
@@ -42,7 +42,15 @@ extension AuthAPI: EndPoint {
     }
 
     var headers: HTTPHeaders? {
-        ["Content-Type": "application/json"]
+        switch self {
+        case .kakaoLogin, .nonce, .tokens:
+            ["Content-Type": "application/json"]
+        case .logout(let accessToken):
+            [
+                "Content-Type": "application/json",
+                "Authorization": "Bearer \(accessToken)"
+            ]
+        }
     }
 
     var parameterEncoding: any ParameterEncoding {

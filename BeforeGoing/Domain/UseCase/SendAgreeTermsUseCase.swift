@@ -5,7 +5,17 @@
 //  Created by APPLE on 9/17/25.
 //
 
-struct SendAgreeTermsUseCase {
+protocol SendAgreeTermsType {
+    
+    func execute(
+        termsOfServiceAgreed: Bool,
+        privacyPolicyAgreed: Bool,
+        isOver14: Bool,
+        eventPushAgreed: Bool
+    ) async throws
+}
+
+struct SendAgreeTermsUseCase: SendAgreeTermsType {
     
     private let repository: TermsInterface
     
@@ -26,4 +36,14 @@ struct SendAgreeTermsUseCase {
             eventPushAgreed: eventPushAgreed
         )
     }
+}
+
+struct MockSendAgreeTermsUseCase: SendAgreeTermsType {
+    
+    func execute(
+        termsOfServiceAgreed: Bool,
+        privacyPolicyAgreed: Bool,
+        isOver14: Bool,
+        eventPushAgreed: Bool
+    ) {}
 }

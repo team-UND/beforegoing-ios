@@ -7,9 +7,9 @@
 
 final class ModifyNicknameViewModel: ViewModeling {
     
-    private let useCase: UpdateNicknameUseCase
+    private let useCase: UpdateNicknameType
     
-    init(useCase: UpdateNicknameUseCase) {
+    init(useCase: UpdateNicknameType) {
         self.useCase = useCase
     }
     

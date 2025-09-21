@@ -10,21 +10,27 @@ struct AuthRepository: AuthInterface {
     private let networkService: NetworkService
     private let tokenReissuer: TokenReissuer
     private let keyChainService: KeyChainService
+    private let userDefaultsService: UserDefaultsService
     private let nonceRequestMapper: NonceRequestMapper
     private let loginRequestMapper: LoginRequestMapper
+    private let tokenValidator: TokenValidator
     
     init(
         networkService: NetworkService,
         tokenReissuer: TokenReissuer,
         keyChainService: KeyChainService,
+        userDefaultsService: UserDefaultsService,
         nonceRequestMapper: NonceRequestMapper,
-        loginRequestMapper: LoginRequestMapper
+        loginRequestMapper: LoginRequestMapper,
+        tokenValidator: TokenValidator
     ) {
         self.networkService = networkService
         self.tokenReissuer = tokenReissuer
         self.keyChainService = keyChainService
+        self.userDefaultsService = userDefaultsService
         self.nonceRequestMapper = nonceRequestMapper
         self.loginRequestMapper = loginRequestMapper
+        self.tokenValidator = tokenValidator
     }
     
     func requestNonce(provider: String) async throws -> NonceEntity {
@@ -40,45 +46,74 @@ struct AuthRepository: AuthInterface {
         return try await networkService.requestKakaoIDToken(nonce: nonce)
     }
     
-    func requestKakaoLogin(provider: String, idToken: String) async throws {
+    func requestKakaoLogin(provider: String, idToken: String) async throws -> Bool {
         let requestDTO = loginRequestMapper.map((provider, idToken))
         let response = try await networkService.request(
             endPoint: AuthAPI.kakaoLogin(dto: requestDTO),
             responseType: LoginResponseDTO.self
         )
-        // 기존 가입 여부에 따른 분기 처리
         saveKeyChain(response: response)
-    }
-    
-    private func saveKeyChain(response: LoginResponseDTO) {
-        keyChainService.save(response.accessToken, forKey: .accessToken)
-        keyChainService.save(response.refreshToken, forKey: .refreshToken)
+        
+        return isMemberNameSet
     }
     
     func autoLogin() async throws -> Bool {
-        guard let accessToken = keyChainService.load(key: .accessToken),
-              let refreshToken = keyChainService.load(key: .refreshToken),
-              !accessToken.isEmpty,
-              !refreshToken.isEmpty else {
-            
+        guard isTokenExists, isMemberNameSet else { return false }
+        
+        guard let accessTokenExpirationDate = keyChainService.load(key: .accessTokenExpirationDate),
+              let refreshTokenExpirationDate = keyChainService.load(key: .refreshTokenExpirationDate) else {
             return false
         }
-        do {
+        
+        if !tokenValidator.isAccessTokenValid(expirationDate: accessTokenExpirationDate) {
+            guard tokenValidator.isRefreshTokenValid(expirationDate: refreshTokenExpirationDate) else {
+                return false
+            }
             try await tokenReissuer.reissue()
-            return true
-        } catch {
-            BeforeGoingLogger.error(BeforeGoingError.reissueTokenFailed)
-            return false
         }
+        return true
     }
     
     func logout() async throws {
-        try await networkService.request(endPoint: AuthAPI.logout)
+        guard let accessToken = keyChainService.load(key: .accessToken) else {
+            BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
+            return
+        }
+        try await networkService.request(endPoint: AuthAPI.logout(accessToken: accessToken))
         deleteUserInformation()
     }
     
-    func deleteUserInformation() {
-        keyChainService.delete(key: .accessToken)
-        keyChainService.delete(key: .refreshToken)
+    private func saveKeyChain(response: LoginResponseDTO) {
+        let responseData: [KeyChainKey: String] = [
+            .accessToken: response.accessToken,
+            .refreshToken: response.refreshToken,
+            .accessTokenExpirationDate: tokenValidator.calculateExpirationDate(expiresIn: response.accessTokenExpiresIn),
+            .refreshTokenExpirationDate: tokenValidator.calculateExpirationDate(expiresIn: response.refreshTokenExpiresIn)
+        ]
+        
+        for data in responseData {
+            keyChainService.save(data.value, forKey: data.key)
+        }
+    }
+    
+    private var isTokenExists: Bool {
+        if let accessToken = keyChainService.load(key: .accessToken),
+           let refreshToken = keyChainService.load(key: .refreshToken),
+           !accessToken.isEmpty,
+           !refreshToken.isEmpty {
+            return true
+        }
+        return false
+    }
+    
+    private var isMemberNameSet: Bool {
+        let memberName: String? = userDefaultsService.load(key: .memberName)
+        return memberName != nil
+    }
+    
+    private func deleteUserInformation() {
+        for key in KeyChainKey.allCases {
+            keyChainService.delete(key: key)
+        }
     }
 }

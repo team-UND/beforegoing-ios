@@ -5,7 +5,11 @@
 //  Created by APPLE on 9/18/25.
 //
 
-struct GetMemberNameUseCase {
+protocol GetMemberNameType {
+    func execute() -> String
+}
+
+struct GetMemberNameUseCase: GetMemberNameType {
     
     private let repository: MemberInterface
     
@@ -16,5 +20,11 @@ struct GetMemberNameUseCase {
     func execute() -> String {
         let name = repository.getMemberName() ?? ""
         return name
+    }
+}
+
+struct MockGetMemberNameUseCase: GetMemberNameType {
+    func execute() -> String {
+        return "mock name"
     }
 }

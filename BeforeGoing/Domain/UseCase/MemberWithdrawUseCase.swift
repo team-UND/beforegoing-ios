@@ -5,7 +5,12 @@
 //  Created by APPLE on 9/18/25.
 //
 
-struct MemberWithdrawUseCase {
+protocol MemberWithdrawType {
+    
+    func execute() async throws
+}
+
+struct MemberWithdrawUseCase: MemberWithdrawType {
     
     private let repository: MemberInterface
     
@@ -16,4 +21,9 @@ struct MemberWithdrawUseCase {
     func execute() async throws {
         try await repository.withdrawMember()
     }
+}
+
+struct MockMemberWithdrawUseCase: MemberWithdrawType {
+    
+    func execute() {}
 }

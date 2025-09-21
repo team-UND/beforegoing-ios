@@ -5,7 +5,11 @@
 //  Created by APPLE on 9/13/25.
 //
 
-struct LogoutUseCase {
+protocol LogoutType {
+    func execute() async throws
+}
+
+struct LogoutUseCase: LogoutType {
     
     private let repository: AuthInterface
     
@@ -16,4 +20,9 @@ struct LogoutUseCase {
     func execute() async throws {
         try await repository.logout()
     }
+}
+
+struct MockLogoutUseCase: LogoutType {
+    
+    func execute() {}
 }

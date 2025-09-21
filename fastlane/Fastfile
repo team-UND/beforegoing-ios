@@ -25,8 +25,7 @@ platform :ios do
       result_bundle: true,
       code_coverage: true,
       output_directory: ".",
-      output_types: "junit,xcresult",
-      skip_testing: ["BeforeGoingUITests"]
+      output_types: "junit,xcresult"
     )
   end
 

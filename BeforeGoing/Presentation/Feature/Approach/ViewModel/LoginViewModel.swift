@@ -7,9 +7,9 @@
 
 final class LoginViewModel: ViewModeling {
     
-    private let kakaoLoginUseCase: KakaoLoginUseCase
+    private let kakaoLoginUseCase: KakaoLoginType
     
-    init(kakaoLoginUseCase: KakaoLoginUseCase) {
+    init(kakaoLoginUseCase: KakaoLoginType) {
         self.kakaoLoginUseCase = kakaoLoginUseCase
     }
     
@@ -18,15 +18,15 @@ final class LoginViewModel: ViewModeling {
         //case appleLoginDidTap
     }
     
-    enum Output {
-        case kakaoLoginResult
+    struct Output {
+        let result: Bool
     }
     
     func action(input: Input) async throws -> Output {
         switch input {
         case .kakaoLoginDidTap:
-            try await kakaoLoginUseCase.execute(provider: Provider.kakao.rawValue)
-            return .kakaoLoginResult
+            let isRegisteredMember = try await kakaoLoginUseCase.execute(provider: Provider.kakao.rawValue)
+            return .init(result: isRegisteredMember)
         }
     }
 }
