@@ -16,23 +16,6 @@ final class DomainDependencyAssembler: DependencyAssembler {
     }
     
     func assemble() {
-        dataDependencyAssembler.assemble()
-        
-        guard let authrepository = DIContainer.shared.resolve(type: AuthInterface.self) else {
-            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            return
-        }
-        
-        guard let termsRepository = DIContainer.shared.resolve(type: TermsInterface.self) else {
-            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            return
-        }
-        
-        guard let memberRepository = DIContainer.shared.resolve(type: MemberInterface.self) else {
-            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            return
-        }
-        
         let isUITestWithMock = ProcessInfo.processInfo.environment["USE_MOCK"] == "true"
         
         if isUITestWithMock {
@@ -48,6 +31,23 @@ final class DomainDependencyAssembler: DependencyAssembler {
             DIContainer.shared.register(type: GetMemberNameType.self) { _ in MockGetMemberNameUseCase() }
             DIContainer.shared.register(type: MemberWithdrawType.self) { _ in MockMemberWithdrawUseCase() }
             
+            return
+        }
+        
+        dataDependencyAssembler.assemble()
+        
+        guard let authrepository = DIContainer.shared.resolve(type: AuthInterface.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            return
+        }
+        
+        guard let termsRepository = DIContainer.shared.resolve(type: TermsInterface.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            return
+        }
+        
+        guard let memberRepository = DIContainer.shared.resolve(type: MemberInterface.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             return
         }
         
