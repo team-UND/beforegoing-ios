@@ -9,17 +9,20 @@ struct TermsRepository: TermsInterface {
     
     private let networkService: NetworkService
     private let keyChainService: KeyChainService
+    private let userDefaultsService: UserDefaultsService
     private let termsRequestMapper: TermsRequestMapper
     private let updateTermRequestMapper: UpdateTermRequestMapper
     
     init(
         networkService: NetworkService,
         keyChainService: KeyChainService,
+        userDefaultsService: UserDefaultsService,
         termsRequestMapper: TermsRequestMapper,
         updateTermRequestMapper: UpdateTermRequestMapper
     ) {
         self.networkService = networkService
         self.keyChainService = keyChainService
+        self.userDefaultsService = userDefaultsService
         self.termsRequestMapper = termsRequestMapper
         self.updateTermRequestMapper = updateTermRequestMapper
     }
@@ -48,6 +51,11 @@ struct TermsRepository: TermsInterface {
             return
         }
         
+        if let _: Bool = userDefaultsService.load(key: .isCompletedAgreeTerms) {
+            try await updateAgreementTerm(eventPushAgreed: eventPushAgreed)
+            return
+        }
+        
         let requestDTO = termsRequestMapper.map(
             (
                 termsOfServiceAgreed: termsOfServiceAgreed,
@@ -60,6 +68,8 @@ struct TermsRepository: TermsInterface {
             endPoint: TermsAPI.sendTerms(accessToken: accessToken, dto: requestDTO),
             responseType: TermsResponseDTO.self
         )
+        
+        let _ = userDefaultsService.save(true, key: .isCompletedAgreeTerms)
     }
     
     func updateAgreementTerm(eventPushAgreed: Bool) async throws {

@@ -44,6 +44,7 @@ struct DataDependencyAssembler: DependencyAssembler {
             TermsRepository(
                 networkService: networkService,
                 keyChainService: keyChainService,
+                userDefaultsService: userDefaultsService,
                 termsRequestMapper: termsRequestMapper,
                 updateTermRequestMapper: updateTermRequestMapper
             )

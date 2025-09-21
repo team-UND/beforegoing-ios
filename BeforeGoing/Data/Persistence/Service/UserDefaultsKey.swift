@@ -6,5 +6,6 @@
 //
 
 enum UserDefaultsKey: String, CaseIterable {
+    case isCompletedAgreeTerms
     case memberName
 }
