@@ -1,7 +1,7 @@
 import Alamofire
 
 enum AuthAPI {
-    case kakaoLogin(dto: LoginRequestDTO)
+    case login(dto: LoginRequestDTO)
     case nonce(dto: NonceRequestDTO)
     case tokens(dto: TokensRequestDTO)
     case logout(accessToken: String)
@@ -17,7 +17,7 @@ extension AuthAPI: EndPoint {
         let basePath = Environment.baseURL + basePath
         
         switch self {
-        case .kakaoLogin:
+        case .login:
             return basePath + "/login"
         case .nonce:
             return basePath + "/nonce"
@@ -30,7 +30,7 @@ extension AuthAPI: EndPoint {
     
     var method: HTTPMethod {
         switch self {
-        case .kakaoLogin, .nonce, .tokens:
+        case .login, .nonce, .tokens:
             return .post
         case .logout:
             return .delete
@@ -43,7 +43,7 @@ extension AuthAPI: EndPoint {
 
     var headers: HTTPHeaders? {
         switch self {
-        case .kakaoLogin, .nonce, .tokens:
+        case .login, .nonce, .tokens:
             ["Content-Type": "application/json"]
         case .logout(let accessToken):
             [
@@ -55,7 +55,7 @@ extension AuthAPI: EndPoint {
 
     var parameterEncoding: any ParameterEncoding {
         switch self {
-        case .kakaoLogin, .nonce, .tokens:
+        case .login, .nonce, .tokens:
             return JSONEncoding.default
         case .logout:
             return URLEncoding.default
@@ -68,7 +68,7 @@ extension AuthAPI: EndPoint {
 
     var bodyParameters: Parameters? {
         switch self {
-        case .kakaoLogin(let dto):
+        case .login(let dto):
             return try? dto.toBodyParameters()
         case .nonce(let dto):
             return try? dto.toBodyParameters()
@@ -81,7 +81,7 @@ extension AuthAPI: EndPoint {
     
     var isNeedReissue: Bool {
         switch self {
-        case .nonce, .kakaoLogin:
+        case .nonce, .login:
             return false
         case .tokens, .logout:
             return true

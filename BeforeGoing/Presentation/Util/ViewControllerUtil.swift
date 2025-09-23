@@ -7,16 +7,21 @@
 
 import UIKit
 
-final class ViewControllerUtil {
+enum ViewControllerUtil {
     
-    static let shared = ViewControllerUtil()
-    private init() {}
-    
-    func replaceRootViewController(to viewController: UIViewController) {
+    static func replaceRootViewController(to viewController: UIViewController) {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first else { return }
         
         window.rootViewController = viewController
         window.makeKeyAndVisible()
+    }
+    
+    static func findTopWindow() -> UIWindow {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first else {
+            return UIWindow()
+        }
+        return window
     }
 }

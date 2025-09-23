@@ -16,7 +16,7 @@ struct PresentationDependencyAssembler: DependencyAssembler {
     func assemble() {
         domainDependencyAssembler.assemble()
         
-        guard let kakaoLoginUseCase = DIContainer.shared.resolve(type: KakaoLoginType.self) else {
+        guard let loginUseCase = DIContainer.shared.resolve(type: LoginType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
         }
@@ -62,7 +62,7 @@ struct PresentationDependencyAssembler: DependencyAssembler {
         }
         
         DIContainer.shared.register(AgreeItemViewModel(useCase: agreeTermsUseCase))
-        DIContainer.shared.register(LoginViewModel(kakaoLoginUseCase: kakaoLoginUseCase))
+        DIContainer.shared.register(LoginViewModel(loginUseCase: loginUseCase))
         DIContainer.shared.register(SplashViewModel(useCase: autoLoginUseCase))
         DIContainer.shared.register(
             ProfileViewModel(

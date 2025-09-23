@@ -119,7 +119,7 @@ extension ProfileViewController {
                 }
                 if result.isSucceedLogout {
                     let loginViewController = ViewControllerFactory.shared.makeLoginViewController()
-                    ViewControllerUtil.shared.replaceRootViewController(to: loginViewController)
+                    ViewControllerUtil.replaceRootViewController(to: loginViewController)
                     return
                 }
                 BeforeGoingLogger.error(BeforeGoingError.logoutFailed)
@@ -141,7 +141,7 @@ extension ProfileViewController {
                     
                     let viewController = ViewControllerFactory.shared.makeLoginViewController()
                     let navigationController = UINavigationController(rootViewController: viewController)
-                    ViewControllerUtil.shared.replaceRootViewController(to: navigationController)
+                    ViewControllerUtil.replaceRootViewController(to: navigationController)
                     return
                 }
             }

@@ -46,7 +46,7 @@ final class SplashViewController: BaseViewController {
     private func moveHome() {
         let viewController = BottomNavigationViewController()
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            ViewControllerUtil.shared.replaceRootViewController(to: viewController)
+            ViewControllerUtil.replaceRootViewController(to: viewController)
         }
     }
     

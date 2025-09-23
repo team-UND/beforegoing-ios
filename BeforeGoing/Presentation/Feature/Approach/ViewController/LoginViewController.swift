@@ -5,6 +5,7 @@
 //  Created by APPLE on 8/2/25.
 //
 
+import AuthenticationServices
 import UIKit
 
 final class LoginViewController: BaseViewController {
@@ -16,7 +17,7 @@ final class LoginViewController: BaseViewController {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -39,8 +40,12 @@ extension LoginViewController {
     func kakaoLoginButtonDidTap() {
         Task {
             do {
-                let output = try await viewModel.action(input: .kakaoLoginDidTap)
-                output.result ? moveHome() : moveTerms()
+                guard let output = try await viewModel.action(
+                    input: .kakaoLoginDidTap
+                ) as? LoginViewModel.SocialLoginOutput else {
+                    return
+                }
+                output.isRegisteredMember ? moveHome() : moveTerms()
             } catch(let error) {
                 BeforeGoingLogger.error(error)
             }
@@ -49,12 +54,22 @@ extension LoginViewController {
     
     @objc
     func appleLoginButtonDidTap() {
-        print("Apple Did Tap")
+        Task {
+            do {
+                let _ = try await viewModel.action(input: .appleLoginDidTap)
+                viewModel.onAppleLoginPerformed = { [weak self] isMemberRegistered in
+                    isMemberRegistered ? self?.moveHome() : self?.moveTerms()
+                }
+            } catch (let error) {
+                BeforeGoingLogger.error(error)
+                BeforeGoingLogger.error(BeforeGoingError.loginFailed)
+            }
+        }
     }
     
     private func moveHome() {
         let viewController = BottomNavigationViewController()
-        ViewControllerUtil.shared.replaceRootViewController(to: viewController)
+        ViewControllerUtil.replaceRootViewController(to: viewController)
     }
     
     private func moveTerms() {
