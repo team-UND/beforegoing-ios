@@ -42,14 +42,17 @@ struct AuthRepository: AuthInterface {
         return response.toEntity()
     }
     
-    func requestIDToken(nonce: String?) async throws -> String {
-        return try await networkService.requestKakaoIDToken(nonce: nonce)
+    func requestLogin(provider: String) async throws -> Bool {
+        let nonceEntity = try await requestNonce(provider: provider)
+        let idToken = try await requestIDToken(nonce: nonceEntity.nonce)
+        
+        return try await requestLogin(provider: provider, idToken: idToken)
     }
     
-    func requestKakaoLogin(provider: String, idToken: String) async throws -> Bool {
+    func requestLogin(provider: String, idToken: String) async throws -> Bool {
         let requestDTO = loginRequestMapper.map((provider, idToken))
         let response = try await networkService.request(
-            endPoint: AuthAPI.kakaoLogin(dto: requestDTO),
+            endPoint: AuthAPI.login(dto: requestDTO),
             responseType: LoginResponseDTO.self
         )
         saveKeyChain(response: response)
@@ -83,12 +86,20 @@ struct AuthRepository: AuthInterface {
         deleteUserInformation()
     }
     
+    private func requestIDToken(nonce: String?) async throws -> String {
+        return try await networkService.requestKakaoIDToken(nonce: nonce)
+    }
+    
     private func saveKeyChain(response: LoginResponseDTO) {
         let responseData: [KeyChainKey: String] = [
             .accessToken: response.accessToken,
             .refreshToken: response.refreshToken,
-            .accessTokenExpirationDate: tokenValidator.calculateExpirationDate(expiresIn: response.accessTokenExpiresIn),
-            .refreshTokenExpirationDate: tokenValidator.calculateExpirationDate(expiresIn: response.refreshTokenExpiresIn)
+            .accessTokenExpirationDate: tokenValidator.calculateExpirationDate(
+                expiresIn: response.accessTokenExpiresIn
+            ),
+            .refreshTokenExpirationDate: tokenValidator.calculateExpirationDate(
+                expiresIn: response.refreshTokenExpiresIn
+            )
         ]
         
         for data in responseData {

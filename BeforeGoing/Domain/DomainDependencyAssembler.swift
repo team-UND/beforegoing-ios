@@ -20,7 +20,7 @@ final class DomainDependencyAssembler: DependencyAssembler {
         
         if isUITestWithMock {
             DIContainer.shared.register(type: AutoLoginType.self) { _ in MockAutoLoginUseCase() }
-            DIContainer.shared.register(type: KakaoLoginType.self) { _ in MockKakaoLoginUseCase() }
+            DIContainer.shared.register(type: LoginType.self) { _ in MockLoginUseCase() }
             DIContainer.shared.register(type: LogoutType.self) { _ in MockLogoutUseCase() }
             
             DIContainer.shared.register(type: FetchAgreeTermsType.self) { _ in MockFetchAgreeTermsUseCase() }
@@ -54,8 +54,8 @@ final class DomainDependencyAssembler: DependencyAssembler {
         DIContainer.shared.register(type: AutoLoginType.self) { _ in
             AutoLoginUseCase(repository: authrepository)
         }
-        DIContainer.shared.register(type: KakaoLoginType.self) { _ in
-            return KakaoLoginUseCase(repository: authrepository)
+        DIContainer.shared.register(type: LoginType.self) { _ in
+            LoginUseCase(repository: authrepository)
         }
         DIContainer.shared.register(type: LogoutType.self) { _ in
             return LogoutUseCase(repository: authrepository)
