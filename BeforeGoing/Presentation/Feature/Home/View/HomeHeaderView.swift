@@ -40,9 +40,8 @@ final class HomeHeaderView: BaseView {
             $0.alignment = .center
         }
         dateLabel.do {
-            // 날짜 뷰컨에서 받아오기
-            $0.text = "2025년 8월 15일"
             $0.textColor = .gray600
+            $0.textAlignment = .center
             $0.font = .custom(.bodyMDSemiBold)
         }
         viewCalendarButton.do {
@@ -59,8 +58,9 @@ final class HomeHeaderView: BaseView {
             $0.layer.shadowRadius = 4
         }
         wordLabel.do {
-            $0.text = "서울시 날씨 좋은데?"
             $0.font = .custom(.bodyMDRegular)
+            $0.textAlignment = .right
+            $0.numberOfLines = 0
         }
         path.do {
             let width = 18.adjustedW
