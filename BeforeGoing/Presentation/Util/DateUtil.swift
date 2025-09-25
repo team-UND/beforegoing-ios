@@ -20,6 +20,14 @@ struct DateUtil {
         return date
     }
     
+    static func getCurrentDate(format: String) -> String {
+        let date: Date = getCurrentDate()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = format
+        
+        return dateFormatter.string(from: date)
+    }
+    
     static func getPreviousMonth(from date: Date) -> Date {
         return getMonth(from: date, offset: -1)
     }

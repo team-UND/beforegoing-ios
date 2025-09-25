@@ -61,9 +61,15 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
+        guard let requestWeatherUseCase = DIContainer.shared.resolve(type: RequestWeatherType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
         DIContainer.shared.register(AgreeItemViewModel(useCase: agreeTermsUseCase))
         DIContainer.shared.register(LoginViewModel(loginUseCase: loginUseCase))
         DIContainer.shared.register(SplashViewModel(useCase: autoLoginUseCase))
+        DIContainer.shared.register(HomeViewModel(weatherUseCase: requestWeatherUseCase))
         DIContainer.shared.register(
             ProfileViewModel(
                 getMemberNameUseCase: getMemberNameUseCase,

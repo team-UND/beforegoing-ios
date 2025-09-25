@@ -2,8 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>KAKAO_NATIVE_APP_KEY</key>
-	<string>${KAKAO_NATIVE_APP_KEY}</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>현재 위치의 날씨 정보를 제공하기 위해 위치 접근 권한이 필요합니다.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>현재 위치의 날씨 정보를 제공하기 위해 위치 접근 권한이 필요합니다.</string>
 	<key>BASE_URL</key>
 	<string>${BASE_URL}</string>
 	<key>CFBundleURLTypes</key>
@@ -17,6 +19,8 @@
 			</array>
 		</dict>
 	</array>
+	<key>KAKAO_NATIVE_APP_KEY</key>
+	<string>${KAKAO_NATIVE_APP_KEY}</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Pretendard-SemiBold.otf</string>
@@ -44,5 +48,9 @@
 			</array>
 		</dict>
 	</dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
 </dict>
 </plist>

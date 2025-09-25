@@ -5,12 +5,14 @@
 //  Created by APPLE on 8/11/25.
 //
 
+import CoreLocation
+
 import UIKit
 
 final class HomeViewController: BaseViewController {
     
-    private let homeView = HomeView()
-    // 실제 데이터로 대체
+    private let rootView = HomeView()
+    private let viewModel: HomeViewModel
     private var items: [(title: String, state: ListItemState, beforeState: ListItemState)] = [
         ("우산 챙기기", .today, .today),
         ("콘센트 빼기", .normal, .normal),
@@ -18,9 +20,35 @@ final class HomeViewController: BaseViewController {
         ("준비물 챙기기", .normal, .normal),
         ("물 한 잔 마시기", .normal, .normal)
     ]
+    private let locationManager = CLLocationManager()
+    
+    init(viewModel: HomeViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
-        view = homeView
+        view = rootView
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setLocationManager()
+        
+Task {
+    do {
+        guard let result = try await viewModel.action(input: .requestDate) as? HomeViewModel.DateOutput else {
+            return
+        }
+        rootView.headerView.updateDateUI(date: result.date)
+    } catch {
+        BeforeGoingLogger.error(error)
+    }
+}
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -29,22 +57,22 @@ final class HomeViewController: BaseViewController {
     }
     
     override func setAction() {
-        homeView.headerView.viewCalendarButton.addTarget(
+        rootView.headerView.viewCalendarButton.addTarget(
             self,
             action: #selector(viewCalendarButtonDidTap),
             for: .touchUpInside
         )
-        homeView.modalView.taskTextField.addTarget(
+        rootView.modalView.taskTextField.addTarget(
             self,
             action: #selector(taskTextFieldEditingChanged),
             for: .editingChanged
         )
-        homeView.modalView.deleteTaskButton.addTarget(
+        rootView.modalView.deleteTaskButton.addTarget(
             self,
             action: #selector(clearTaskTextField),
             for: .touchUpInside
         )
-        homeView.modalView.addTaskButton.addTarget(
+        rootView.modalView.addTaskButton.addTarget(
             self,
             action: #selector(addTaskButtonDidTap),
             for: .touchUpInside
@@ -52,11 +80,27 @@ final class HomeViewController: BaseViewController {
     }
     
     override func setDelegate() {
-        homeView.modalView.listTableView.do {
+        rootView.modalView.listTableView.do {
             $0.delegate = self
             $0.dataSource = self
             $0.register(ListItemCell.self, forCellReuseIdentifier: ListItemCell.identifier)
             $0.reloadData()
+        }
+    }
+    
+    private func setLocationManager() {
+        locationManager.do {
+            $0.delegate = self
+            $0.desiredAccuracy = kCLLocationAccuracyBest
+            $0.requestAlwaysAuthorization()
+        }
+    }
+    
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        let status = manager.authorizationStatus
+        if status == .authorizedWhenInUse || status == .authorizedAlways,
+        CLLocationManager.locationServicesEnabled() {
+            manager.requestLocation()
         }
     }
 }
@@ -72,15 +116,15 @@ extension HomeViewController {
     
     @objc
     private func taskTextFieldEditingChanged() {
-        if let text = homeView.modalView.taskTextField.text,
+        if let text = rootView.modalView.taskTextField.text,
            !text.isEmpty {
-            homeView.modalView.do {
+            rootView.modalView.do {
                 $0.enableAddTaskButton()
                 $0.revealDeleteTaskButton()
             }
             return
         }
-        homeView.modalView.do {
+        rootView.modalView.do {
             $0.disableAddTaskButton()
             $0.hideDeleteTaskButton()
         }
@@ -88,7 +132,7 @@ extension HomeViewController {
     
     @objc
     private func clearTaskTextField() {
-        homeView.modalView.do {
+        rootView.modalView.do {
             $0.taskTextField.text = ""
             $0.disableAddTaskButton()
             $0.hideDeleteTaskButton()
@@ -97,14 +141,43 @@ extension HomeViewController {
     
     @objc
     private func addTaskButtonDidTap() {
-        guard let task = homeView.modalView.taskTextField.text, !task.isEmpty else {
+        guard let task = rootView.modalView.taskTextField.text, !task.isEmpty else {
             return
         }
         
         clearTaskTextField()
         items.insert((title: task, state: .today, beforeState: .today), at: 0)
-        homeView.modalView.listTableView.reloadData()
+        rootView.modalView.listTableView.reloadData()
         self.view.endEditing(true)
+    }
+}
+
+extension HomeViewController: CLLocationManagerDelegate {
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let location = locations.first {
+            let latitude = location.coordinate.latitude
+            let longitude = location.coordinate.longitude
+            
+            Task {
+                do {
+                    guard let result = try await viewModel.action(
+                        input: .requestWeather(latitude: latitude, longitude: longitude)
+                    ) as? HomeViewModel.WeatherOutput else {
+                        return
+                    }
+                    self.rootView.headerView.updateWeatherUI(weather: result.weatherResult)
+manager.stopUpdatingLocation()
+                } catch (let error) {
+                    BeforeGoingLogger.error(error)
+                    BeforeGoingLogger.error(BeforeGoingError.requestWeatherFailed)
+                }
+            }
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
+        BeforeGoingLogger.error(error)
     }
 }
 

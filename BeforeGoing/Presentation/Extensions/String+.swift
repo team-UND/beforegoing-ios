@@ -5,7 +5,7 @@
 //  Created by APPLE on 8/6/25.
 //
 
-import Foundation
+import UIKit
 
 extension String {
     
@@ -15,7 +15,20 @@ extension String {
         return predicate.evaluate(with: self)
     }
     
-    func trim(limit: Int) -> String {
+    func trim(limit: Int) -> Self {
         return String(self.prefix(limit))
+    }
+    
+    func customText(
+        rangedText: String
+    ) -> NSMutableAttributedString {
+        let attributedString = NSMutableAttributedString(string: self)
+        
+        let range = (self as NSString).range(of: rangedText)
+        if range.location != NSNotFound {
+            attributedString.addAttribute(.foregroundColor, value: UIColor.warning600.cgColor, range: range)
+        }
+        
+        return attributedString
     }
 }

@@ -40,9 +40,8 @@ final class HomeHeaderView: BaseView {
             $0.alignment = .center
         }
         dateLabel.do {
-            // 날짜 뷰컨에서 받아오기
-            $0.text = "2025년 8월 15일"
             $0.textColor = .gray600
+            $0.textAlignment = .center
             $0.font = .custom(.bodyMDSemiBold)
         }
         viewCalendarButton.do {
@@ -59,8 +58,9 @@ final class HomeHeaderView: BaseView {
             $0.layer.shadowRadius = 4
         }
         wordLabel.do {
-            $0.text = "서울시 날씨 좋은데?"
             $0.font = .custom(.bodyMDRegular)
+            $0.textAlignment = .right
+            $0.numberOfLines = 0
         }
         path.do {
             let width = 18.adjustedW
@@ -124,12 +124,12 @@ final class HomeHeaderView: BaseView {
         dateStackView.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide.snp.top)
             $0.centerX.equalToSuperview()
-            $0.width.equalTo(120.adjustedW)
+            $0.width.equalTo(140.adjustedW)
         }
         dateLabel.snp.makeConstraints {
             $0.top.equalTo(dateStackView.snp.top)
             $0.leading.equalTo(dateStackView.snp.leading)
-            $0.width.equalTo(95.adjustedW)
+            $0.width.equalTo(115.adjustedW)
         }
         viewCalendarButton.snp.makeConstraints {
             $0.top.equalTo(dateStackView.snp.top)
@@ -157,5 +157,16 @@ final class HomeHeaderView: BaseView {
             $0.size.equalTo(8.adjustedW)
             $0.bottom.equalToSuperview().inset(66.adjustedH)
         }
+    }
+}
+
+extension HomeHeaderView {
+    
+    func updateDateUI(date: String) {
+        dateLabel.text = date
+    }
+    
+    func updateWeatherUI(weather: NSMutableAttributedString) {
+        wordLabel.attributedText = weather
     }
 }
