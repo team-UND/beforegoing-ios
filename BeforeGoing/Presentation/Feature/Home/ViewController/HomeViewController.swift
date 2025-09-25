@@ -39,12 +39,16 @@ final class HomeViewController: BaseViewController {
         super.viewDidLoad()
         setLocationManager()
         
-        Task {
-            guard let result = try await viewModel.action(input: .requestDate) as? HomeViewModel.DateOutput else {
-                return
-            }
-            rootView.headerView.updateDateUI(date: result.date)
+Task {
+    do {
+        guard let result = try await viewModel.action(input: .requestDate) as? HomeViewModel.DateOutput else {
+            return
         }
+        rootView.headerView.updateDateUI(date: result.date)
+    } catch {
+        BeforeGoingLogger.error(error)
+    }
+}
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
