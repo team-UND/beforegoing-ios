@@ -1,4 +1,5 @@
 enum BeforeGoingError: Error {
+    case urlNotFound
     case decodingError
     case loginFailed
     case idTokenMissing
@@ -13,4 +14,5 @@ enum BeforeGoingError: Error {
     case updatePushAgreedFailed
     case eventPushAgreedNotFound
     case accessTokenMissing
+    case requestWeatherFailed
 }
