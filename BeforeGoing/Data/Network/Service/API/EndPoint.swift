@@ -42,4 +42,3 @@ var requestURL: URL {
     
     return url
 }
-}
