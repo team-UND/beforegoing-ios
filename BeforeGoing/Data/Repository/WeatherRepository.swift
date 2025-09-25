@@ -26,9 +26,9 @@ struct WeatherRepository: WeatherInterface {
         timezone: String,
         weatherRequestDTO: WeatherRequestDTO
     ) async throws -> WeatherEntity {
-        guard let accessToken = keyChainServcie.load(key: .accessToken) else {
-            return .stub()
-        }
+guard let accessToken = keyChainServcie.load(key: .accessToken) else {
+    throw BeforeGoingError.accessTokenMissing
+}
         
         let result = try await networkService
             .request(
