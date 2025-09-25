@@ -5,6 +5,8 @@
 //  Created by APPLE on 9/10/25.
 //
 
+import Foundation
+
 import Alamofire
 
 protocol EndPoint {
@@ -18,4 +20,27 @@ protocol EndPoint {
     var queryParameters: [String: String]? { get }
     var bodyParameters: Parameters? { get }
     var isNeedReissue: Bool { get }
+}
+
+extension EndPoint {
+    
+    var requestURL: URL {
+        guard var urlComponents = URLComponents(string: url) else {
+            BeforeGoingLogger.error(BeforeGoingError.urlNotFound)
+            return URL(string: "")!
+        }
+        
+        if let queryParameters {
+            urlComponents.queryItems = queryParameters.map {
+                URLQueryItem(name: $0, value: $1)
+            }
+        }
+        
+        guard let url = urlComponents.url else {
+            BeforeGoingLogger.error(BeforeGoingError.urlNotFound)
+            return URL(string: "")!
+        }
+        
+        return url
+    }
 }

@@ -36,7 +36,7 @@ final class NetworkService: APIManaging {
     
     private func createDataRequest(endPoint: EndPoint) -> DataRequest {
         return AF.request(
-            endPoint.url,
+            endPoint.requestURL,
             method: endPoint.method,
             parameters: endPoint.bodyParameters,
             encoding: endPoint.parameterEncoding,
