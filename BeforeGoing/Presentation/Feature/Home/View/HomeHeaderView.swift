@@ -159,3 +159,14 @@ final class HomeHeaderView: BaseView {
         }
     }
 }
+
+extension HomeHeaderView {
+    
+    func updateDateUI(date: String) {
+        dateLabel.text = date
+    }
+    
+    func updateWeatherUI(weather: NSMutableAttributedString) {
+        wordLabel.attributedText = weather
+    }
+}
