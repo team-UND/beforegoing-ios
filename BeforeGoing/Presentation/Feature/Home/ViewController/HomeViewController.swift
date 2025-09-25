@@ -167,7 +167,7 @@ extension HomeViewController: CLLocationManagerDelegate {
                         return
                     }
                     self.rootView.headerView.updateWeatherUI(weather: result.weatherResult)
-                    //manager.stopUpdatingLocation()
+manager.stopUpdatingLocation()
                 } catch (let error) {
                     BeforeGoingLogger.error(error)
                     BeforeGoingLogger.error(BeforeGoingError.requestWeatherFailed)
