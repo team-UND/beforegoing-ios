@@ -17,7 +17,7 @@ final class CalendarViewController: BaseViewController {
         calendar.firstWeekday = 2
         return calendar
     }()
-    public var currentDate = DateUtil.getCurrentDate()
+    public var currentDate: Date = DateUtil.getCurrentDate()
     private var startOfMonth: Date {
         guard let date = calendar.date(from: calendar.dateComponents([.year, .month], from: currentDate)) else {
             fatalError("Unable to calculate the start of the month.")
