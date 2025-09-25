@@ -25,22 +25,21 @@ protocol EndPoint {
 extension EndPoint {
     
     var requestURL: URL {
-        guard var urlComponents = URLComponents(string: url) else {
-            BeforeGoingLogger.error(BeforeGoingError.urlNotFound)
-            return URL(string: "")!
-        }
-        
-        if let queryParameters {
-            urlComponents.queryItems = queryParameters.map {
-                URLQueryItem(name: $0, value: $1)
-            }
-        }
-        
-        guard let url = urlComponents.url else {
-            BeforeGoingLogger.error(BeforeGoingError.urlNotFound)
-            return URL(string: "")!
-        }
-        
-        return url
+var requestURL: URL {
+    guard var urlComponents = URLComponents(string: url) else {
+        fatalError("Invalid URL string in EndPoint: \(url)")
     }
+    
+    if let queryParameters {
+        urlComponents.queryItems = queryParameters.map {
+            URLQueryItem(name: $0, value: $1)
+        }
+    }
+    
+    guard let url = urlComponents.url else {
+        fatalError("Could not construct URL with query parameters for: \(url)")
+    }
+    
+    return url
+}
 }
