@@ -124,12 +124,12 @@ final class HomeHeaderView: BaseView {
         dateStackView.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide.snp.top)
             $0.centerX.equalToSuperview()
-            $0.width.equalTo(120.adjustedW)
+            $0.width.equalTo(140.adjustedW)
         }
         dateLabel.snp.makeConstraints {
             $0.top.equalTo(dateStackView.snp.top)
             $0.leading.equalTo(dateStackView.snp.leading)
-            $0.width.equalTo(95.adjustedW)
+            $0.width.equalTo(115.adjustedW)
         }
         viewCalendarButton.snp.makeConstraints {
             $0.top.equalTo(dateStackView.snp.top)
