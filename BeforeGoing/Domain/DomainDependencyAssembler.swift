@@ -33,6 +33,8 @@ final class DomainDependencyAssembler: DependencyAssembler {
             
             DIContainer.shared.register(type: RequestWeatherUseCase.self) { _ in MockRequestWeatherUseCase() }
             
+            DIContainer.shared.register(type: AddScenarioType.self) { _ in MockAddScenarioUseCase() }
+            
             return
         }
         
@@ -54,6 +56,11 @@ final class DomainDependencyAssembler: DependencyAssembler {
         }
         
         guard let weatherRepository = DIContainer.shared.resolve(type: WeatherInterface.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            return
+        }
+        
+        guard let scenarioRepository = DIContainer.shared.resolve(type: ScenarioInterface.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             return
         }
@@ -90,6 +97,10 @@ final class DomainDependencyAssembler: DependencyAssembler {
         
         DIContainer.shared.register(type: RequestWeatherType.self) { _ in
             return RequestWeatherUseCase(repository: weatherRepository)
+        }
+        
+        DIContainer.shared.register(type: AddScenarioType.self) { _ in
+            return AddScenarioUseCase(repository: scenarioRepository)
         }
     }
 }

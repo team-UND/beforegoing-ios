@@ -17,6 +17,7 @@ struct DataDependencyAssembler: DependencyAssembler {
     private let updateTermRequestMapper = UpdateTermRequestMapper()
     private let updateNicknameRequestMapper = UpdateNicknameRequestMapper()
     private let weatherResponseMapper = WeatherResponseMapper()
+    private let addScenarioRequestMapper = AddScenarioRequestMapper()
     private let tokenValidator = TokenValidator()
     
     init() {
@@ -64,6 +65,13 @@ struct DataDependencyAssembler: DependencyAssembler {
                 networkService: networkService,
                 keyChainServcie: keyChainService,
                 weatherResponseMapper: weatherResponseMapper
+            )
+        }
+        DIContainer.shared.register(type: ScenarioInterface.self) { _ in
+            ScenarioRepository(
+                networkService: networkService,
+                keyChainService: keyChainService,
+                addScenarioRequestMapper: addScenarioRequestMapper
             )
         }
     }
