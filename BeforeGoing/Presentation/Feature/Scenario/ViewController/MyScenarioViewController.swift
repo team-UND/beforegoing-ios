@@ -24,7 +24,7 @@ final class MyScenarioViewController: BaseViewController {
         self.updateScenarioOrderViewModel = updateScenarioOrderViewModel
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -91,11 +91,11 @@ extension MyScenarioViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 76.adjustedH
     }
-
+    
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return section == getScenariosViewModel.scenariosCount - 1 ? 0 : 12
     }
-
+    
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         return UIView()
     }
@@ -208,23 +208,28 @@ extension MyScenarioViewController: UITableViewDropDelegate {
             guard let sourceIndexPath = item.sourceIndexPath else { continue }
             let sourceSection = sourceIndexPath.section
             
+            getScenariosViewModel.moveScenario(
+                originalAt: sourceSection,
+                destinationAt: destinationSection
+            )
+            
             Task {
-                    let result = try await updateScenarioOrderViewModel.action(
-                        input: .scenarioDidDrag(
-                            scenarioID: getScenariosViewModel.getScenarioID(at: sourceSection),
-                            prevOrder: getScenariosViewModel.getPreviousScenarioOrder(current: sourceSection),
-                            nextOrder: getScenariosViewModel.getNextScenarioOrder(current: sourceSection)
-                        )
+                let result = try await updateScenarioOrderViewModel.action(
+                    input: .scenarioDidDrag(
+                        scenarioID: getScenariosViewModel.getScenarioID(at: destinationSection),
+                        prevOrder: getScenariosViewModel.getPreviousScenarioOrder(current: destinationSection),
+                        nextOrder: getScenariosViewModel.getNextScenarioOrder(current: destinationSection)
                     )
-                    
-                    switch result.updateScenarioOrderResult {
-                    case .success(let result):
-                        getScenariosViewModel.updateOrder(updates: result.orderUpdates)
-                        getScenariosViewModel.sortScenario()
-                        rootView.scenarioListTableView.reloadData()
-                    case .failure(let error):
-                        BeforeGoingLogger.error(error)
-                    }
+                )
+                
+                switch result.updateScenarioOrderResult {
+                case .success(let result):
+                    getScenariosViewModel.updateOrder(updates: result.orderUpdates)
+                    getScenariosViewModel.sortScenario()
+                    rootView.scenarioListTableView.reloadData()
+                case .failure(let error):
+                    BeforeGoingLogger.error(error)
+                }
             }
         }
         tableView.reloadData()
