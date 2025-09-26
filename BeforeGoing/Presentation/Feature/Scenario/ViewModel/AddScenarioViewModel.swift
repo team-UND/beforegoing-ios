@@ -16,9 +16,9 @@ final class AddScenarioViewModel: ViewModeling {
     private var startHour: Int?
     private var startMinute: Int?
     
-    private let addScenarioUseCase: AddScenarioType
+    private let useCase: AddScenarioType
     
-    init(addScenarioUseCase: AddScenarioType) {
+    init(useCase: AddScenarioType) {
         self.addScenarioUseCase = addScenarioUseCase
     }
     
