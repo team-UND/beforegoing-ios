@@ -65,4 +65,35 @@ final class GetScenariosViewModel: ViewModeling {
     func getScenarioID(at index: Int) -> Int {
         scenarios?[index].scenarioId ?? 0
     }
+    
+    func getPreviousScenarioOrder(current: Int) -> Int? {
+        if current == 0 {
+            return nil
+        }
+        return scenarios?[current - 1].scenarioOrder
+    }
+    
+    func getNextScenarioOrder(current: Int) -> Int? {
+        if current == scenariosCount - 1 {
+            return nil
+        }
+        return scenarios?[current + 1].scenarioOrder
+    }
+    
+    func updateOrder(updates: [NewOrderEntity]) {
+        updates.forEach {
+            guard var scenario = findScenarioByID(id: $0.id) else {
+                return
+            }
+            scenario.scenarioOrder = $0.newOrder
+        }
+    }
+    
+    func sortScenario() {
+        scenarios?.sort { $0.scenarioOrder < $1.scenarioOrder }
+    }
+    
+    private func findScenarioByID(id: Int) -> ScenarioEntity? {
+        scenarios?.filter { $0.scenarioId == id }.first
+    }
 }
