@@ -11,6 +11,16 @@ final class SettingScenarioViewController: BaseViewController {
     
     private let rootView = SettingScenarioView()
     private var missions: [String] = []
+    private let viewModel: ScenarioViewModel
+    
+    init(viewModel: ScenarioViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         view = rootView
@@ -173,7 +183,26 @@ extension SettingScenarioViewController {
     
     @objc
     private func nextButtonDidTap() {
-        let viewController = NoticeViewController()
+        guard let scenarioName = rootView.inputScenarioView.textField.text,
+              let memo = rootView.inputMemoView.textField.text else {
+            return
+        }
+        
+        Task {
+            do {
+                let _ = try await viewModel.action(
+                    input: .nextButtonInSetScenarioDidTap(
+                        scenarioName: scenarioName,
+                        memo: memo,
+                        basicMissions: missions
+                    )
+                )
+            } catch {
+                BeforeGoingLogger.error(error)
+            }
+        }
+        
+        let viewController = ViewControllerFactory.shared.makeNoticeViewController()
         viewController.navigationItem.hidesBackButton = true
         self.navigationController?.pushViewController(viewController, animated: false)
     }

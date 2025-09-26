@@ -10,7 +10,17 @@ import UIKit
 final class SetNoticeMethodViewController: BaseViewController {
     
     private let rootView = SetNoticeMethodView()
+    private let viewModel: ScenarioViewModel
     
+    init(viewModel: ScenarioViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+        
     override func loadView() {
         view = rootView
     }
@@ -59,6 +69,16 @@ extension SetNoticeMethodViewController {
     
     @objc
     private func saveButtonDidTap() {
-        self.navigationController?.popToRootViewController(animated: false)
+        Task {
+            let noticeMethodType = rootView.selectNoticeMethodView.getSelectedNoticeMethodType()
+            do {
+                let _ = try await viewModel.action(
+                    input: .saveButtonInSetNoticeMethodDidTap(noticeMethodType: noticeMethodType)
+                )
+                self.navigationController?.popToRootViewController(animated: false)
+            } catch {
+                BeforeGoingLogger.error(error)
+            }
+        }
     }
 }

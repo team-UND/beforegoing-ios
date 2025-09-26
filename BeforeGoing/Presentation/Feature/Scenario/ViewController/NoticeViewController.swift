@@ -10,6 +10,16 @@ import UIKit
 final class NoticeViewController: BaseViewController {
     
     private let rootView = NoticeView()
+    private let viewModel: ScenarioViewModel
+    
+    init(viewModel: ScenarioViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         view = rootView
@@ -106,11 +116,27 @@ extension NoticeViewController {
         
         switch text {
         case "저장하기":
-            self.navigationController?.popToRootViewController(animated: false)
+            Task {
+                let _ = try await viewModel.action(input: .saveButtonInSetNoticeDidTap)
+                self.navigationController?.popToRootViewController(animated: false)
+            }
         case "다음":
-            let viewController = SetNoticeMethodViewController()
-            viewController.navigationItem.hidesBackButton = true
-            self.navigationController?.pushViewController(viewController, animated: false)
+            let daysOfWeek = rootView.setNoticeTimeView.selectDayView.selected
+            let startHour = rootView.setNoticeTimeView.timePickerView.getHour()
+            let startMinute = rootView.setNoticeTimeView.timePickerView.getMinute()
+            
+            Task {
+                let _ = try await viewModel.action(
+                    input: .nextButtonInSetNoticeDidTap(
+                        daysOfWeek: daysOfWeek,
+                        startHour: startHour,
+                        startMinute: startMinute
+                    )
+                )
+                let viewController = ViewControllerFactory.shared.makeSetNoticeMethodViewController()
+                viewController.navigationItem.hidesBackButton = true
+                self.navigationController?.pushViewController(viewController, animated: false)
+            }
         default:
             break
         }
