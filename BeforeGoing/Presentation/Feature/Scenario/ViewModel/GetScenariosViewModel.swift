@@ -35,6 +35,9 @@ final class GetScenariosViewModel: ViewModeling {
             }
         }
     }
+}
+
+extension GetScenariosViewModel {
     
     var scenariosCount: Int {
         scenarios?.count ?? 0
