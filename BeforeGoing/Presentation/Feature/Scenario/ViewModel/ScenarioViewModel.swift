@@ -93,17 +93,22 @@ final class ScenarioViewModel: ViewModeling {
                   let startMinute = startMinute else {
                 return EmptyOutput()
             }
-            let result = try await addScenarioUseCase.execute(
-                scenarioName: scenarioName,
-                memo: memo,
-                basicMissions: basicMissions,
-                isNotificationActive: true,
-                noticeMethodType: noticeMethodType.rawValue,
-                daysOfWeekOrdinal: daysOfWeek,
-                startHour: startHour,
-                startMinute: startMinute
-            )
-            return AddScenarioOutput(addScenarioResult: result)
+            do {
+                let result = try await addScenarioUseCase.execute(
+                    scenarioName: scenarioName,
+                    memo: memo,
+                    basicMissions: basicMissions,
+                    isNotificationActive: true,
+                    noticeMethodType: noticeMethodType.rawValue,
+                    daysOfWeekOrdinal: daysOfWeek,
+                    startHour: startHour,
+                    startMinute: startMinute
+                )
+                return AddScenarioOutput(addScenarioResult: result)
+            } catch {
+                BeforeGoingLogger.error(error)
+                return EmptyOutput()
+            }
         }
     }
 }
