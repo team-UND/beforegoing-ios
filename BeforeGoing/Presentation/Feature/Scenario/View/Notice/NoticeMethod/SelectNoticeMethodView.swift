@@ -52,4 +52,11 @@ extension SelectNoticeMethodView {
             $0.updateImage(isSelected: !isPushNoticeSelected)
         }
     }
+    
+    func getSelectedNoticeMethodType() -> NoticeMethodType {
+        let noticeMethodType: NoticeMethodType =
+        (pushNoticeView.radioButton.currentState == .enable) ? .push : .alarm
+        
+        return noticeMethodType
+    }
 }
