@@ -17,4 +17,5 @@ protocol ScenarioInterface {
         startHour: Int?,
         startMinute: Int?
     ) async throws -> ScenarioEntity
+    func fetchScenarios() async throws -> [ScenarioEntity]
 }

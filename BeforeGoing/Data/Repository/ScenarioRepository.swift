@@ -60,6 +60,19 @@ struct ScenarioRepository: ScenarioInterface {
         return result.first?.toEntity() ?? .stub()
     }
     
+    func fetchScenarios() async throws -> [ScenarioEntity] {
+        guard let accessToken = keyChainService.load(key: .accessToken) else {
+            BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
+            return [.stub()]
+        }
+        
+        let result = try await networkService.request(
+            endPoint: ScenarioAPI.getScenarios(accessToken: accessToken),
+            responseType: [ScenarioResponseDTO].self
+        )
+        return result.map { $0.toEntity() }
+    }
+    
     private func decideEndPoint(dto: AddScenarioRequestDTO, accessToken: String) -> EndPoint {
         switch dto {
         case .withNotification(let withNotificationAddScenarioRequestDTO):

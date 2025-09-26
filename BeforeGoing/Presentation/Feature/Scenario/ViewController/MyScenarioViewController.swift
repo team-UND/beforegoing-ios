@@ -10,12 +10,32 @@ import UIKit
 final class MyScenarioViewController: BaseViewController {
     
     private let rootView = ScenarioListView()
+    private let viewModel: GetScenariosViewModel
     
-    // TO-DO 실제 데이터로 대체
-    private var scenarios: [ScenarioType] = [.outing, .goWork, .leaveWork, .exercise, .miracle]
+    init(viewModel: GetScenariosViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         view = rootView
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        Task {
+            do {
+                let _ = try await viewModel.action(input: .viewWillAppear)
+                rootView.scenarioListTableView.reloadData()
+            } catch {
+                BeforeGoingLogger.error(BeforeGoingError.getScenariosFailed)
+            }
+        }
     }
     
     override func viewDidLoad() {
@@ -65,7 +85,7 @@ extension MyScenarioViewController: UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return section == scenarios.count - 1 ? 0 : 12
+        return section == viewModel.scenariosCount - 1 ? 0 : 12
     }
 
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -76,7 +96,7 @@ extension MyScenarioViewController: UITableViewDelegate {
 extension MyScenarioViewController: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return scenarios.count
+        return viewModel.scenariosCount
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -90,7 +110,10 @@ extension MyScenarioViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        cell.bind(type: scenarios[indexPath.section])
+        let name = viewModel.getScenarioName(section: indexPath.section)
+        let memo = viewModel.getScenarioMemo(section: indexPath.section)
+        
+        cell.bind(name: name, memo: memo)
         return cell
     }
     
@@ -112,7 +135,7 @@ extension MyScenarioViewController: UITableViewDataSource {
             style: .normal,
             title: nil
         ) { [weak self] (_, view, completion) in
-            self?.scenarios.remove(at: indexPath.section)
+            self?.viewModel.removeScenario(at: indexPath.section)
             tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
             completion(true)
         }
@@ -163,8 +186,10 @@ extension MyScenarioViewController: UITableViewDropDelegate {
             guard let sourceIndexPath = item.sourceIndexPath else { continue }
             let sourceSection = sourceIndexPath.section
             
-            let movedSection = scenarios.remove(at: sourceSection)
-            scenarios.insert(movedSection, at: destinationSection)
+            viewModel.moveScenario(
+                originalAt: sourceSection,
+                destinationAt: destinationSection
+            )
         }
         tableView.reloadData()
     }

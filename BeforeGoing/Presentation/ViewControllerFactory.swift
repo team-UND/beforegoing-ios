@@ -50,7 +50,8 @@ final class ViewControllerFactory {
     }
     
     func makeMyScenarioViewController() -> MyScenarioViewController {
-        return MyScenarioViewController()
+        let viewModel = resolveViewModel(GetScenariosViewModel.self)
+        return MyScenarioViewController(viewModel: viewModel)
     }
     
     func makeSettingViewController() -> SettingViewController {

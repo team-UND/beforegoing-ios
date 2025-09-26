@@ -40,10 +40,10 @@ final class ScenarioListItemCell: UITableViewCell {
 
 extension ScenarioListItemCell {
     
-    func bind(type: ScenarioType) {
+    func bind(name: String, memo: String) {
         scenarioItemView.do {
-            $0.titleLabel.text = type.rawValue
-            $0.subtitleLabel.text = type.subtitle
+            $0.titleLabel.text = name
+            $0.subtitleLabel.text = memo
         }
     }
 }
