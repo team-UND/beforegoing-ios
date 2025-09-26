@@ -15,4 +15,5 @@ enum BeforeGoingError: Error {
     case eventPushAgreedNotFound
     case accessTokenMissing
     case requestWeatherFailed
+    case invalidParameter
 }
