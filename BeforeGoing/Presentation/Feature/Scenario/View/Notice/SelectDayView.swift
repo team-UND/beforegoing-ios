@@ -145,4 +145,9 @@ extension SelectDayView {
         let isAllSelected = dayOfWeeks.allSatisfy { dayOfWeeksState[$0] == true }
         everydayButton.toggle(isOn: isAllSelected)
     }
+    
+    var selected: [Int] {
+        let selected = dayOfWeeks.indices.filter { dayOfWeeksState[dayOfWeeks[$0]] == true }
+        return selected
+    }
 }
