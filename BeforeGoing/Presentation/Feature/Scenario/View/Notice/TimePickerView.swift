@@ -23,7 +23,6 @@ final class TimePickerView: BaseView {
             $0.datePickerMode = .time
             $0.minuteInterval = 1
             $0.locale = Locale(identifier: "ko_KR")
-            //$0.addTarget(self, action: #selector(timeDidChange), for: .valueChanged)
         }
     }
     
@@ -60,5 +59,22 @@ extension TimePickerView {
         dateFormatter.locale = Locale(identifier: "ko_KR")
         dateFormatter.dateFormat = "a h:mm"
         return dateFormatter.string(from: date)
+    }
+}
+
+extension TimePickerView {
+    
+    func getHour() -> Int? {
+        let now = DateUtil.getCurrentDate()
+        let dateComponents = Calendar.current.dateComponents([.hour], from: now)
+
+        return dateComponents.hour
+    }
+    
+    func getMinute() -> Int? {
+        let now = DateUtil.getCurrentDate()
+        let dateComponents = Calendar.current.dateComponents([.minute], from: now)
+
+        return dateComponents.hour
     }
 }
