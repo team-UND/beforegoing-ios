@@ -90,7 +90,6 @@ final class GetScenariosViewModel: ViewModeling {
     
     func sortScenario() {
         scenarios?.sort { $0.scenarioOrder < $1.scenarioOrder }
-        print(scenarios)
     }
     
     private func findScenarioByID(id: Int) -> ScenarioEntity? {
