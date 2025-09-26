@@ -5,14 +5,14 @@
 //  Created by APPLE on 9/26/25.
 //
 
-struct AddScenarioResponseDTO: Decodable {
+struct ScenarioResponseDTO: Decodable {
     let scenarioId: Int
     let scenarioName: String
     let memo: String
     let scenarioOrder: Int
 }
 
-extension AddScenarioResponseDTO {
+extension ScenarioResponseDTO {
     
     func toEntity() -> ScenarioEntity {
         .init(

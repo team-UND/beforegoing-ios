@@ -55,7 +55,7 @@ struct ScenarioRepository: ScenarioInterface {
         )
         let result = try await networkService.request(
             endPoint: endPoint,
-            responseType: [AddScenarioResponseDTO].self
+            responseType: [ScenarioResponseDTO].self
         )
         return result.first?.toEntity() ?? .stub()
     }
