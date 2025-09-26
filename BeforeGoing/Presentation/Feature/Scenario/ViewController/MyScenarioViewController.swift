@@ -10,10 +10,15 @@ import UIKit
 final class MyScenarioViewController: BaseViewController {
     
     private let rootView = ScenarioListView()
-    private let viewModel: GetScenariosViewModel
+    private let getScenariosViewModel: GetScenariosViewModel
+    private let deleteScenarioViewModel: DeleteScenarioViewModel
     
-    init(viewModel: GetScenariosViewModel) {
-        self.viewModel = viewModel
+    init(
+        getScenariosViewModel: GetScenariosViewModel,
+        deleteScenarioViewModel: DeleteScenarioViewModel
+    ) {
+        self.getScenariosViewModel = getScenariosViewModel
+        self.deleteScenarioViewModel = deleteScenarioViewModel
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -30,7 +35,7 @@ final class MyScenarioViewController: BaseViewController {
         
         Task {
             do {
-                let _ = try await viewModel.action(input: .viewWillAppear)
+                let _ = try await getScenariosViewModel.action(input: .viewWillAppear)
                 rootView.scenarioListTableView.reloadData()
             } catch {
                 BeforeGoingLogger.error(BeforeGoingError.getScenariosFailed)
@@ -85,7 +90,7 @@ extension MyScenarioViewController: UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return section == viewModel.scenariosCount - 1 ? 0 : 12
+        return section == getScenariosViewModel.scenariosCount - 1 ? 0 : 12
     }
 
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -96,7 +101,7 @@ extension MyScenarioViewController: UITableViewDelegate {
 extension MyScenarioViewController: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return viewModel.scenariosCount
+        return getScenariosViewModel.scenariosCount
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -110,8 +115,8 @@ extension MyScenarioViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let name = viewModel.getScenarioName(section: indexPath.section)
-        let memo = viewModel.getScenarioMemo(section: indexPath.section)
+        let name = getScenariosViewModel.getScenarioName(section: indexPath.section)
+        let memo = getScenariosViewModel.getScenarioMemo(section: indexPath.section)
         
         cell.bind(name: name, memo: memo)
         return cell
@@ -135,9 +140,23 @@ extension MyScenarioViewController: UITableViewDataSource {
             style: .normal,
             title: nil
         ) { [weak self] (_, view, completion) in
-            self?.viewModel.removeScenario(at: indexPath.section)
-            tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
-            completion(true)
+            Task {
+                guard let self = self else { return }
+                
+                do {
+                    let _ = try await self.deleteScenarioViewModel.action(
+                        input: .deleteButtonDidTap(
+                            scenarioID: self.getScenariosViewModel.getScenarioID(at: indexPath.section)
+                        )
+                    )
+                } catch {
+                    BeforeGoingLogger.error(error)
+                }
+                
+                self.getScenariosViewModel.removeScenario(at: indexPath.section)
+                tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
+                completion(true)
+            }
         }
     }
     
@@ -186,7 +205,7 @@ extension MyScenarioViewController: UITableViewDropDelegate {
             guard let sourceIndexPath = item.sourceIndexPath else { continue }
             let sourceSection = sourceIndexPath.section
             
-            viewModel.moveScenario(
+            getScenariosViewModel.moveScenario(
                 originalAt: sourceSection,
                 destinationAt: destinationSection
             )

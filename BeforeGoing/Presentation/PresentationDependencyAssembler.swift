@@ -76,6 +76,11 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
+        guard let deleteScenarioUseCase = DIContainer.shared.resolve(type: DeleteScenarioType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
         DIContainer.shared.register(AgreeItemViewModel(useCase: agreeTermsUseCase))
         DIContainer.shared.register(LoginViewModel(loginUseCase: loginUseCase))
         DIContainer.shared.register(SplashViewModel(useCase: autoLoginUseCase))
@@ -97,5 +102,6 @@ struct PresentationDependencyAssembler: DependencyAssembler {
         DIContainer.shared.register(ModifyNicknameViewModel(useCase: updateNicknameUseCase))
         DIContainer.shared.register(AddScenarioViewModel(useCase: addScenarioUseCase))
         DIContainer.shared.register(GetScenariosViewModel(useCase: fetchScenariosUseCase))
+        DIContainer.shared.register(DeleteScenarioViewModel(useCase: deleteScenarioUseCase))
     }
 }

@@ -11,6 +11,7 @@ enum ScenarioAPI {
     case getScenarios(accessToken: String)
     case addScnearioWithNotification(accessToken: String, dto: WithNotificationAddScenarioRequestDTO)
     case addScnearioWithoutNotification(accessToken: String, dto: WithoutNotificationAddScenarioRequestDTO)
+    case deleteScenario(accessToken: String, scenarioID: Int)
 }
 
 extension ScenarioAPI: EndPoint {
@@ -25,6 +26,8 @@ extension ScenarioAPI: EndPoint {
         switch self {
         case .getScenarios, .addScnearioWithNotification, .addScnearioWithoutNotification:
             return basePath
+        case .deleteScenario(_, let scenarioID):
+            return basePath + "/\(scenarioID)"
         }
     }
 
@@ -34,6 +37,8 @@ extension ScenarioAPI: EndPoint {
             return .get
         case .addScnearioWithNotification, .addScnearioWithoutNotification:
             return .post
+        case .deleteScenario:
+            return .delete
         }
     }
 
@@ -45,7 +50,8 @@ extension ScenarioAPI: EndPoint {
         switch self {
         case .getScenarios(let accessToken),
              .addScnearioWithNotification(let accessToken, _),
-             .addScnearioWithoutNotification(let accessToken, _):
+             .addScnearioWithoutNotification(let accessToken, _),
+             .deleteScenario(let accessToken, _):
             return [
                 "Content-Type": "application/json",
                 "Authorization": "Bearer \(accessToken)"
@@ -55,7 +61,7 @@ extension ScenarioAPI: EndPoint {
 
     var parameterEncoding: any ParameterEncoding {
         switch self {
-        case .getScenarios:
+        case .getScenarios, .deleteScenario:
             return URLEncoding.default
         case .addScnearioWithNotification, .addScnearioWithoutNotification:
             return JSONEncoding.default
@@ -64,14 +70,14 @@ extension ScenarioAPI: EndPoint {
 
     var queryParameters: [String : String]? {
         switch self {
-        case .getScenarios, .addScnearioWithNotification, .addScnearioWithoutNotification:
+        case .getScenarios, .addScnearioWithNotification, .addScnearioWithoutNotification, .deleteScenario:
             return nil
         }
     }
 
     var bodyParameters: Parameters? {
         switch self {
-        case .getScenarios:
+        case .getScenarios, .deleteScenario:
             return nil
         case .addScnearioWithNotification(_, let dto):
             return try? dto.toBodyParameters()

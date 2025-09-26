@@ -18,4 +18,5 @@ protocol ScenarioInterface {
         startMinute: Int?
     ) async throws -> ScenarioEntity
     func fetchScenarios() async throws -> [ScenarioEntity]
+    func deleteScenario(scenarioID: Int) async throws
 }

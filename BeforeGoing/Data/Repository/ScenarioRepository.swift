@@ -73,6 +73,20 @@ struct ScenarioRepository: ScenarioInterface {
         return result.map { $0.toEntity() }
     }
     
+    func deleteScenario(scenarioID: Int) async throws {
+        guard let accessToken = keyChainService.load(key: .accessToken) else {
+            BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
+            return
+        }
+        
+        try await networkService.request(
+            endPoint: ScenarioAPI.deleteScenario(
+                accessToken: accessToken,
+                scenarioID: scenarioID
+            )
+        )
+    }
+    
     private func decideEndPoint(dto: AddScenarioRequestDTO, accessToken: String) -> EndPoint {
         switch dto {
         case .withNotification(let withNotificationAddScenarioRequestDTO):
