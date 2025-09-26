@@ -7,13 +7,13 @@
 
 import UIKit
 
-enum NoticeMethodType {
+enum NoticeMethodType: String {
     
-    case pushNotice, alarm
+    case push, alarm
     
     var component: NoticeMethodComponent {
         switch self {
-        case .pushNotice:
+        case .push:
             return .init(
                 unSelectedImage: .pushWhite,
                 selectedImage: .pushBlue,

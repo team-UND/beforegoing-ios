@@ -10,7 +10,7 @@ import UIKit
 final class SelectNoticeMethodView: BaseView {
     
     private let methodStackView = UIStackView()
-    private(set) var pushNoticeView = NoticeMethodView(type: .pushNotice)
+    private(set) var pushNoticeView = NoticeMethodView(type: .push)
     private(set) var alarmView = NoticeMethodView(type: .alarm)
     
     override func setStyle() {

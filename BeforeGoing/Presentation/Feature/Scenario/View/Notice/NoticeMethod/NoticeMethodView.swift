@@ -24,7 +24,7 @@ final class NoticeMethodView: BaseView {
     
     private func initProperty(type: NoticeMethodType) {
         let component = type.component
-        imageView.image = (type == .pushNotice) ? component.selectedImage : component.unSelectedImage
+        imageView.image = (type == .push) ? component.selectedImage : component.unSelectedImage
         methodNameLabel.text = component.methodName
     }
     
