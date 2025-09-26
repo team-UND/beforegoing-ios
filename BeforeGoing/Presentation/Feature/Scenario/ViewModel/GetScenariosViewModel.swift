@@ -61,4 +61,8 @@ final class GetScenariosViewModel: ViewModeling {
         }
         scenarios?.insert(movedSection, at: destinationAt)
     }
+    
+    func getScenarioID(at index: Int) -> Int {
+        scenarios?[index].scenarioId ?? 0
+    }
 }
