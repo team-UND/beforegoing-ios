@@ -9,7 +9,7 @@ struct ScenarioEntity {
     let scenarioId: Int
     let scenarioName: String
     let memo: String
-    let scenarioOrder: Int
+    var scenarioOrder: Int
 }
 
 extension ScenarioEntity {
