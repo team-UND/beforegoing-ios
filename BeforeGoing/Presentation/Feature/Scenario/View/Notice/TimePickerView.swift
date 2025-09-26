@@ -65,16 +65,12 @@ extension TimePickerView {
 extension TimePickerView {
     
     func getHour() -> Int? {
-        let now = DateUtil.getCurrentDate()
-        let dateComponents = Calendar.current.dateComponents([.hour], from: now)
-
+        let dateComponents = Calendar.current.dateComponents([.hour], from: datePicker.date)
         return dateComponents.hour
     }
     
     func getMinute() -> Int? {
-        let now = DateUtil.getCurrentDate()
-        let dateComponents = Calendar.current.dateComponents([.minute], from: now)
-
-        return dateComponents.hour
+        let dateComponents = Calendar.current.dateComponents([.minute], from: datePicker.date)
+        return dateComponents.minute
     }
 }
