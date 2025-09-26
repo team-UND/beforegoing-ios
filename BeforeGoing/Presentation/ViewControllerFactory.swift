@@ -59,17 +59,17 @@ final class ViewControllerFactory {
     }
     
     func makeSettingScenarioViewController() -> SettingScenarioViewController {
-        let viewModel = resolveViewModel(ScenarioViewModel.self)
+        let viewModel = resolveViewModel(AddScenarioViewModel.self)
         return .init(viewModel: viewModel)
     }
     
     func makeSetNoticeMethodViewController() -> SetNoticeMethodViewController {
-        let viewModel = resolveViewModel(ScenarioViewModel.self)
+        let viewModel = resolveViewModel(AddScenarioViewModel.self)
         return .init(viewModel: viewModel)
     }
     
     func makeNoticeViewController() -> NoticeViewController {
-        let viewModel = resolveViewModel(ScenarioViewModel.self)
+        let viewModel = resolveViewModel(AddScenarioViewModel.self)
         return .init(viewModel: viewModel)
     }
 }

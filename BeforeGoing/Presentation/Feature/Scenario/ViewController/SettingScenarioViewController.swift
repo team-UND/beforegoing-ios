@@ -11,9 +11,9 @@ final class SettingScenarioViewController: BaseViewController {
     
     private let rootView = SettingScenarioView()
     private var missions: [String] = []
-    private let viewModel: ScenarioViewModel
+    private let viewModel: AddScenarioViewModel
     
-    init(viewModel: ScenarioViewModel) {
+    init(viewModel: AddScenarioViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }

@@ -7,7 +7,7 @@
 
 protocol ScenarioOutput {}
 
-final class ScenarioViewModel: ViewModeling {
+final class AddScenarioViewModel: ViewModeling {
     
     private var scenarioName: String?
     private var memo: String?

@@ -90,6 +90,6 @@ struct PresentationDependencyAssembler: DependencyAssembler {
         )
         DIContainer.shared.register(NicknameViewModel(useCase: updateNicknameUseCase))
         DIContainer.shared.register(ModifyNicknameViewModel(useCase: updateNicknameUseCase))
-        DIContainer.shared.register(ScenarioViewModel(addScenarioUseCase: addScenarioUseCase))
+        DIContainer.shared.register(AddScenarioViewModel(addScenarioUseCase: addScenarioUseCase))
     }
 }

@@ -10,9 +10,9 @@ import UIKit
 final class NoticeViewController: BaseViewController {
     
     private let rootView = NoticeView()
-    private let viewModel: ScenarioViewModel
+    private let viewModel: AddScenarioViewModel
     
-    init(viewModel: ScenarioViewModel) {
+    init(viewModel: AddScenarioViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
