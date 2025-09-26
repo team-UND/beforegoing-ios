@@ -19,7 +19,7 @@ final class AddScenarioViewModel: ViewModeling {
     private let useCase: AddScenarioType
     
     init(useCase: AddScenarioType) {
-        self.addScenarioUseCase = addScenarioUseCase
+        self.useCase = useCase
     }
     
     enum Input {
@@ -61,7 +61,7 @@ final class AddScenarioViewModel: ViewModeling {
                 return EmptyOutput()
             }
             do {
-                let result = try await addScenarioUseCase.execute(
+                let result = try await useCase.execute(
                     scenarioName: scenarioName,
                     memo: memo,
                     basicMissions: basicMissions,
@@ -94,7 +94,7 @@ final class AddScenarioViewModel: ViewModeling {
                 return EmptyOutput()
             }
             do {
-                let result = try await addScenarioUseCase.execute(
+                let result = try await useCase.execute(
                     scenarioName: scenarioName,
                     memo: memo,
                     basicMissions: basicMissions,
