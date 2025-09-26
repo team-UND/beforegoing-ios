@@ -10,15 +10,18 @@ struct ScenarioRepository: ScenarioInterface {
     private let networkService: NetworkService
     private let keyChainService: KeyChainService
     private let addScenarioRequestMapper: AddScenarioRequestMapper
+    private let updateScenarioOrderRequestMapper: UpdateScenarioOrderRequestMapper
     
     init(
         networkService: NetworkService,
         keyChainService: KeyChainService,
-        addScenarioRequestMapper: AddScenarioRequestMapper
+        addScenarioRequestMapper: AddScenarioRequestMapper,
+        updateScenarioOrderRequestMapper: UpdateScenarioOrderRequestMapper
     ) {
         self.networkService = networkService
         self.keyChainService = keyChainService
         self.addScenarioRequestMapper = addScenarioRequestMapper
+        self.updateScenarioOrderRequestMapper = updateScenarioOrderRequestMapper
     }
     
     func addScenario(
@@ -85,6 +88,30 @@ struct ScenarioRepository: ScenarioInterface {
                 scenarioID: scenarioID
             )
         )
+    }
+    
+    func updateScenarioOrder(
+        scenarioID: Int,
+        prevOrder: Int?,
+        nextOrder: Int?
+    ) async throws -> NewScenarioOrderEntity {
+        guard let accessToken = keyChainService.load(key: .accessToken) else {
+            BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
+            return .stub()
+        }
+        
+        let dto = updateScenarioOrderRequestMapper.map((prevOrder, nextOrder))
+        
+        let result = try await networkService
+            .request(
+                endPoint: ScenarioAPI.updateOrder(
+                    accessToken: accessToken,
+                    scenarioID: scenarioID,
+                    dto: dto
+                ),
+                responseType: UpdateScenarioOrderResponseDTO.self
+            )
+        return result.toEntity()
     }
     
     private func decideEndPoint(dto: AddScenarioRequestDTO, accessToken: String) -> EndPoint {

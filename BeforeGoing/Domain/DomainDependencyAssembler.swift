@@ -36,6 +36,7 @@ final class DomainDependencyAssembler: DependencyAssembler {
             DIContainer.shared.register(type: AddScenarioType.self) { _ in MockAddScenarioUseCase() }
             DIContainer.shared.register(type: FetchScenariosType.self) { _ in MockFetchScenariosUseCase() }
             DIContainer.shared.register(type: DeleteScenarioType.self) { _ in MockDeleteScenarioUseCase() }
+            DIContainer.shared.register(type: UpdateScenarioOrderType.self) { _ in MockUpdateScenarioOrderUseCase() }
             
             return
         }
@@ -109,6 +110,9 @@ final class DomainDependencyAssembler: DependencyAssembler {
         }
         DIContainer.shared.register(type: DeleteScenarioType.self) { _ in
             return DeleteScenarioUseCase(repository: scenarioRepository)
+        }
+        DIContainer.shared.register(type: UpdateScenarioOrderType.self) { _ in
+            return UpdateScenarioOrderUseCase(repository: scenarioRepository)
         }
     }
 }

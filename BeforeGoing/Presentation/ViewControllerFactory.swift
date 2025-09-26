@@ -52,9 +52,12 @@ final class ViewControllerFactory {
     func makeMyScenarioViewController() -> MyScenarioViewController {
         let getScenariosViewModel = resolveViewModel(GetScenariosViewModel.self)
         let deleteScenarioViewModel = resolveViewModel(DeleteScenarioViewModel.self)
+        let updateScenarioOrderViewModel = resolveViewModel(UpdateScenarioOrderViewModel.self)
+        
         return MyScenarioViewController(
             getScenariosViewModel: getScenariosViewModel,
-            deleteScenarioViewModel: deleteScenarioViewModel
+            deleteScenarioViewModel: deleteScenarioViewModel,
+            updateScenarioOrderViewModel: updateScenarioOrderViewModel
         )
     }
     

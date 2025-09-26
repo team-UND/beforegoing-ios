@@ -12,6 +12,7 @@ enum ScenarioAPI {
     case addScnearioWithNotification(accessToken: String, dto: WithNotificationAddScenarioRequestDTO)
     case addScnearioWithoutNotification(accessToken: String, dto: WithoutNotificationAddScenarioRequestDTO)
     case deleteScenario(accessToken: String, scenarioID: Int)
+    case updateOrder(accessToken: String, scenarioID: Int, dto: UpdateScenarioOrderRequestDTO)
 }
 
 extension ScenarioAPI: EndPoint {
@@ -19,7 +20,7 @@ extension ScenarioAPI: EndPoint {
     var basePath: String {
         "/v1/scenarios"
     }
-
+    
     var url: String {
         let basePath = Environment.baseURL + basePath
         
@@ -28,9 +29,11 @@ extension ScenarioAPI: EndPoint {
             return basePath
         case .deleteScenario(_, let scenarioID):
             return basePath + "/\(scenarioID)"
+        case .updateOrder(_, let scenarioID, _):
+            return basePath + "/\(scenarioID)" + "/order"
         }
     }
-
+    
     var method: HTTPMethod {
         switch self {
         case .getScenarios:
@@ -39,42 +42,49 @@ extension ScenarioAPI: EndPoint {
             return .post
         case .deleteScenario:
             return .delete
+        case .updateOrder:
+            return .patch
         }
     }
-
+    
     var parameters: [String : Any]? {
         return nil
     }
-
+    
     var headers: HTTPHeaders? {
         switch self {
         case .getScenarios(let accessToken),
-             .addScnearioWithNotification(let accessToken, _),
-             .addScnearioWithoutNotification(let accessToken, _),
-             .deleteScenario(let accessToken, _):
+                .addScnearioWithNotification(let accessToken, _),
+                .addScnearioWithoutNotification(let accessToken, _),
+                .deleteScenario(let accessToken, _),
+                .updateOrder(let accessToken, _, _):
             return [
                 "Content-Type": "application/json",
                 "Authorization": "Bearer \(accessToken)"
             ]
         }
     }
-
+    
     var parameterEncoding: any ParameterEncoding {
         switch self {
         case .getScenarios, .deleteScenario:
             return URLEncoding.default
-        case .addScnearioWithNotification, .addScnearioWithoutNotification:
+        case .addScnearioWithNotification, .addScnearioWithoutNotification, .updateOrder:
             return JSONEncoding.default
         }
     }
-
+    
     var queryParameters: [String : String]? {
         switch self {
-        case .getScenarios, .addScnearioWithNotification, .addScnearioWithoutNotification, .deleteScenario:
+        case .getScenarios,
+                .addScnearioWithNotification,
+                .addScnearioWithoutNotification,
+                .deleteScenario,
+                .updateOrder:
             return nil
         }
     }
-
+    
     var bodyParameters: Parameters? {
         switch self {
         case .getScenarios, .deleteScenario:
@@ -83,9 +93,11 @@ extension ScenarioAPI: EndPoint {
             return try? dto.toBodyParameters()
         case .addScnearioWithoutNotification(_, let dto):
             return try? dto.toBodyParameters()
+        case .updateOrder(_, _, let dto):
+            return try? dto.toBodyParameters()
         }
     }
-
+    
     var isNeedReissue: Bool {
         return true
     }

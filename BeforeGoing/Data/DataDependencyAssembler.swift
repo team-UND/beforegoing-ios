@@ -18,6 +18,7 @@ struct DataDependencyAssembler: DependencyAssembler {
     private let updateNicknameRequestMapper = UpdateNicknameRequestMapper()
     private let weatherResponseMapper = WeatherResponseMapper()
     private let addScenarioRequestMapper = AddScenarioRequestMapper()
+    private let updateScenarioOrderRequestMapper = UpdateScenarioOrderRequestMapper()
     private let tokenValidator = TokenValidator()
     
     init() {
@@ -71,7 +72,8 @@ struct DataDependencyAssembler: DependencyAssembler {
             ScenarioRepository(
                 networkService: networkService,
                 keyChainService: keyChainService,
-                addScenarioRequestMapper: addScenarioRequestMapper
+                addScenarioRequestMapper: addScenarioRequestMapper,
+                updateScenarioOrderRequestMapper: updateScenarioOrderRequestMapper
             )
         }
     }

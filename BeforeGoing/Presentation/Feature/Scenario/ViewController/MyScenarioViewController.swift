@@ -12,13 +12,16 @@ final class MyScenarioViewController: BaseViewController {
     private let rootView = ScenarioListView()
     private let getScenariosViewModel: GetScenariosViewModel
     private let deleteScenarioViewModel: DeleteScenarioViewModel
+    private let updateScenarioOrderViewModel: UpdateScenarioOrderViewModel
     
     init(
         getScenariosViewModel: GetScenariosViewModel,
-        deleteScenarioViewModel: DeleteScenarioViewModel
+        deleteScenarioViewModel: DeleteScenarioViewModel,
+        updateScenarioOrderViewModel: UpdateScenarioOrderViewModel
     ) {
         self.getScenariosViewModel = getScenariosViewModel
         self.deleteScenarioViewModel = deleteScenarioViewModel
+        self.updateScenarioOrderViewModel = updateScenarioOrderViewModel
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -205,10 +208,24 @@ extension MyScenarioViewController: UITableViewDropDelegate {
             guard let sourceIndexPath = item.sourceIndexPath else { continue }
             let sourceSection = sourceIndexPath.section
             
-            getScenariosViewModel.moveScenario(
-                originalAt: sourceSection,
-                destinationAt: destinationSection
-            )
+            Task {
+                    let result = try await updateScenarioOrderViewModel.action(
+                        input: .scenarioDidDrag(
+                            scenarioID: getScenariosViewModel.getScenarioID(at: sourceSection),
+                            prevOrder: getScenariosViewModel.getPreviousScenarioOrder(current: sourceSection),
+                            nextOrder: getScenariosViewModel.getNextScenarioOrder(current: sourceSection)
+                        )
+                    )
+                    
+                    switch result.updateScenarioOrderResult {
+                    case .success(let result):
+                        getScenariosViewModel.updateOrder(updates: result.orderUpdates)
+                        getScenariosViewModel.sortScenario()
+                        rootView.scenarioListTableView.reloadData()
+                    case .failure(let error):
+                        BeforeGoingLogger.error(error)
+                    }
+            }
         }
         tableView.reloadData()
     }

@@ -19,4 +19,9 @@ protocol ScenarioInterface {
     ) async throws -> ScenarioEntity
     func fetchScenarios() async throws -> [ScenarioEntity]
     func deleteScenario(scenarioID: Int) async throws
+    func updateScenarioOrder(
+        scenarioID: Int,
+        prevOrder: Int?,
+        nextOrder: Int?
+    ) async throws -> NewScenarioOrderEntity
 }
