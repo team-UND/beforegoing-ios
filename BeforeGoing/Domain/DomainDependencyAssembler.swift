@@ -34,6 +34,7 @@ final class DomainDependencyAssembler: DependencyAssembler {
             DIContainer.shared.register(type: RequestWeatherUseCase.self) { _ in MockRequestWeatherUseCase() }
             
             DIContainer.shared.register(type: AddScenarioType.self) { _ in MockAddScenarioUseCase() }
+            DIContainer.shared.register(type: FetchScenariosType.self) { _ in MockFetchScenariosUseCase() }
             
             return
         }
@@ -101,6 +102,9 @@ final class DomainDependencyAssembler: DependencyAssembler {
         
         DIContainer.shared.register(type: AddScenarioType.self) { _ in
             return AddScenarioUseCase(repository: scenarioRepository)
+        }
+        DIContainer.shared.register(type: FetchScenariosType.self) { _ in
+            return FetchScenariosUseCase(repository: scenarioRepository)
         }
     }
 }
