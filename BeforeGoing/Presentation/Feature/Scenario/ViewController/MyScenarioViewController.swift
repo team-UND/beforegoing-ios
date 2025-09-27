@@ -97,25 +97,31 @@ extension MyScenarioViewController {
                     scenarioID: getScenariosViewModel.getScenarioID(at: at)
                 )
             )
-            
-            switch result.getScenarioResult {
-            case .success(let scenario):
-                let viewController = ViewControllerFactory.shared.makeSettingScenarioViewController()
-                viewController.do {
-                    $0.navigationItem.hidesBackButton = true
-                    $0.hidesBottomBarWhenPushed = true
-                    $0.configure(
-                        scenarioName: scenario.scenarioName,
-                        memo: scenario.memo,
-                        missions: scenario.basicMissions.map { $0.content }
-                    )
-                }
-                self.navigationController?.pushViewController(viewController, animated: false)
-                
-            case .failure(let error):
-                BeforeGoingLogger.error(error)
-            }
+            handleGetScenarioResult(result: result.getScenarioResult)
         }
+    }
+    
+    private func handleGetScenarioResult(result: Result<ScenarioWithNotificationEntity, Error>) {
+        switch result {
+        case .success(let scenario):
+            moveSettingScenario(scenario: scenario)
+        case .failure(let error):
+            BeforeGoingLogger.error(error)
+        }
+    }
+    
+    private func moveSettingScenario(scenario: ScenarioWithNotificationEntity) {
+        let viewController = ViewControllerFactory.shared.makeSettingScenarioViewController()
+        viewController.do {
+            $0.navigationItem.hidesBackButton = true
+            $0.hidesBottomBarWhenPushed = true
+            $0.configure(
+                scenarioName: scenario.scenarioName,
+                memo: scenario.memo,
+                missions: scenario.basicMissions.map { $0.content }
+            )
+        }
+        self.navigationController?.pushViewController(viewController, animated: false)
     }
 }
 
@@ -151,10 +157,7 @@ extension MyScenarioViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let name = getScenariosViewModel.getScenarioName(section: indexPath.section)
-        let memo = getScenariosViewModel.getScenarioMemo(section: indexPath.section)
-        
-        cell.bind(name: name, memo: memo)
+        bindCell(to: cell, section: indexPath.section)
         cell.onDidTap = { [weak self] in
             self?.scenarioListItemCellDidTap(at: indexPath.section)
         }
@@ -170,8 +173,13 @@ extension MyScenarioViewController: UITableViewDataSource {
         setDeleteActionStyle(deleteAction: deleteAction, largeConfig: largeConfig)
         
         let config = createSwipeAction(deleteAction: deleteAction)
-        
         return config
+    }
+    
+    private func bindCell(to cell: ScenarioListItemCell, section: Int) {
+        let name = getScenariosViewModel.getScenarioName(section: section)
+        let memo = getScenariosViewModel.getScenarioMemo(section: section)
+        cell.bind(name: name, memo: memo)
     }
     
     private func createDeleteAction(tableView: UITableView, indexPath: IndexPath) -> UIContextualAction {
@@ -182,22 +190,21 @@ extension MyScenarioViewController: UITableViewDataSource {
             Task {
                 guard let self = self else { return }
                 
+                let scenarioID = self.getScenariosViewModel.getScenarioID(at: indexPath.section)
                 do {
                     let _ = try await self.deleteScenarioViewModel.action(
-                        input: .deleteButtonDidTap(
-                            scenarioID: self.getScenariosViewModel.getScenarioID(at: indexPath.section)
-                        )
+                        input: .deleteButtonDidTap(scenarioID: scenarioID)
                     )
+                    self.getScenariosViewModel.removeScenario(at: indexPath.section)
+                    tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
                 } catch {
                     BeforeGoingLogger.error(error)
                 }
-                
-                self.getScenariosViewModel.removeScenario(at: indexPath.section)
-                tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
                 completion(true)
             }
         }
     }
+    
     
     private func createLargeConfig() -> UIImage.SymbolConfiguration {
         return UIImage.SymbolConfiguration(pointSize: 12.0, weight: .bold, scale: .large)
@@ -244,29 +251,8 @@ extension MyScenarioViewController: UITableViewDropDelegate {
             guard let sourceIndexPath = item.sourceIndexPath else { continue }
             let sourceSection = sourceIndexPath.section
             
-            getScenariosViewModel.moveScenario(
-                originalAt: sourceSection,
-                destinationAt: destinationSection
-            )
-            
-            Task {
-                let result = try await updateScenarioOrderViewModel.action(
-                    input: .scenarioDidDrag(
-                        scenarioID: getScenariosViewModel.getScenarioID(at: destinationSection),
-                        prevOrder: getScenariosViewModel.getPreviousScenarioOrder(current: destinationSection),
-                        nextOrder: getScenariosViewModel.getNextScenarioOrder(current: destinationSection)
-                    )
-                )
-                
-                switch result.updateScenarioOrderResult {
-                case .success(let result):
-                    getScenariosViewModel.updateOrder(updates: result.orderUpdates)
-                    getScenariosViewModel.sortScenario()
-                    rootView.scenarioListTableView.reloadData()
-                case .failure(let error):
-                    BeforeGoingLogger.error(error)
-                }
-            }
+            moveScenario(originalAt: sourceSection, destinationAt: destinationSection)
+            updateScenarioOrder(section: destinationSection)
         }
         tableView.reloadData()
     }
@@ -280,5 +266,44 @@ extension MyScenarioViewController: UITableViewDropDelegate {
             return UITableViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
         }
         return UITableViewDropProposal(operation: .cancel, intent: .unspecified)
+    }
+    
+    private func moveScenario(originalAt: Int, destinationAt: Int) {
+        getScenariosViewModel.moveScenario(
+            originalAt: originalAt,
+            destinationAt: destinationAt
+        )
+    }
+    
+    private func updateScenarioOrder(section: Int) {
+        let scenarioID = getScenariosViewModel.getScenarioID(at: section)
+        let prevOrder = getScenariosViewModel.getPreviousScenarioOrder(current: section)
+        let nextOrder = getScenariosViewModel.getNextScenarioOrder(current: section)
+        
+        Task {
+            let result = try await updateScenarioOrderViewModel.action(
+                input: .scenarioDidDrag(
+                    scenarioID: scenarioID,
+                    prevOrder: prevOrder,
+                    nextOrder: nextOrder
+                )
+            )
+            handleUpdateScenarioOrderResult(result: result.updateScenarioOrderResult)
+        }
+    }
+    
+    private func handleUpdateScenarioOrderResult(result: Result<NewScenarioOrderEntity, Error>) {
+        switch result {
+        case .success(let result):
+            reflectMyScenario(orderUpdates: result.orderUpdates)
+        case .failure(let error):
+            BeforeGoingLogger.error(error)
+        }
+    }
+    
+    private func reflectMyScenario(orderUpdates: [NewOrderEntity]) {
+        getScenariosViewModel.updateOrder(updates: orderUpdates)
+        getScenariosViewModel.sortScenario()
+        rootView.scenarioListTableView.reloadData()
     }
 }
