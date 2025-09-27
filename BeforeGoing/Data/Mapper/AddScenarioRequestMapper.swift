@@ -33,23 +33,22 @@ struct AddScenarioRequestMapper: Mapper {
         )
     ) -> Output {
         if input.isNotificationActive {
-            guard let notificationMethodType = input.noticeMethodType,
-                  let daysOfWeekOrdinal = input.daysOfWeekOrdinal,
-                  let startHour = input.startHour,
-                  let startMinute = input.startMinute else {
-                BeforeGoingLogger.error(BeforeGoingError.invalidParameter)
-                return .withNotification(WithNotificationAddScenarioRequestDTO.stub())
+            if let notificationMethodType = input.noticeMethodType,
+               let daysOfWeekOrdinal = input.daysOfWeekOrdinal,
+               let startHour = input.startHour,
+               let startMinute = input.startMinute {
+                
+                return createWithNotificationAddScenarioRequestDTO(
+                    scenarioName: input.scenarioName,
+                    memo: input.memo,
+                    basicMissions: input.basicMissions,
+                    notificationMethodType: notificationMethodType,
+                    daysOfWeekOrdinal: daysOfWeekOrdinal,
+                    startHour: startHour,
+                    startMinute: startMinute
+                )
             }
-            
-            return createWithNotificationAddScenarioRequestDTO(
-                scenarioName: input.scenarioName,
-                memo: input.memo,
-                basicMissions: input.basicMissions,
-                notificationMethodType: notificationMethodType,
-                daysOfWeekOrdinal: daysOfWeekOrdinal,
-                startHour: startHour,
-                startMinute: startMinute
-            )
+            BeforeGoingLogger.error(BeforeGoingError.invalidParameter)
         }
         return createWithoutNotificationAddScenarioRequestDTO(
             scenarioName: input.scenarioName,
