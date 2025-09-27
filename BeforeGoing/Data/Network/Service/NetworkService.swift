@@ -22,16 +22,24 @@ final class NetworkService: APIManaging {
         endPoint: any EndPoint,
         responseType: T.Type
     ) async throws -> T {
-        let dataRequest = createDataRequest(endPoint: endPoint)
-        let response = try await dataRequest.serializingDecodable(T.self).value
-        writeLog(response: response)
-        return response
+        do {
+            let dataRequest = createDataRequest(endPoint: endPoint)
+            let response = try await dataRequest.serializingDecodable(T.self).value
+            writeLog(response: response)
+            return response
+        } catch {
+            throw error
+        }
     }
     
     func request(endPoint: any EndPoint) async throws  {
-        let dataRequest = createDataRequest(endPoint: endPoint)
-        let response = try await dataRequest.serializingData().value
-        writeLog(response: response)
+        do {
+            let dataRequest = createDataRequest(endPoint: endPoint)
+            let response = try await dataRequest.serializingData().value
+            writeLog(response: response)
+        } catch {
+            throw error
+        }
     }
     
     private func createDataRequest(endPoint: EndPoint) -> DataRequest {
