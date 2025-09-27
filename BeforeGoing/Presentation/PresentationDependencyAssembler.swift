@@ -71,6 +71,11 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
+        guard let fetchSingleScenarioUsecase = DIContainer.shared.resolve(type: FetchSingleScenarioType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
         guard let fetchScenariosUseCase = DIContainer.shared.resolve(type: FetchScenariosType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
@@ -109,5 +114,6 @@ struct PresentationDependencyAssembler: DependencyAssembler {
         DIContainer.shared.register(GetScenariosViewModel(useCase: fetchScenariosUseCase))
         DIContainer.shared.register(DeleteScenarioViewModel(useCase: deleteScenarioUseCase))
         DIContainer.shared.register(UpdateScenarioOrderViewModel(useCase: updateScenarioOrderUseCase))
+        DIContainer.shared.register(GetSingleScenarioViewModel(useCase: fetchSingleScenarioUsecase))
     }
 }
