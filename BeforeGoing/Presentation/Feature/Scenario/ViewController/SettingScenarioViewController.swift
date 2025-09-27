@@ -119,6 +119,19 @@ extension SettingScenarioViewController {
             }
         }
     }
+    
+    func configure(scenarioName: String, memo: String, missions: [String]) {
+        rootView.inputScenarioView.do {
+            $0.textField.text = scenarioName
+            $0.updateTextCount(scenarioName.count)
+        }
+        rootView.inputMemoView.do {
+            $0.textField.text = memo
+            $0.updateTextCount(memo.count)
+        }
+        missions.forEach { self.missions.append($0) }
+        rootView.settingMissionView.missionTableView.reloadData()
+    }
 }
 
 extension SettingScenarioViewController {
