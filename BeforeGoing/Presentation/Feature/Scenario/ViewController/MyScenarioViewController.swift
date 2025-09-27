@@ -10,15 +10,18 @@ import UIKit
 final class MyScenarioViewController: BaseViewController {
     
     private let rootView = ScenarioListView()
+    private let getSingleScenarioViewModel: GetSingleScenarioViewModel
     private let getScenariosViewModel: GetScenariosViewModel
     private let deleteScenarioViewModel: DeleteScenarioViewModel
     private let updateScenarioOrderViewModel: UpdateScenarioOrderViewModel
     
     init(
+        getSingleScenarioViewModel: GetSingleScenarioViewModel,
         getScenariosViewModel: GetScenariosViewModel,
         deleteScenarioViewModel: DeleteScenarioViewModel,
         updateScenarioOrderViewModel: UpdateScenarioOrderViewModel
     ) {
+        self.getSingleScenarioViewModel = getSingleScenarioViewModel
         self.getScenariosViewModel = getScenariosViewModel
         self.deleteScenarioViewModel = deleteScenarioViewModel
         self.updateScenarioOrderViewModel = updateScenarioOrderViewModel
@@ -79,10 +82,40 @@ extension MyScenarioViewController {
     @objc
     private func addScenarioButtonDidTap() {
         let viewController = ManageScenarioViewController()
-        viewController.navigationItem.hidesBackButton = true
-        viewController.hidesBottomBarWhenPushed = true
-        
+        viewController.do {
+            $0.navigationItem.hidesBackButton = true
+            $0.hidesBottomBarWhenPushed = true
+        }
         self.navigationController?.pushViewController(viewController, animated: false)
+    }
+    
+    @objc
+    private func scenarioListItemCellDidTap(at: Int) {
+        Task {
+            let result = try await getSingleScenarioViewModel.action(
+                input: .scenarioListItemCellDidTap(
+                    scenarioID: getScenariosViewModel.getScenarioID(at: at)
+                )
+            )
+            
+            switch result.getScenarioResult {
+            case .success(let scenario):
+                let viewController = ViewControllerFactory.shared.makeSettingScenarioViewController()
+                viewController.do {
+                    $0.navigationItem.hidesBackButton = true
+                    $0.hidesBottomBarWhenPushed = true
+                    $0.configure(
+                        scenarioName: scenario.scenarioName,
+                        memo: scenario.memo,
+                        missions: scenario.basicMissions.map { $0.content }
+                    )
+                }
+                self.navigationController?.pushViewController(viewController, animated: false)
+                
+            case .failure(let error):
+                BeforeGoingLogger.error(error)
+            }
+        }
     }
 }
 
@@ -122,6 +155,9 @@ extension MyScenarioViewController: UITableViewDataSource {
         let memo = getScenariosViewModel.getScenarioMemo(section: indexPath.section)
         
         cell.bind(name: name, memo: memo)
+        cell.onDidTap = { [weak self] in
+            self?.scenarioListItemCellDidTap(at: indexPath.section)
+        }
         return cell
     }
     

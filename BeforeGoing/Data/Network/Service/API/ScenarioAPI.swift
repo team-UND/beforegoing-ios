@@ -8,6 +8,7 @@
 import Alamofire
 
 enum ScenarioAPI {
+    case getScenario(accessToken: String, scenarioID: Int)
     case getScenarios(accessToken: String)
     case addScnearioWithNotification(accessToken: String, dto: WithNotificationAddScenarioRequestDTO)
     case addScnearioWithoutNotification(accessToken: String, dto: WithoutNotificationAddScenarioRequestDTO)
@@ -27,7 +28,7 @@ extension ScenarioAPI: EndPoint {
         switch self {
         case .getScenarios, .addScnearioWithNotification, .addScnearioWithoutNotification:
             return basePath
-        case .deleteScenario(_, let scenarioID):
+        case .getScenario(_, let scenarioID), .deleteScenario(_, let scenarioID):
             return basePath + "/\(scenarioID)"
         case .updateOrder(_, let scenarioID, _):
             return basePath + "/\(scenarioID)" + "/order"
@@ -36,7 +37,7 @@ extension ScenarioAPI: EndPoint {
     
     var method: HTTPMethod {
         switch self {
-        case .getScenarios:
+        case .getScenario, .getScenarios:
             return .get
         case .addScnearioWithNotification, .addScnearioWithoutNotification:
             return .post
@@ -53,7 +54,8 @@ extension ScenarioAPI: EndPoint {
     
     var headers: HTTPHeaders? {
         switch self {
-        case .getScenarios(let accessToken),
+        case .getScenario(let accessToken, _),
+                .getScenarios(let accessToken),
                 .addScnearioWithNotification(let accessToken, _),
                 .addScnearioWithoutNotification(let accessToken, _),
                 .deleteScenario(let accessToken, _),
@@ -67,7 +69,7 @@ extension ScenarioAPI: EndPoint {
     
     var parameterEncoding: any ParameterEncoding {
         switch self {
-        case .getScenarios, .deleteScenario:
+        case .getScenario, .getScenarios, .deleteScenario:
             return URLEncoding.default
         case .addScnearioWithNotification, .addScnearioWithoutNotification, .updateOrder:
             return JSONEncoding.default
@@ -76,7 +78,8 @@ extension ScenarioAPI: EndPoint {
     
     var queryParameters: [String : String]? {
         switch self {
-        case .getScenarios,
+        case .getScenario,
+                .getScenarios,
                 .addScnearioWithNotification,
                 .addScnearioWithoutNotification,
                 .deleteScenario,
@@ -87,7 +90,7 @@ extension ScenarioAPI: EndPoint {
     
     var bodyParameters: Parameters? {
         switch self {
-        case .getScenarios, .deleteScenario:
+        case .getScenario, .getScenarios, .deleteScenario:
             return nil
         case .addScnearioWithNotification(_, let dto):
             return try? dto.toBodyParameters()

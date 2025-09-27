@@ -10,3 +10,14 @@ struct NotificationConditionDTO: Codable {
     let startHour: Int
     let startMinute: Int
 }
+
+extension NotificationConditionDTO {
+    
+    func toEntity() -> NotificationConditionEntity {
+        return .init(
+            notificationType: notificationType,
+            startHour: startHour,
+            startMinute: startMinute
+        )
+    }
+}

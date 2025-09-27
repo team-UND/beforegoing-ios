@@ -6,7 +6,7 @@
 //
 
 struct ScenarioRepository: ScenarioInterface {
-    
+        
     private let networkService: NetworkService
     private let keyChainService: KeyChainService
     private let addScenarioRequestMapper: AddScenarioRequestMapper
@@ -61,6 +61,22 @@ struct ScenarioRepository: ScenarioInterface {
             responseType: [ScenarioResponseDTO].self
         )
         return result.first?.toEntity() ?? .stub()
+    }
+    
+    func fetchScenario(scenarioID: Int) async throws -> ScenarioWithNotificationEntity {
+        guard let accessToken = keyChainService.load(key: .accessToken) else {
+            BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
+            return .stub()
+        }
+        
+        let result = try await networkService.request(
+            endPoint: ScenarioAPI.getScenario(
+                accessToken: accessToken,
+                scenarioID: scenarioID
+            ),
+            responseType: GetScenarioResponseDTO.self
+        )
+        return result.toEntity()
     }
     
     func fetchScenarios() async throws -> [ScenarioEntity] {
