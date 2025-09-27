@@ -16,4 +16,5 @@ enum BeforeGoingError: Error {
     case accessTokenMissing
     case requestWeatherFailed
     case invalidParameter
+    case getScenariosFailed
 }
