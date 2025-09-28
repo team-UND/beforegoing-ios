@@ -86,6 +86,11 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
+        guard let getMissionUseCase = DIContainer.shared.resolve(type: FetchMissionsType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
         guard let updateScenarioOrderUseCase = DIContainer.shared.resolve(type: UpdateScenarioOrderType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
@@ -94,7 +99,12 @@ struct PresentationDependencyAssembler: DependencyAssembler {
         DIContainer.shared.register(AgreeItemViewModel(useCase: agreeTermsUseCase))
         DIContainer.shared.register(LoginViewModel(loginUseCase: loginUseCase))
         DIContainer.shared.register(SplashViewModel(useCase: autoLoginUseCase))
-        DIContainer.shared.register(HomeViewModel(weatherUseCase: requestWeatherUseCase))
+        DIContainer.shared.register(
+            HomeViewModel(
+                weatherUseCase: requestWeatherUseCase,
+                getMissionsUseCase: getMissionUseCase
+            )
+        )
         DIContainer.shared.register(
             ProfileViewModel(
                 getMemberNameUseCase: getMemberNameUseCase,

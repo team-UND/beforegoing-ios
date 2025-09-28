@@ -39,6 +39,8 @@ final class DomainDependencyAssembler: DependencyAssembler {
             DIContainer.shared.register(type: UpdateScenarioOrderType.self) { _ in MockUpdateScenarioOrderUseCase() }
             DIContainer.shared.register(type: FetchSingleScenarioType.self) { _ in MockFetchSingleScenarioUseCase() }
             
+            DIContainer.shared.register(type: FetchMissionsType.self) { _ in MockFetchMissionsUseCase() }
+            
             return
         }
         
@@ -65,6 +67,11 @@ final class DomainDependencyAssembler: DependencyAssembler {
         }
         
         guard let scenarioRepository = DIContainer.shared.resolve(type: ScenarioInterface.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            return
+        }
+        
+        guard let missionRepository = DIContainer.shared.resolve(type: MissionInterface.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             return
         }
@@ -117,6 +124,10 @@ final class DomainDependencyAssembler: DependencyAssembler {
         }
         DIContainer.shared.register(type: FetchSingleScenarioType.self) { _ in
             return FetchSingleScenarioUseCase(repository: scenarioRepository)
+        }
+        
+        DIContainer.shared.register(type: FetchMissionsType.self) { _ in
+            return FetchMissionsUseCase(repository: missionRepository)
         }
     }
 }

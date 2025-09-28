@@ -18,6 +18,7 @@ struct DataDependencyAssembler: DependencyAssembler {
     private let updateNicknameRequestMapper = UpdateNicknameRequestMapper()
     private let weatherResponseMapper = WeatherResponseMapper()
     private let addScenarioRequestMapper = AddScenarioRequestMapper()
+    private let updateScenarioRequestMapper = UpdateScenarioRequestMapper()
     private let updateScenarioOrderRequestMapper = UpdateScenarioOrderRequestMapper()
     private let tokenValidator = TokenValidator()
     
@@ -30,6 +31,7 @@ struct DataDependencyAssembler: DependencyAssembler {
         DIContainer.shared.register(loginRequestMapper)
         DIContainer.shared.register(termsRequestMapper)
         DIContainer.shared.register(updateTermRequestMapper)
+        DIContainer.shared.register(updateScenarioRequestMapper)
         DIContainer.shared.register(updateNicknameRequestMapper)
         DIContainer.shared.register(weatherResponseMapper)
         
@@ -73,7 +75,14 @@ struct DataDependencyAssembler: DependencyAssembler {
                 networkService: networkService,
                 keyChainService: keyChainService,
                 addScenarioRequestMapper: addScenarioRequestMapper,
+                updateScenarioRequestMapper: updateScenarioRequestMapper,
                 updateScenarioOrderRequestMapper: updateScenarioOrderRequestMapper
+            )
+        }
+        DIContainer.shared.register(type: MissionInterface.self) { _ in
+            MissionRepository(
+                networkService: networkService,
+                keyChainService: keyChainService
             )
         }
     }
