@@ -14,14 +14,22 @@ final class HomeViewModel: ViewModeling {
     
     private static let seperator = ", "
     private let weatherUseCase: RequestWeatherType
+    private let getMissionsUseCase: FetchMissionsType
     
-    init(weatherUseCase: RequestWeatherType) {
+    private var missions: [(missionID: Int, content: String, state: ListItemState)] = []
+    
+    init(
+        weatherUseCase: RequestWeatherType,
+        getMissionsUseCase: FetchMissionsType
+    ) {
         self.weatherUseCase = weatherUseCase
+        self.getMissionsUseCase = getMissionsUseCase
     }
     
     enum Input {
         case requestDate
         case requestWeather(latitude: CLLocationDegrees, longitude: CLLocationDegrees)
+        case scenarioDidTap(scenarioID: Int, date: String)
     }
     
     typealias Output = HomeOutput
@@ -34,6 +42,10 @@ final class HomeViewModel: ViewModeling {
         let weatherResult: NSMutableAttributedString
     }
     
+    struct MissionsOutput: HomeOutput {
+        let missionsResult: Result<MissionsEntity, Error>
+    }
+    
     func action(input: Input) async throws -> Output {
         switch input {
         case .requestDate:
@@ -41,11 +53,34 @@ final class HomeViewModel: ViewModeling {
             return DateOutput(date: date)
             
         case .requestWeather(let latitude, let longitude) :
-            let administrativeArea = try await getAdministrativeArea(latitude: latitude, longitude: longitude)
-            let result = try await requestWeatherResult(latitude: latitude, longitude: longitude)
-            let weatherResult = convertWeatherResult(administrativeArea: administrativeArea, result: result)
-            
+            let administrativeArea = try await getAdministrativeArea(
+                latitude: latitude,
+                longitude: longitude
+            )
+            let result = try await requestWeatherResult(
+                latitude: latitude,
+                longitude: longitude
+            )
+            let weatherResult = convertWeatherResult(
+                administrativeArea: administrativeArea,
+                result: result
+            )
             return WeatherOutput(weatherResult: weatherResult)
+            
+        case .scenarioDidTap(let scenarioID, let date):
+            do {
+                let result = try await getMissionsUseCase.execute(
+                    scenarioID: scenarioID,
+                    date: date
+                )
+                missions.removeAll()
+                result.todayMissions.forEach { addMissionContent($0.missionId, $0.content, .today) }
+                result.basicMissions.forEach { addMissionContent($0.missionId, $0.content, .normal) }
+                return MissionsOutput(missionsResult: .success(result))
+            } catch {
+                BeforeGoingLogger.error(error)
+                return MissionsOutput(missionsResult: .failure(error))
+            }
         }
     }
     
@@ -123,5 +158,50 @@ final class HomeViewModel: ViewModeling {
             }
         }
         return resultAttributedString
+    }
+    
+    private func addMissionContent(_ missionID: Int, _ content: String, _ state: ListItemState) {
+        if !isExistMission(content: content) {
+            self.missions.append((missionID, content, state))
+        }
+    }
+    
+    private func isExistMission(content: String) -> Bool {
+        missions.contains(where: { mission in
+            mission.content == content
+        })
+    }
+}
+
+extension HomeViewModel {
+    
+    var missionsCount: Int {
+        missions.count
+    }
+    
+//    func addTodayMission(content: String) {
+//        missions.insert((content, .today), at: 0)
+//    }
+    
+    func getMissionTitle(at index: Int) -> String {
+        missions[index].content
+    }
+    
+    func getMissionState(at index: Int) -> ListItemState {
+        missions[index].state
+    }
+    
+    func completeMission(at index: Int) {
+        missions[index].state = .completed
+        let removed = missions.remove(at: index)
+        missions.append(removed)
+    }
+    
+    func isTodayMission(at index: Int) -> Bool {
+        missions[index].state == .today
+    }
+    
+    func removeMission(at index: Int) {
+        missions.remove(at: index)
     }
 }

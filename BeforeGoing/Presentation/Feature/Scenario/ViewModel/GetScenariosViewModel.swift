@@ -98,4 +98,8 @@ extension GetScenariosViewModel {
     private func findScenarioByID(id: Int) -> ScenarioEntity? {
         scenarios?.filter { $0.scenarioId == id }.first
     }
+    
+    var firstScenarioID: Int {
+        scenarios?.first?.scenarioId ?? 0
+    }
 }
