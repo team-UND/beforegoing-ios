@@ -7,5 +7,5 @@
 
 protocol MissionInterface {
     
-    func execute(scenarioID: Int, date: String) async throws -> MissionsEntity
+    func fetchMissions(scenarioID: Int, date: String) async throws -> MissionsEntity
 }

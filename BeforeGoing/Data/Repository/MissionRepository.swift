@@ -18,7 +18,7 @@ struct MissionRepository: MissionInterface {
         self.keyChainService = keyChainService
     }
     
-    func execute(scenarioID: Int, date: String) async throws -> MissionsEntity {
+    func fetchMissions(scenarioID: Int, date: String) async throws -> MissionsEntity {
         guard let accessToken = keyChainService.load(key: .accessToken) else {
             BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
             return .stub()
