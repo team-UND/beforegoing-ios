@@ -45,8 +45,12 @@ final class ViewControllerFactory {
     }
     
     func makeHomeViewController() -> HomeViewController {
-        let viewModel = resolveViewModel(HomeViewModel.self)
-        return HomeViewController(viewModel: viewModel)
+        let homeViewModel = resolveViewModel(HomeViewModel.self)
+        let getScenariosViewModel = resolveViewModel(GetScenariosViewModel.self)
+        return HomeViewController(
+            homeViewModel: homeViewModel,
+            getScenariosViewModel: getScenariosViewModel
+        )
     }
     
     func makeMyScenarioViewController() -> MyScenarioViewController {
