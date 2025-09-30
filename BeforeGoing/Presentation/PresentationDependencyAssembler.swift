@@ -86,12 +86,17 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
+        guard let updateScenarioOrderUseCase = DIContainer.shared.resolve(type: UpdateScenarioOrderType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
         guard let getMissionUseCase = DIContainer.shared.resolve(type: FetchMissionsType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
         }
         
-        guard let updateScenarioOrderUseCase = DIContainer.shared.resolve(type: UpdateScenarioOrderType.self) else {
+        guard let checkMissionUseCase = DIContainer.shared.resolve(type: CheckMissionType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
         }
@@ -102,7 +107,8 @@ struct PresentationDependencyAssembler: DependencyAssembler {
         DIContainer.shared.register(
             HomeViewModel(
                 weatherUseCase: requestWeatherUseCase,
-                getMissionsUseCase: getMissionUseCase
+                getMissionsUseCase: getMissionUseCase,
+                checkMissionUseCase: checkMissionUseCase
             )
         )
         DIContainer.shared.register(
