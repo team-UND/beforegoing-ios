@@ -34,4 +34,20 @@ struct MissionRepository: MissionInterface {
         )
         return result.toEntity()
     }
+    
+    func checkMission(missionID: Int, date: String, isChecked: Bool) async throws {
+        guard let accessToken = keyChainService.load(key: .accessToken) else {
+            BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
+            return
+        }
+        
+        try await networkService.request(
+            endPoint: MissionAPI.checkMission(
+                accessToken: accessToken,
+                missionID: missionID,
+                date: date,
+                isChecked: isChecked
+            )
+        )
+    }
 }

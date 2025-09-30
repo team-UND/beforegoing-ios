@@ -9,6 +9,7 @@ import Alamofire
 
 enum MissionAPI {
     case getMissions(accessToken: String, scenarioID: Int, date: String)
+    case checkMission(accessToken: String, missionID: Int, date: String, isChecked: Bool)
 }
 
 extension MissionAPI: EndPoint {
@@ -22,7 +23,9 @@ extension MissionAPI: EndPoint {
         
         switch self {
         case .getMissions(_, let scenarioID, _):
-            return basePath + "/scenarios" + "/\(scenarioID)" + "/missions"
+            return basePath + "/scenarios/\(scenarioID)/missions"
+        case .checkMission(_, let missionID, _, _):
+            return basePath + "/missions/\(missionID)/check"
         }
     }
 
@@ -30,6 +33,8 @@ extension MissionAPI: EndPoint {
         switch self {
         case .getMissions:
             return .get
+        case .checkMission:
+            return .patch
         }
     }
 
@@ -39,7 +44,7 @@ extension MissionAPI: EndPoint {
 
     var headers: HTTPHeaders? {
         switch self {
-        case .getMissions(let accessToken, _, _):
+        case .getMissions(let accessToken, _, _), .checkMission(let accessToken, _, _, _):
             return [
                 "Content-Type": "application/json",
                 "Authorization": "Bearer \(accessToken)"
@@ -51,19 +56,21 @@ extension MissionAPI: EndPoint {
         switch self {
         case .getMissions:
             return URLEncoding.default
+        case .checkMission(_, _, _, let isChecked):
+            return SingleBoolEncoding(value: isChecked)
         }
     }
 
     var queryParameters: [String : String]? {
         switch self {
-        case .getMissions(_, _, let date):
+        case .getMissions(_, _, let date), .checkMission(_, _, let date, _):
             return ["date": date]
         }
     }
 
     var bodyParameters: Parameters? {
         switch self {
-        case .getMissions:
+        case .getMissions, .checkMission:
             return nil
         }
     }

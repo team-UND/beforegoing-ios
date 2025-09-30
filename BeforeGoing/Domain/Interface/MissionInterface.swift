@@ -8,4 +8,5 @@
 protocol MissionInterface {
     
     func fetchMissions(scenarioID: Int, date: String) async throws -> MissionsEntity
+    func checkMission(missionID: Int, date: String, isChecked: Bool) async throws
 }
