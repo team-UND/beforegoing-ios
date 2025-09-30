@@ -41,13 +41,14 @@ final class CompletedListItem: TodayListItemComponentView, ListItemProtocol {
     }
     
     override func setUI() {
+        if beforeState == .today {
+            super.setUI()
+        }
+        
         addSubviews(
             checkBox,
             contentLabel
         )
-        if beforeState == .today {
-            super.setUI()
-        }
     }
     
     override func setLayout() {
@@ -55,12 +56,7 @@ final class CompletedListItem: TodayListItemComponentView, ListItemProtocol {
             $0.leading.equalToSuperview().inset(16.adjustedW)
             $0.centerY.equalToSuperview()
         }
-        if beforeState == .normal {
-            contentLabel.snp.makeConstraints {
-                $0.leading.equalTo(checkBox.snp.trailing).offset(8.adjustedW)
-                $0.centerY.equalToSuperview()
-            }
-        } else {
+        if beforeState == .today {
             super.setLayout()
             
             todayBackgroundView.snp.makeConstraints {
@@ -71,6 +67,11 @@ final class CompletedListItem: TodayListItemComponentView, ListItemProtocol {
             }
             contentLabel.snp.makeConstraints {
                 $0.leading.equalTo(todayBackgroundView.snp.trailing).offset(8.adjustedW)
+                $0.centerY.equalToSuperview()
+            }
+        } else {
+            contentLabel.snp.makeConstraints {
+                $0.leading.equalTo(checkBox.snp.trailing).offset(8.adjustedW)
                 $0.centerY.equalToSuperview()
             }
         }
