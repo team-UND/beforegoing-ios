@@ -18,7 +18,7 @@ struct FetchMissionsUseCase: FetchMissionsType {
     }
     
     func execute(scenarioID: Int, date: String) async throws -> MissionsEntity {
-        let result = try await repository.execute(
+        let result = try await repository.fetchMissions(
             scenarioID: scenarioID,
             date: date
         )
