@@ -40,6 +40,7 @@ final class DomainDependencyAssembler: DependencyAssembler {
             DIContainer.shared.register(type: FetchSingleScenarioType.self) { _ in MockFetchSingleScenarioUseCase() }
             
             DIContainer.shared.register(type: FetchMissionsType.self) { _ in MockFetchMissionsUseCase() }
+            DIContainer.shared.register(type: CheckMissionType.self) { _ in MockCheckMissionUseCase() }
             
             return
         }
@@ -128,6 +129,10 @@ final class DomainDependencyAssembler: DependencyAssembler {
         
         DIContainer.shared.register(type: FetchMissionsType.self) { _ in
             return FetchMissionsUseCase(repository: missionRepository)
+        }
+        
+        DIContainer.shared.register(type: CheckMissionType.self) { _ in
+            return CheckMissionUseCase(repository: missionRepository)
         }
     }
 }
