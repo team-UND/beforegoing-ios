@@ -288,8 +288,21 @@ extension HomeViewController: UITableViewDataSource {
         )
         
         cell.onCellDidTap = { [weak self] in
-            self?.homeViewModel.completeMission(at: indexPath.section)
-            tableView.reloadData()
+            guard let self = self else { return }
+            
+            self.homeViewModel.completeMission(at: indexPath.section)
+            let missionID = self.homeViewModel.getMissionID(at: indexPath.section)
+            let date = DateUtil.getCurrentDate(format: "yyyy-MM-dd")
+            
+            Task {
+                let _ = try await self.homeViewModel.action(
+                    input: .missionChecked(
+                        missionID: missionID,
+                        date: date
+                    )
+                )
+                tableView.reloadData()
+            }
         }
         return cell
     }
