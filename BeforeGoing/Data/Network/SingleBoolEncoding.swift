@@ -9,7 +9,7 @@ import Foundation
 
 import Alamofire
 
-struct SingleBoolValue: ParameterEncoding {
+struct SingleBoolEncoding: ParameterEncoding {
     
     private let value: Bool
     
