@@ -13,23 +13,28 @@ protocol HomeOutput {}
 final class HomeViewModel: ViewModeling {
     
     private static let seperator = ", "
+    
     private let weatherUseCase: RequestWeatherType
     private let getMissionsUseCase: FetchMissionsType
+    private let checkMissionUseCase: CheckMissionType
     
     private var missions: [(missionID: Int, content: String, state: ListItemState)] = []
     
     init(
         weatherUseCase: RequestWeatherType,
-        getMissionsUseCase: FetchMissionsType
+        getMissionsUseCase: FetchMissionsType,
+        checkMissionUseCase: CheckMissionType
     ) {
         self.weatherUseCase = weatherUseCase
         self.getMissionsUseCase = getMissionsUseCase
+        self.checkMissionUseCase = checkMissionUseCase
     }
     
     enum Input {
         case requestDate
         case requestWeather(latitude: CLLocationDegrees, longitude: CLLocationDegrees)
         case scenarioDidTap(scenarioID: Int, date: String)
+        case missionChecked(missionID: Int, date: String)
     }
     
     typealias Output = HomeOutput
@@ -45,6 +50,8 @@ final class HomeViewModel: ViewModeling {
     struct MissionsOutput: HomeOutput {
         let missionsResult: Result<MissionsEntity, Error>
     }
+    
+    struct EmptyOutput: HomeOutput {}
     
     func action(input: Input) async throws -> Output {
         switch input {
@@ -81,6 +88,18 @@ final class HomeViewModel: ViewModeling {
                 BeforeGoingLogger.error(error)
                 return MissionsOutput(missionsResult: .failure(error))
             }
+            
+        case .missionChecked(let missionID, let date):
+            do {
+                try await checkMissionUseCase.execute(
+                    missionID: missionID,
+                    date: date,
+                    isChecked: true
+                )
+            } catch {
+                BeforeGoingLogger.error(error)
+            }
+            return EmptyOutput()
         }
     }
     
@@ -203,5 +222,9 @@ extension HomeViewModel {
     
     func removeMission(at index: Int) {
         missions.remove(at: index)
+    }
+    
+    func getMissionID(at index: Int) -> Int {
+        missions[index].missionID
     }
 }
