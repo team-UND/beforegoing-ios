@@ -20,6 +20,7 @@ struct DataDependencyAssembler: DependencyAssembler {
     private let addScenarioRequestMapper = AddScenarioRequestMapper()
     private let updateScenarioRequestMapper = UpdateScenarioRequestMapper()
     private let updateScenarioOrderRequestMapper = UpdateScenarioOrderRequestMapper()
+    private let addTodayMissionRequestMapper = AddTodayMissionRequestMapper()
     private let tokenValidator = TokenValidator()
     
     init() {
@@ -82,7 +83,8 @@ struct DataDependencyAssembler: DependencyAssembler {
         DIContainer.shared.register(type: MissionInterface.self) { _ in
             MissionRepository(
                 networkService: networkService,
-                keyChainService: keyChainService
+                keyChainService: keyChainService,
+                addTodayMissionRequestMapper: addTodayMissionRequestMapper
             )
         }
     }
