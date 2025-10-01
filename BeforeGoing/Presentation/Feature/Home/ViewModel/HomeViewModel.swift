@@ -262,12 +262,6 @@ extension HomeViewModel {
         missions[index].initState
     }
     
-    func completeMission(at index: Int) {
-        missions[index].state = .completed
-        let removed = missions.remove(at: index)
-        missions.append(removed)
-    }
-    
     func isTodayMission(at index: Int) -> Bool {
         missions[index].state == .today
     }
@@ -278,5 +272,12 @@ extension HomeViewModel {
     
     func getMissionID(at index: Int) -> Int {
         missions[index].missionID
+    }
+    
+    private func completeMission(at index: Int) {
+        missions[index].state = .completed
+        missions[index].isChecked = true
+        let removed = missions.remove(at: index)
+        missions.append(removed)
     }
 }
