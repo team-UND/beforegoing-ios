@@ -9,6 +9,7 @@ final class GetScenariosViewModel: ViewModeling {
     
     private let useCase: FetchScenariosType
     private var scenarios: [ScenarioEntity]?
+    private var pointer = 0
     
     init(useCase: FetchScenariosType) {
         self.useCase = useCase
@@ -43,6 +44,10 @@ extension GetScenariosViewModel {
         scenarios?.count ?? 0
     }
     
+    var firstScenarioID: Int {
+        scenarios?.first?.scenarioId ?? 0
+    }
+    
     func getScenarioName(section: Int) -> String {
         scenarios?[section].scenarioName ?? ""
     }
@@ -63,6 +68,10 @@ extension GetScenariosViewModel {
             return
         }
         scenarios?.insert(movedSection, at: destinationAt)
+    }
+    
+    func getScenarioID() -> Int {
+        scenarios?[pointer].scenarioId ?? 0
     }
     
     func getScenarioID(at index: Int) -> Int {
@@ -95,11 +104,11 @@ extension GetScenariosViewModel {
         scenarios?.sort { $0.scenarioOrder < $1.scenarioOrder }
     }
     
-    private func findScenarioByID(id: Int) -> ScenarioEntity? {
-        scenarios?.filter { $0.scenarioId == id }.first
+    func updatePointer(to pointer: Int) {
+        self.pointer = pointer
     }
     
-    var firstScenarioID: Int {
-        scenarios?.first?.scenarioId ?? 0
+    private func findScenarioByID(id: Int) -> ScenarioEntity? {
+        scenarios?.filter { $0.scenarioId == id }.first
     }
 }
