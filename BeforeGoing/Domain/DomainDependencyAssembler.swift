@@ -42,6 +42,7 @@ final class DomainDependencyAssembler: DependencyAssembler {
             DIContainer.shared.register(type: FetchMissionsType.self) { _ in MockFetchMissionsUseCase() }
             DIContainer.shared.register(type: CheckMissionType.self) { _ in MockCheckMissionUseCase() }
             DIContainer.shared.register(type: AddTodayMissionType.self) { _ in MockAddTodayMissionUseCase() }
+            DIContainer.shared.register(type: AddTodayMissionType.self) { _ in MockDeleteTodayMissionUseCase() }
             
             return
         }
@@ -131,13 +132,14 @@ final class DomainDependencyAssembler: DependencyAssembler {
         DIContainer.shared.register(type: FetchMissionsType.self) { _ in
             return FetchMissionsUseCase(repository: missionRepository)
         }
-        
         DIContainer.shared.register(type: CheckMissionType.self) { _ in
             return CheckMissionUseCase(repository: missionRepository)
         }
-        
         DIContainer.shared.register(type: AddTodayMissionType.self) { _ in
             return CheckMissionUseCase(repository: missionRepository)
+        }
+        DIContainer.shared.register(type: DeleteTodayMissionType.self) { _ in
+            return DeleteTodayMissionUseCase(repository: missionRepository)
         }
     }
 }
