@@ -136,7 +136,7 @@ final class DomainDependencyAssembler: DependencyAssembler {
             return CheckMissionUseCase(repository: missionRepository)
         }
         DIContainer.shared.register(type: AddTodayMissionType.self) { _ in
-            return CheckMissionUseCase(repository: missionRepository)
+            return AddTodayMissionUseCase(repository: missionRepository)
         }
         DIContainer.shared.register(type: DeleteTodayMissionType.self) { _ in
             return DeleteTodayMissionUseCase(repository: missionRepository)
