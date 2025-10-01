@@ -183,8 +183,26 @@ extension HomeViewController {
         }
         
         clearTaskTextField()
-        //homeViewModel.addTodayMission(content: content)
-        rootView.modalView.listTableView.reloadData()
+        let date = DateUtil.getCurrentDate(format: "yyyy-MM-dd")
+        
+        Task {
+            guard let result = try await homeViewModel.action(
+                input: .addTodayMissionButtonDidTap(
+                    scenarioID: getScenariosViewModel.getScenarioID(),
+                    date: date,
+                    content: content
+                )
+            ) as? HomeViewModel.TodayMissionOutput else {
+                return
+            }
+            
+            switch result.todayMissionResult {
+            case .success:
+                rootView.modalView.listTableView.reloadData()
+            case .failure(let error):
+                BeforeGoingLogger.error(error)
+            }
+        }
         self.view.endEditing(true)
     }
     
