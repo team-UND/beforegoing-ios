@@ -56,8 +56,8 @@ extension MissionAPI: EndPoint {
         switch self {
         case .getMissions(let accessToken, _, _),
                 .checkMission(let accessToken, _, _, _),
-                .addTodayMission(let accessToken, _, _, _):
-                .deleteTodayMission(let accessToken, _)
+                .addTodayMission(let accessToken, _, _, _),
+                .deleteTodayMission(let accessToken, _):
             return [
                 "Content-Type": "application/json",
                 "Authorization": "Bearer \(accessToken)"
