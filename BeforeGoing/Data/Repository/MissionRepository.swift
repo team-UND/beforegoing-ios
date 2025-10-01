@@ -83,4 +83,18 @@ struct MissionRepository: MissionInterface {
         )
         return result.toEntity()
     }
+    
+    func deleteTodayMission(missionID: Int) async throws {
+        guard let accessToken = keyChainService.load(key: .accessToken) else {
+            BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
+            return
+        }
+        
+        let _ = try await networkService.request(
+            endPoint: MissionAPI.deleteTodayMission(
+                accessToken: accessToken,
+                missionID: missionID
+            )
+        )
+    }
 }

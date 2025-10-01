@@ -18,6 +18,7 @@ final class HomeViewModel: ViewModeling {
     private let getMissionsUseCase: FetchMissionsType
     private let checkMissionUseCase: CheckMissionType
     private let addTodayMissionUseCase: AddTodayMissionType
+    private let deleteTodayMissionUseCase: DeleteTodayMissionType
     
     private var missions: [(missionID: Int, content: String, state: ListItemState)] = []
     
@@ -25,12 +26,14 @@ final class HomeViewModel: ViewModeling {
         weatherUseCase: RequestWeatherType,
         getMissionsUseCase: FetchMissionsType,
         checkMissionUseCase: CheckMissionType,
-        addTodayMissionUseCase: AddTodayMissionType
+        addTodayMissionUseCase: AddTodayMissionType,
+        deleteTodayMissionUseCase: DeleteTodayMissionUseCase
     ) {
         self.weatherUseCase = weatherUseCase
         self.getMissionsUseCase = getMissionsUseCase
         self.checkMissionUseCase = checkMissionUseCase
         self.addTodayMissionUseCase = addTodayMissionUseCase
+        self.deleteTodayMissionUseCase = deleteTodayMissionUseCase
     }
     
     enum Input {
@@ -39,6 +42,7 @@ final class HomeViewModel: ViewModeling {
         case scenarioDidTap(scenarioID: Int, date: String)
         case missionChecked(missionID: Int, date: String)
         case addTodayMissionButtonDidTap(scenarioID: Int, date: String, content: String)
+        case deleteTodayMissionButtonDidTap(missionID: Int)
     }
     
     typealias Output = HomeOutput
@@ -57,6 +61,10 @@ final class HomeViewModel: ViewModeling {
     
     struct TodayMissionOutput: HomeOutput {
         let todayMissionResult: Result<TodayMissionEntity, Error>
+    }
+    
+    struct DeleteTodayMissionOutput: HomeOutput {
+        let deleteTodayMissionResult: Result<Void, Error>
     }
     
     struct EmptyOutput: HomeOutput {}
@@ -116,11 +124,28 @@ final class HomeViewModel: ViewModeling {
                     date: date,
                     content: content
                 )
-                missions.append((missionID: result.missionId, content: result.content, state: .today))
+                missions.insert(
+                    (missionID: result.missionId, content: result.content, state: .today),
+                    at: 0
+                )
                 return TodayMissionOutput(todayMissionResult: .success(result))
             } catch {
                 BeforeGoingLogger.error(error)
                 return TodayMissionOutput(todayMissionResult: .failure(error))
+            }
+            
+        case .deleteTodayMissionButtonDidTap(let missionID):
+            do {
+                try await deleteTodayMissionUseCase.execute(missionID: missionID)
+                guard let index = missions.firstIndex(where: { $0.missionID == missionID }) else {
+                    return DeleteTodayMissionOutput(
+                        deleteTodayMissionResult: .failure(BeforeGoingError.missionNotFound)
+                    )
+                }
+                return DeleteTodayMissionOutput(deleteTodayMissionResult: .success(Void()))
+            } catch {
+                BeforeGoingLogger.error(error)
+                return DeleteTodayMissionOutput(deleteTodayMissionResult: .failure(error))
             }
         }
     }

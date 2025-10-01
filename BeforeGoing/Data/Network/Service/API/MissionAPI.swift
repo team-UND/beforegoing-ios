@@ -11,6 +11,7 @@ enum MissionAPI {
     case getMissions(accessToken: String, scenarioID: Int, date: String)
     case checkMission(accessToken: String, missionID: Int, date: String, isChecked: Bool)
     case addTodayMission(accessToken: String, scenarioID: Int, date: String, dto: AddTodayMissionRequestDTO)
+    case deleteTodayMission(accessToken: String, missionID: Int)
 }
 
 extension MissionAPI: EndPoint {
@@ -27,8 +28,10 @@ extension MissionAPI: EndPoint {
             return basePath + "/scenarios/\(scenarioID)/missions"
         case .checkMission(_, let missionID, _, _):
             return basePath + "/missions/\(missionID)/check"
-        case .addTodayMission(_, let scenarioID, _):
+        case .addTodayMission(_, let scenarioID, _, _):
             return basePath + "/scenarios/\(scenarioID)/missions/today"
+        case .deleteTodayMission(_, let missionID):
+            return basePath + "/missions/\(missionID)"
         }
     }
     
@@ -40,6 +43,8 @@ extension MissionAPI: EndPoint {
             return .patch
         case .addTodayMission:
             return .post
+        case .deleteTodayMission:
+            return .delete
         }
     }
     
@@ -52,6 +57,7 @@ extension MissionAPI: EndPoint {
         case .getMissions(let accessToken, _, _),
                 .checkMission(let accessToken, _, _, _),
                 .addTodayMission(let accessToken, _, _, _):
+                .deleteTodayMission(let accessToken, _)
             return [
                 "Content-Type": "application/json",
                 "Authorization": "Bearer \(accessToken)"
@@ -61,7 +67,7 @@ extension MissionAPI: EndPoint {
     
     var parameterEncoding: any ParameterEncoding {
         switch self {
-        case .getMissions:
+        case .getMissions, .deleteTodayMission:
             return URLEncoding.default
         case .checkMission(_, _, _, let isChecked):
             return SingleBoolEncoding(value: isChecked)
@@ -74,12 +80,14 @@ extension MissionAPI: EndPoint {
         switch self {
         case .getMissions(_, _, let date), .checkMission(_, _, let date, _), .addTodayMission(_, _, let date, _):
             return ["date": date]
+        case .deleteTodayMission:
+            return nil
         }
     }
     
     var bodyParameters: Parameters? {
         switch self {
-        case .getMissions, .checkMission:
+        case .getMissions, .checkMission, .deleteTodayMission:
             return nil
         case .addTodayMission(_, _, _, let dto):
             return try? dto.toBodyParameters()
