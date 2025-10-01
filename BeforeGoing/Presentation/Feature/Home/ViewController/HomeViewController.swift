@@ -214,6 +214,8 @@ extension HomeViewController {
         let scenarioID = getScenariosViewModel.getScenarioID(at: tag)
         let currentDate = DateUtil.getCurrentDate(format: "yyyy-MM-dd")
         
+        rootView.modalView.headerView.updateTappedLabel(tag: tag)
+        
         Task {
             guard let result = try await homeViewModel.action(
                 input: .scenarioDidTap(
@@ -224,6 +226,7 @@ extension HomeViewController {
             
             switch result.missionsResult {
             case .success:
+                getScenariosViewModel.updatePointer(to: tag)
                 rootView.modalView.listTableView.reloadData()
             case .failure(let error):
                 BeforeGoingLogger.error(error)
