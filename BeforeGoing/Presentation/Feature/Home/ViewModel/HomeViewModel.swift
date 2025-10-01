@@ -17,17 +17,20 @@ final class HomeViewModel: ViewModeling {
     private let weatherUseCase: RequestWeatherType
     private let getMissionsUseCase: FetchMissionsType
     private let checkMissionUseCase: CheckMissionType
+    private let addTodayMissionUseCase: AddTodayMissionType
     
     private var missions: [(missionID: Int, content: String, state: ListItemState)] = []
     
     init(
         weatherUseCase: RequestWeatherType,
         getMissionsUseCase: FetchMissionsType,
-        checkMissionUseCase: CheckMissionType
+        checkMissionUseCase: CheckMissionType,
+        addTodayMissionUseCase: AddTodayMissionType
     ) {
         self.weatherUseCase = weatherUseCase
         self.getMissionsUseCase = getMissionsUseCase
         self.checkMissionUseCase = checkMissionUseCase
+        self.addTodayMissionUseCase = addTodayMissionUseCase
     }
     
     enum Input {
@@ -35,6 +38,7 @@ final class HomeViewModel: ViewModeling {
         case requestWeather(latitude: CLLocationDegrees, longitude: CLLocationDegrees)
         case scenarioDidTap(scenarioID: Int, date: String)
         case missionChecked(missionID: Int, date: String)
+        case addTodayMissionButtonDidTap(scenarioID: Int, date: String, content: String)
     }
     
     typealias Output = HomeOutput
@@ -49,6 +53,10 @@ final class HomeViewModel: ViewModeling {
     
     struct MissionsOutput: HomeOutput {
         let missionsResult: Result<MissionsEntity, Error>
+    }
+    
+    struct TodayMissionOutput: HomeOutput {
+        let todayMissionResult: Result<TodayMissionEntity, Error>
     }
     
     struct EmptyOutput: HomeOutput {}
@@ -100,6 +108,20 @@ final class HomeViewModel: ViewModeling {
                 BeforeGoingLogger.error(error)
             }
             return EmptyOutput()
+            
+        case .addTodayMissionButtonDidTap(let scenarioID, let date, let content):
+            do {
+                let result = try await addTodayMissionUseCase.execute(
+                    scenarioID: scenarioID,
+                    date: date,
+                    content: content
+                )
+                missions.append((missionID: result.missionId, content: result.content, state: .today))
+                return TodayMissionOutput(todayMissionResult: .success(result))
+            } catch {
+                BeforeGoingLogger.error(error)
+                return TodayMissionOutput(todayMissionResult: .failure(error))
+            }
         }
     }
     

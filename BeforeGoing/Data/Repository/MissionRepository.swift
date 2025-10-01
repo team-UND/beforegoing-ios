@@ -9,16 +9,22 @@ struct MissionRepository: MissionInterface {
     
     private let networkService: NetworkService
     private let keyChainService: KeyChainService
+    private let addTodayMissionRequestMapper: AddTodayMissionRequestMapper
     
     init(
         networkService: NetworkService,
-        keyChainService: KeyChainService
+        keyChainService: KeyChainService,
+        addTodayMissionRequestMapper: AddTodayMissionRequestMapper
     ) {
         self.networkService = networkService
         self.keyChainService = keyChainService
+        self.addTodayMissionRequestMapper = addTodayMissionRequestMapper
     }
     
-    func fetchMissions(scenarioID: Int, date: String) async throws -> MissionsEntity {
+    func fetchMissions(
+        scenarioID: Int,
+        date: String
+    ) async throws -> MissionsEntity {
         guard let accessToken = keyChainService.load(key: .accessToken) else {
             BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
             return .stub()
@@ -35,7 +41,11 @@ struct MissionRepository: MissionInterface {
         return result.toEntity()
     }
     
-    func checkMission(missionID: Int, date: String, isChecked: Bool) async throws {
+    func checkMission(
+        missionID: Int,
+        date: String,
+        isChecked: Bool
+    ) async throws {
         guard let accessToken = keyChainService.load(key: .accessToken) else {
             BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
             return
@@ -49,5 +59,28 @@ struct MissionRepository: MissionInterface {
                 isChecked: isChecked
             )
         )
+    }
+    
+    func addTodayMission(
+        scenarioID: Int,
+        date: String,
+        content: String
+    ) async throws -> TodayMissionEntity {
+        guard let accessToken = keyChainService.load(key: .accessToken) else {
+            BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
+            return .stub()
+        }
+        
+        let requestDTO = addTodayMissionRequestMapper.map(content)
+        let result = try await networkService.request(
+            endPoint: MissionAPI.addTodayMission(
+                accessToken: accessToken,
+                scenarioID: scenarioID,
+                date: date,
+                dto: requestDTO
+            ),
+            responseType: TodayMissionDTO.self
+        )
+        return result.toEntity()
     }
 }
