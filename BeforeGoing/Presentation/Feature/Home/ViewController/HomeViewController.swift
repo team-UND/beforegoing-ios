@@ -304,7 +304,6 @@ extension HomeViewController: UITableViewDataSource {
         cell.onCellDidTap = { [weak self] in
             guard let self = self else { return }
             
-            self.homeViewModel.completeMission(at: indexPath.section)
             let missionID = self.homeViewModel.getMissionID(at: indexPath.section)
             let date = DateUtil.getCurrentDate(format: "yyyy-MM-dd")
             

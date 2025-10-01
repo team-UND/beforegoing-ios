@@ -20,7 +20,13 @@ final class HomeViewModel: ViewModeling {
     private let addTodayMissionUseCase: AddTodayMissionType
     private let deleteTodayMissionUseCase: DeleteTodayMissionType
     
-    private var missions: [(missionID: Int, content: String, initState: ListItemState, state: ListItemState)] = []
+    private var missions: [(
+        missionID: Int,
+        content: String,
+        initState: ListItemState,
+        state: ListItemState,
+        isChecked: Bool
+    )] = []
     
     init(
         weatherUseCase: RequestWeatherType,
@@ -97,8 +103,21 @@ final class HomeViewModel: ViewModeling {
                     date: date
                 )
                 missions.removeAll()
-                result.todayMissions.forEach { addMissionContent($0.missionId, $0.content, .today) }
-                result.basicMissions.forEach { addMissionContent($0.missionId, $0.content, .normal) }
+                
+                result.todayMissions.forEach {
+                    if $0.isChecked {
+                        addMissionContent($0.missionId, $0.content, .today, .completed, $0.isChecked)
+                        return
+                    }
+                    addMissionContent($0.missionId, $0.content, .today, .today, $0.isChecked)
+                }
+                result.basicMissions.forEach {
+                    if $0.isChecked {
+                        addMissionContent($0.missionId, $0.content, .normal, .completed, $0.isChecked)
+                        return
+                    }
+                    addMissionContent($0.missionId, $0.content, .normal, .normal, $0.isChecked)
+                }
                 return MissionsOutput(missionsResult: .success(result))
             } catch {
                 BeforeGoingLogger.error(error)
@@ -112,6 +131,9 @@ final class HomeViewModel: ViewModeling {
                     date: date,
                     isChecked: true
                 )
+                if let index = missions.firstIndex(where: { $0.missionID == missionID }) {
+                    completeMission(at: index)
+                }
             } catch {
                 BeforeGoingLogger.error(error)
             }
@@ -125,7 +147,13 @@ final class HomeViewModel: ViewModeling {
                     content: content
                 )
                 missions.insert(
-                    (missionID: result.missionId, content: result.content, initState: .today, state: .today),
+                    (
+                        missionID: result.missionId,
+                        content: result.content,
+                        initState: .today,
+                        state: .today,
+                        isChecked: result.isChecked
+                    ),
                     at: 0
                 )
                 return TodayMissionOutput(todayMissionResult: .success(result))
@@ -227,9 +255,15 @@ final class HomeViewModel: ViewModeling {
         return resultAttributedString
     }
     
-    private func addMissionContent(_ missionID: Int, _ content: String, _ state: ListItemState) {
+    private func addMissionContent(
+        _ missionID: Int,
+        _ content: String,
+        _ beforeState: ListItemState,
+        _ state: ListItemState,
+        _ isChecked: Bool
+    ) {
         if !isExistMission(content: content) {
-            self.missions.append((missionID, content, state, state))
+            self.missions.append((missionID, content, beforeState, state, isChecked))
         }
     }
     
@@ -245,10 +279,6 @@ extension HomeViewModel {
     var missionsCount: Int {
         missions.count
     }
-    
-//    func addTodayMission(content: String) {
-//        missions.insert((content, .today), at: 0)
-//    }
     
     func getMissionTitle(at index: Int) -> String {
         missions[index].content
