@@ -9,10 +9,7 @@ import UIKit
 
 final class UserScenarioModalHeaderView: BaseView {
     
-    // 실제 데이터로 대체
-    private let scenarios = ["출근 전", "외출 전", "운동 전", "요리하기 전", "나가기 전"]
-    
-    private let scenarioStackView = UIStackView()
+    private(set) var scenarioStackView = UIStackView()
     private let scenarioScrollView = UIScrollView()
     private let addScenarioView = UIView()
     private let addScenarioButton = UIButton()
@@ -25,16 +22,12 @@ final class UserScenarioModalHeaderView: BaseView {
         scenarioStackView.do {
             $0.axis = .horizontal
             $0.spacing = 0
-            $0.alignment = .fill
         }
         addScenarioView.do {
             $0.backgroundColor = .white
         }
         addScenarioButton.do {
             $0.setImage(.plusCircle.withTintColor(.gray900), for: .normal)
-        }
-        scenarios.forEach {
-            scenarioStackView.addArrangedSubview(createScenarioItem(title: $0))
         }
         if let firstContainer = scenarioStackView.arrangedSubviews.first,
            let firstLabel = firstContainer.subviews.compactMap({ $0 as? UILabel }).first {
@@ -76,9 +69,21 @@ final class UserScenarioModalHeaderView: BaseView {
 
 extension UserScenarioModalHeaderView {
     
-    private func createScenarioItem(title: String) -> UIView {
+    func clear() {
+        scenarioStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+    }
+    
+    func createScenarioItem(
+        title: String,
+        tag: Int,
+        tapGesture: UITapGestureRecognizer
+    ) {
         let containerView = UIView()
-        let scenarioLabel = createScenarioLabel(title: title)
+        let scenarioLabel = createScenarioLabel(
+            title: title,
+            tag: tag,
+            tapGesture: tapGesture
+        )
         let selectBar = createSelectBar()
         
         containerView.addSubviews(
@@ -90,12 +95,16 @@ extension UserScenarioModalHeaderView {
             scenarioLabel,
             selectBar
         )
-        
-        return containerView
+        tag == 0 ? manageTappedLabel(scenarioLabel) : manageNotTappedLabel(scenarioLabel)
+        scenarioStackView.addArrangedSubview(containerView)
     }
     
     
-    private func createScenarioLabel(title: String) -> UILabel {
+    private func createScenarioLabel(
+        title: String,
+        tag: Int,
+        tapGesture: UITapGestureRecognizer
+    ) -> UILabel {
         let scenarioLabel = UILabel()
         let scenario = title
         scenarioLabel.do {
@@ -103,13 +112,10 @@ extension UserScenarioModalHeaderView {
             $0.textColor = .gray400
             $0.textAlignment = .center
             $0.font = .custom(.bodyMDSemiBold)
+            $0.tag = tag
+            $0.addGestureRecognizer(tapGesture)
             $0.isUserInteractionEnabled = true
         }
-        let tapGesture = UITapGestureRecognizer(
-            target: self,
-            action: #selector(scenarioTapped(_:))
-        )
-        scenarioLabel.addGestureRecognizer(tapGesture)
         return scenarioLabel
     }
     
@@ -131,6 +137,7 @@ extension UserScenarioModalHeaderView {
     ) {
         scenarioLabel.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview().inset(12.adjustedW)
             $0.height.equalTo(40.adjustedH)
         }
         selectBar.snp.makeConstraints {
@@ -139,7 +146,6 @@ extension UserScenarioModalHeaderView {
             $0.height.equalTo(2.adjustedH)
         }
         containerView.snp.makeConstraints {
-            $0.width.equalTo(83.5.adjustedW)
             $0.height.equalTo(42.adjustedH)
         }
     }
@@ -147,30 +153,40 @@ extension UserScenarioModalHeaderView {
 
 extension UserScenarioModalHeaderView {
     
-    @objc
-    private func scenarioTapped(_ sender: UITapGestureRecognizer) {
-        guard let label = sender.view as? UILabel else { return }
-        manageTappedLabel(label)
-        manageNotTappedLabel(label)
+    func updateTappedLabel(tag: Int) {
+        scenarioStackView.arrangedSubviews.forEach {
+            guard let label = $0.subviews.first as? UILabel else {
+                return
+            }
+            label.tag == tag ? manageTappedLabel(label) : manageNotTappedLabel(label)
+        }
     }
     
     private func manageTappedLabel(_ label: UILabel) {
-        scenarioStackView.arrangedSubviews.forEach { container in
-            if let tappedlabel = container.subviews.compactMap({ $0 as? UILabel }).first,
-               tappedlabel != label {
-                tappedlabel.textColor = .gray400
-                if let bar = container.subviews.last as? UILabel {
-                    bar.isHidden = true
-                }
+        label.textColor = .gray900
+        
+        if let container = label.superview,
+           let bar = container.subviews.last as? UILabel {
+            bar.do {
+                $0.backgroundColor = .blue400
+                $0.layer.borderColor = UIColor.blue400.cgColor
+                $0.layer.borderWidth = 2
+                $0.isHidden = false
             }
         }
     }
     
     private func manageNotTappedLabel(_ label: UILabel) {
-        label.textColor = .gray900
+        label.textColor = .gray400
+        
         if let container = label.superview,
            let bar = container.subviews.last as? UILabel {
-            bar.isHidden = false
+            bar.do {
+                $0.backgroundColor = .clear
+                $0.layer.borderColor = UIColor.clear.cgColor
+                $0.layer.borderWidth = 0
+                $0.isHidden = true
+            }
         }
     }
 }

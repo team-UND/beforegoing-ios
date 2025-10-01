@@ -42,10 +42,19 @@ final class HomeViewController: BaseViewController {
             switch result.scenariosResult {
             case .success(let scenarios):
                 rootView.modalView.headerView.clear()
-                scenarios.forEach {
-                    rootView.modalView.headerView.createScenarioItem(title: $0.scenarioName)
+                
+                for (index, scenario) in scenarios.enumerated() {
+                    let tapGesture = UITapGestureRecognizer(
+                        target: self,
+                        action: #selector(scenarioNameDidTap)
+                    )
+                    
+                    rootView.modalView.headerView.createScenarioItem(
+                        title: scenario.scenarioName,
+                        tag: index,
+                        tapGesture: tapGesture
+                    )
                 }
-                setGesture()
                 
                 let _ = try await homeViewModel.action(
                     input: .scenarioDidTap(
@@ -128,21 +137,6 @@ final class HomeViewController: BaseViewController {
         if status == .authorizedWhenInUse || status == .authorizedAlways,
            CLLocationManager.locationServicesEnabled() {
             manager.requestLocation()
-        }
-    }
-    
-    private func setGesture() {
-        for (index, view) in rootView.modalView.headerView.scenarioStackView.arrangedSubviews.enumerated() {
-            let tapGesture = UITapGestureRecognizer(
-                target: self,
-                action: #selector(scenarioNameDidTap)
-            )
-            view.do {
-                $0.tag = index
-                $0.addGestureRecognizer(tapGesture)
-                $0.isUserInteractionEnabled = true
-            }
-            rootView.modalView.headerView.scenarioDidTap(tapGesture)
         }
     }
 }
