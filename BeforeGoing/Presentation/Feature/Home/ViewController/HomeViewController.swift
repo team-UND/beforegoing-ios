@@ -344,8 +344,23 @@ extension HomeViewController: UITableViewDataSource {
             style: .normal,
             title: nil
         ) { [weak self] (_, view, completion) in
-            self?.homeViewModel.removeMission(at: indexPath.section)
-            tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
+            Task {
+                guard let missionID = self?.homeViewModel.getMissionID(at: indexPath.section),
+                      let result = try await self?.homeViewModel.action(
+                        input: .deleteTodayMissionButtonDidTap(
+                            missionID: missionID
+                        )
+                      ) as? HomeViewModel.DeleteTodayMissionOutput else {
+                    return
+                }
+                
+                switch result.deleteTodayMissionResult {
+                case .success:
+                    tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
+                case .failure(let error):
+                    BeforeGoingLogger.error(error)
+                }
+            }
             completion(true)
         }
     }
