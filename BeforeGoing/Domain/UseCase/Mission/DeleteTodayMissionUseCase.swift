@@ -21,3 +21,8 @@ struct DeleteTodayMissionUseCase: DeleteTodayMissionType {
         try await repository.deleteTodayMission(missionID: missionID)
     }
 }
+
+struct MockDeleteTodayMissionUseCase: DeleteTodayMissionType {
+    
+    func execute(missionID: Int) async throws {}
+}
