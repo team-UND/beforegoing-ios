@@ -327,7 +327,7 @@ extension HomeViewController: UITableViewDataSource {
                    trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath)
     -> UISwipeActionsConfiguration? {
         
-        if homeViewModel.isTodayMission(at: indexPath.section) {
+        if !homeViewModel.isTodayMission(at: indexPath.section) {
             return nil
         }
         let deleteAction = createDeleteAction(tableView: tableView, indexPath: indexPath)
