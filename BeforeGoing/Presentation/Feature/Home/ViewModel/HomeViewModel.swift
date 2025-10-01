@@ -27,7 +27,7 @@ final class HomeViewModel: ViewModeling {
         getMissionsUseCase: FetchMissionsType,
         checkMissionUseCase: CheckMissionType,
         addTodayMissionUseCase: AddTodayMissionType,
-        deleteTodayMissionUseCase: DeleteTodayMissionUseCase
+        deleteTodayMissionUseCase: DeleteTodayMissionType
     ) {
         self.weatherUseCase = weatherUseCase
         self.getMissionsUseCase = getMissionsUseCase
