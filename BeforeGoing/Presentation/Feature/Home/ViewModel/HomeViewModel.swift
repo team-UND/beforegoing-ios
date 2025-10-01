@@ -20,7 +20,7 @@ final class HomeViewModel: ViewModeling {
     private let addTodayMissionUseCase: AddTodayMissionType
     private let deleteTodayMissionUseCase: DeleteTodayMissionType
     
-    private var missions: [(missionID: Int, content: String, state: ListItemState)] = []
+    private var missions: [(missionID: Int, content: String, initState: ListItemState, state: ListItemState)] = []
     
     init(
         weatherUseCase: RequestWeatherType,
@@ -125,7 +125,7 @@ final class HomeViewModel: ViewModeling {
                     content: content
                 )
                 missions.insert(
-                    (missionID: result.missionId, content: result.content, state: .today),
+                    (missionID: result.missionId, content: result.content, initState: .today, state: .today),
                     at: 0
                 )
                 return TodayMissionOutput(todayMissionResult: .success(result))
@@ -142,6 +142,7 @@ final class HomeViewModel: ViewModeling {
                         deleteTodayMissionResult: .failure(BeforeGoingError.missionNotFound)
                     )
                 }
+                missions.remove(at: index)
                 return DeleteTodayMissionOutput(deleteTodayMissionResult: .success(Void()))
             } catch {
                 BeforeGoingLogger.error(error)
@@ -228,7 +229,7 @@ final class HomeViewModel: ViewModeling {
     
     private func addMissionContent(_ missionID: Int, _ content: String, _ state: ListItemState) {
         if !isExistMission(content: content) {
-            self.missions.append((missionID, content, state))
+            self.missions.append((missionID, content, state, state))
         }
     }
     
@@ -255,6 +256,10 @@ extension HomeViewModel {
     
     func getMissionState(at index: Int) -> ListItemState {
         missions[index].state
+    }
+    
+    func getBeforeMissionState(at index: Int) -> ListItemState {
+        missions[index].initState
     }
     
     func completeMission(at index: Int) {

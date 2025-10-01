@@ -293,10 +293,12 @@ extension HomeViewController: UITableViewDataSource {
         }
         
         let missionState = homeViewModel.getMissionState(at: indexPath.section)
+        let beforeMissionState = homeViewModel.getBeforeMissionState(at: indexPath.section)
+        
         cell.bind(
             itemTitle: homeViewModel.getMissionTitle(at: indexPath.section),
             state: missionState,
-            beforeState: missionState
+            beforeState: beforeMissionState
         )
         
         cell.onCellDidTap = { [weak self] in
