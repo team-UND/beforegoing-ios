@@ -28,9 +28,12 @@ final class GetScenariosViewModel: ViewModeling {
         case .viewWillAppear:
             do {
                 let result = try await useCase.execute()
+                if result.isEmpty {
+                    return Output(scenariosResult: .failure(BeforeGoingError.notFoundError))
+                }
                 self.scenarios = result
                 return Output(scenariosResult: .success(result))
-            } catch {
+            } catch (let error) {
                 BeforeGoingLogger.error(error)
                 return Output(scenariosResult: .failure(error))
             }

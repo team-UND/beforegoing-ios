@@ -28,6 +28,9 @@ final class NetworkService: APIManaging {
             writeLog(response: response)
             return response
         } catch {
+            if let afError = error.asAFError {
+                throw handleError(afError: afError)
+            }
             throw error
         }
     }
@@ -57,6 +60,29 @@ final class NetworkService: APIManaging {
     private func writeLog<T: Decodable>(response: T) {
         BeforeGoingLogger.network(response)
         BeforeGoingLogger.data(response)
+    }
+    
+    private func handleError(afError: AFError) -> BeforeGoingError {
+        switch afError {
+        case .responseValidationFailed(let reason):
+            if case .unacceptableStatusCode(let statuscode) = reason {
+                if statuscode == 304 {
+                    return .notModifiedError
+                }
+                if statuscode == 400 {
+                    return .badRequestError
+                }
+                if statuscode == 404 {
+                    return .notFoundError
+                }
+                if statuscode == 503 {
+                    return .weatherServiceError
+                }
+            }
+            return .unknownError
+        default:
+            return .unknownError
+        }
     }
 }
 

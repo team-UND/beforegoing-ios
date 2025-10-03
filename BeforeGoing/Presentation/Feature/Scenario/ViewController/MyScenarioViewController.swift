@@ -41,9 +41,18 @@ final class MyScenarioViewController: BaseViewController {
         
         Task {
             do {
-                let _ = try await getScenariosViewModel.action(input: .viewWillAppear)
-                rootView.scenarioListTableView.reloadData()
-            } catch {
+                let result = try await getScenariosViewModel.action(input: .viewWillAppear)
+                
+                switch result.scenariosResult {
+                case .success:
+                    rootView.scenarioListTableView.reloadData()
+                case .failure(let error):
+                    if let error = error as? BeforeGoingError,
+                       error == .notFoundError {
+                        rootView.replaceEmptyView()
+                    }
+                }
+            } catch(let error) {
                 BeforeGoingLogger.error(BeforeGoingError.getScenariosFailed)
             }
         }
