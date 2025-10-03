@@ -43,7 +43,7 @@ final class DomainDependencyAssembler: DependencyAssembler {
             DIContainer.shared.register(type: FetchMissionsType.self) { _ in MockFetchMissionsUseCase() }
             DIContainer.shared.register(type: CheckMissionType.self) { _ in MockCheckMissionUseCase() }
             DIContainer.shared.register(type: AddTodayMissionType.self) { _ in MockAddTodayMissionUseCase() }
-            DIContainer.shared.register(type: AddTodayMissionType.self) { _ in MockDeleteTodayMissionUseCase() }
+            DIContainer.shared.register(type: DeleteTodayMissionType.self) { _ in MockDeleteTodayMissionUseCase() }
             
             return
         }
