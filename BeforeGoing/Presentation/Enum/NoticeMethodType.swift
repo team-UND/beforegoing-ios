@@ -7,13 +7,13 @@
 
 import UIKit
 
-enum NoticeMethodType {
+enum NoticeMethodType: String, CaseIterable {
     
-    case pushNotice, alarm
+    case push, alarm
     
     var component: NoticeMethodComponent {
         switch self {
-        case .pushNotice:
+        case .push:
             return .init(
                 unSelectedImage: .pushWhite,
                 selectedImage: .pushBlue,
@@ -28,6 +28,19 @@ enum NoticeMethodType {
                 radioButton: RadioButton(state: .disable)
             )
         }
+    }
+    
+    static func findMethod(value: String) -> Self? {
+        for method in Self.allCases {
+            if method.rawValue.uppercased() == value {
+                return method
+            }
+        }
+        return nil
+    }
+    
+    var isPush: Bool {
+        self == .push
     }
 }
 

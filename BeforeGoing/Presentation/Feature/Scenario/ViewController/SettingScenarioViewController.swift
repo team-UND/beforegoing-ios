@@ -10,7 +10,31 @@ import UIKit
 final class SettingScenarioViewController: BaseViewController {
     
     private let rootView = SettingScenarioView()
-    private var missions: [String] = []
+    
+    private var missions: [(missionID: Int?, content: String)] = []
+    private var scenarioID: Int?
+    private var enterType: SettingScenarioEnterType?
+    private var isNotificationActive: Bool?
+    private var daysOfWeek: [Int]?
+    private var startHour: Int?
+    private var startMinute: Int?
+    private var notificationMethod: NoticeMethodType?
+    
+    private let addScenarioViewModel: AddScenarioViewModel
+    private let updateScenarioViewModel: UpdateScenarioViewModel
+    
+    init(
+        addScenarioViewModel: AddScenarioViewModel,
+        updateScnearioViewModel: UpdateScenarioViewModel
+    ) {
+        self.addScenarioViewModel = addScenarioViewModel
+        self.updateScenarioViewModel = updateScnearioViewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         view = rootView
@@ -109,6 +133,39 @@ extension SettingScenarioViewController {
             }
         }
     }
+    
+    func configure(
+        scenarioID: Int,
+        scenarioName: String,
+        memo: String,
+        missions: [(missionID: Int, content: String)],
+        isNotificationActive: Bool,
+        daysOfWeek: [Int]?,
+        startHour: Int?,
+        startMinute: Int?,
+        notificationMethod: NoticeMethodType?,
+        enterType: SettingScenarioEnterType
+    ) {
+        self.scenarioID = scenarioID
+        self.isNotificationActive = isNotificationActive
+        self.daysOfWeek = daysOfWeek
+        self.startHour = startHour
+        self.startMinute = startMinute
+        self.notificationMethod = notificationMethod
+        self.enterType = enterType
+
+        missions.forEach { self.missions.append(($0.missionID, $0.content)) }
+        rootView.inputScenarioView.do {
+            $0.textField.text = scenarioName
+            $0.updateTextCount(scenarioName.count)
+        }
+        rootView.inputMemoView.do {
+            $0.textField.text = memo
+            $0.updateTextCount(memo.count)
+        }
+        rootView.settingMissionView.missionTableView.reloadData()
+        checkNextButtonState()
+    }
 }
 
 extension SettingScenarioViewController {
@@ -162,7 +219,7 @@ extension SettingScenarioViewController {
     private func addMissionButtonDidTap() {
         guard let mission = rootView.settingMissionView.getUserMission(),
                 !mission.isEmpty else { return }
-        missions.insert(mission, at: 0)
+        missions.insert((nil, mission), at: 0)
         rootView.settingMissionView.missionTableView.insertSections(
             IndexSet(integer: 0),
             with: .automatic
@@ -173,9 +230,17 @@ extension SettingScenarioViewController {
     
     @objc
     private func nextButtonDidTap() {
-        let viewController = NoticeViewController()
-        viewController.navigationItem.hidesBackButton = true
-        self.navigationController?.pushViewController(viewController, animated: false)
+        guard let scenarioName = rootView.inputScenarioView.textField.text,
+              let memo = rootView.inputMemoView.textField.text,
+              let enterType = enterType else {
+            return
+        }
+        
+        if enterType.isAddScenarioType {
+            addScenario(scenarioName: scenarioName, memo: memo)
+            return
+        }
+        updateScenario(scenarioName: scenarioName, memo: memo)
     }
     
     private func checkNextButtonState() {
@@ -184,6 +249,57 @@ extension SettingScenarioViewController {
         let isEnabled = !scenario.isEmpty && !memo.isEmpty && missions.count >= 1
         
         rootView.updateUI(state: isEnabled ? .enableLongButton : .disableLongButton)
+    }
+    
+    private func addScenario(scenarioName: String, memo: String) {
+        Task {
+            do {
+                let _ = try await addScenarioViewModel.action(
+                    input: .nextButtonInSetScenarioDidTap(
+                        scenarioName: scenarioName,
+                        memo: memo,
+                        basicMissions: missions.map { $0.content }
+                    )
+                )
+                moveNotice(enterType: .addScenario)
+            } catch {
+                BeforeGoingLogger.error(error)
+            }
+        }
+    }
+    
+    private func updateScenario(scenarioName: String, memo: String) {
+        guard let scenarioID = scenarioID else { return }
+
+        Task {
+            do {
+                let _ = try await updateScenarioViewModel.action(
+                    input: .nextButtonInSetScenarioDidTap(
+                        scenarioID: scenarioID,
+                        scenarioName: scenarioName,
+                        memo: memo,
+                        basicMissions: missions
+                    )
+                )
+                moveNotice(enterType: .updateScenario)
+            } catch {
+                BeforeGoingLogger.error(error)
+            }
+        }
+    }
+    
+    private func moveNotice(enterType: SettingScenarioEnterType) {
+        let viewController = ViewControllerFactory.shared.makeNoticeViewController()
+        viewController.navigationItem.hidesBackButton = true
+        viewController.configure(
+            isNotificationActive: isNotificationActive,
+            daysOfWeek: daysOfWeek,
+            startHour: startHour,
+            startMinute: startMinute,
+            notificationMethod: notificationMethod,
+            enterType: enterType
+        )
+        self.navigationController?.pushViewController(viewController, animated: false)
     }
 }
 
@@ -215,7 +331,7 @@ extension SettingScenarioViewController: UITableViewDataSource {
         ) as? MissionItemCell else {
             return UITableViewCell()
         }
-        cell.bind(mission: missions[indexPath.section])
+        cell.bind(mission: missions[indexPath.section].content)
         return cell
     }
     

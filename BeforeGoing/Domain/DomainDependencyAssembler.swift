@@ -33,6 +33,18 @@ final class DomainDependencyAssembler: DependencyAssembler {
             
             DIContainer.shared.register(type: RequestWeatherUseCase.self) { _ in MockRequestWeatherUseCase() }
             
+            DIContainer.shared.register(type: AddScenarioType.self) { _ in MockAddScenarioUseCase() }
+            DIContainer.shared.register(type: FetchScenariosType.self) { _ in MockFetchScenariosUseCase() }
+            DIContainer.shared.register(type: DeleteScenarioType.self) { _ in MockDeleteScenarioUseCase() }
+            DIContainer.shared.register(type: UpdateScenarioType.self) { _ in  MockUpdateScenarioUseCase() }
+            DIContainer.shared.register(type: UpdateScenarioOrderType.self) { _ in MockUpdateScenarioOrderUseCase() }
+            DIContainer.shared.register(type: FetchSingleScenarioType.self) { _ in MockFetchSingleScenarioUseCase() }
+            
+            DIContainer.shared.register(type: FetchMissionsType.self) { _ in MockFetchMissionsUseCase() }
+            DIContainer.shared.register(type: CheckMissionType.self) { _ in MockCheckMissionUseCase() }
+            DIContainer.shared.register(type: AddTodayMissionType.self) { _ in MockAddTodayMissionUseCase() }
+            DIContainer.shared.register(type: DeleteTodayMissionType.self) { _ in MockDeleteTodayMissionUseCase() }
+            
             return
         }
         
@@ -54,6 +66,16 @@ final class DomainDependencyAssembler: DependencyAssembler {
         }
         
         guard let weatherRepository = DIContainer.shared.resolve(type: WeatherInterface.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            return
+        }
+        
+        guard let scenarioRepository = DIContainer.shared.resolve(type: ScenarioInterface.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            return
+        }
+        
+        guard let missionRepository = DIContainer.shared.resolve(type: MissionInterface.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             return
         }
@@ -90,6 +112,38 @@ final class DomainDependencyAssembler: DependencyAssembler {
         
         DIContainer.shared.register(type: RequestWeatherType.self) { _ in
             return RequestWeatherUseCase(repository: weatherRepository)
+        }
+        
+        DIContainer.shared.register(type: AddScenarioType.self) { _ in
+            return AddScenarioUseCase(repository: scenarioRepository)
+        }
+        DIContainer.shared.register(type: FetchScenariosType.self) { _ in
+            return FetchScenariosUseCase(repository: scenarioRepository)
+        }
+        DIContainer.shared.register(type: DeleteScenarioType.self) { _ in
+            return DeleteScenarioUseCase(repository: scenarioRepository)
+        }
+        DIContainer.shared.register(type: UpdateScenarioType.self) { _ in
+            return UpdateScenarioUseCase(repository: scenarioRepository)
+        }
+        DIContainer.shared.register(type: UpdateScenarioOrderType.self) { _ in
+            return UpdateScenarioOrderUseCase(repository: scenarioRepository)
+        }
+        DIContainer.shared.register(type: FetchSingleScenarioType.self) { _ in
+            return FetchSingleScenarioUseCase(repository: scenarioRepository)
+        }
+        
+        DIContainer.shared.register(type: FetchMissionsType.self) { _ in
+            return FetchMissionsUseCase(repository: missionRepository)
+        }
+        DIContainer.shared.register(type: CheckMissionType.self) { _ in
+            return CheckMissionUseCase(repository: missionRepository)
+        }
+        DIContainer.shared.register(type: AddTodayMissionType.self) { _ in
+            return AddTodayMissionUseCase(repository: missionRepository)
+        }
+        DIContainer.shared.register(type: DeleteTodayMissionType.self) { _ in
+            return DeleteTodayMissionUseCase(repository: missionRepository)
         }
     }
 }

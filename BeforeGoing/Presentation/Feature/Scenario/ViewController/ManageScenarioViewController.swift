@@ -53,7 +53,7 @@ extension ManageScenarioViewController {
     func selectButtonDidTap() {
         guard let selectedIndex = selectedIndex else { return }
         
-        let viewController = SettingScenarioViewController()
+        let viewController = ViewControllerFactory.shared.makeSettingScenarioViewController()
         let scenarioType = templates[selectedIndex]
         
         viewController.navigationItem.hidesBackButton = true

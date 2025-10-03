@@ -66,10 +66,68 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
+        guard let addScenarioUseCase = DIContainer.shared.resolve(type: AddScenarioType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
+        guard let fetchSingleScenarioUsecase = DIContainer.shared.resolve(type: FetchSingleScenarioType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
+        guard let fetchScenariosUseCase = DIContainer.shared.resolve(type: FetchScenariosType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
+        guard let deleteScenarioUseCase = DIContainer.shared.resolve(type: DeleteScenarioType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
+        guard let updateScenarioUseCase = DIContainer.shared.resolve(type: UpdateScenarioType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
+        guard let updateScenarioOrderUseCase = DIContainer.shared.resolve(type: UpdateScenarioOrderType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
+        guard let getMissionUseCase = DIContainer.shared.resolve(type: FetchMissionsType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
+        guard let checkMissionUseCase = DIContainer.shared.resolve(type: CheckMissionType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
+        guard let addTodayMissionUseCase = DIContainer.shared.resolve(type: AddTodayMissionType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
+        guard let deleteTodayMissionUseCase = DIContainer.shared.resolve(type: DeleteTodayMissionType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
         DIContainer.shared.register(AgreeItemViewModel(useCase: agreeTermsUseCase))
         DIContainer.shared.register(LoginViewModel(loginUseCase: loginUseCase))
         DIContainer.shared.register(SplashViewModel(useCase: autoLoginUseCase))
-        DIContainer.shared.register(HomeViewModel(weatherUseCase: requestWeatherUseCase))
+        DIContainer.shared.register(
+            HomeViewModel(
+                weatherUseCase: requestWeatherUseCase,
+                getMissionsUseCase: getMissionUseCase,
+                checkMissionUseCase: checkMissionUseCase,
+                addTodayMissionUseCase: addTodayMissionUseCase,
+                deleteTodayMissionUseCase: deleteTodayMissionUseCase
+            )
+        )
         DIContainer.shared.register(
             ProfileViewModel(
                 getMemberNameUseCase: getMemberNameUseCase,
@@ -85,5 +143,11 @@ struct PresentationDependencyAssembler: DependencyAssembler {
         )
         DIContainer.shared.register(NicknameViewModel(useCase: updateNicknameUseCase))
         DIContainer.shared.register(ModifyNicknameViewModel(useCase: updateNicknameUseCase))
+        DIContainer.shared.register(AddScenarioViewModel(useCase: addScenarioUseCase))
+        DIContainer.shared.register(GetScenariosViewModel(useCase: fetchScenariosUseCase))
+        DIContainer.shared.register(DeleteScenarioViewModel(useCase: deleteScenarioUseCase))
+        DIContainer.shared.register(UpdateScenarioViewModel(useCase: updateScenarioUseCase))
+        DIContainer.shared.register(UpdateScenarioOrderViewModel(useCase: updateScenarioOrderUseCase))
+        DIContainer.shared.register(GetSingleScenarioViewModel(useCase: fetchSingleScenarioUsecase))
     }
 }

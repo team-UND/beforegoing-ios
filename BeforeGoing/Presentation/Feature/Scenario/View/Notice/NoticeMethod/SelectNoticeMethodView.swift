@@ -10,7 +10,7 @@ import UIKit
 final class SelectNoticeMethodView: BaseView {
     
     private let methodStackView = UIStackView()
-    private(set) var pushNoticeView = NoticeMethodView(type: .pushNotice)
+    private(set) var pushNoticeView = NoticeMethodView(type: .push)
     private(set) var alarmView = NoticeMethodView(type: .alarm)
     
     override func setStyle() {
@@ -51,5 +51,12 @@ extension SelectNoticeMethodView {
             $0.radioButton.changeState(!isPushNoticeSelected)
             $0.updateImage(isSelected: !isPushNoticeSelected)
         }
+    }
+    
+    func getSelectedNoticeMethodType() -> NoticeMethodType {
+        let noticeMethodType: NoticeMethodType =
+        (pushNoticeView.radioButton.currentState == .enable) ? .push : .alarm
+        
+        return noticeMethodType
     }
 }

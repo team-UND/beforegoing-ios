@@ -10,6 +10,7 @@ import UIKit
 final class ScenarioListItemCell: UITableViewCell {
     
     private let scenarioItemView = ScenarioItemView(height: 76, isExistSubtitle: true)
+    var onDidTap: (() -> Void)?
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -17,6 +18,7 @@ final class ScenarioListItemCell: UITableViewCell {
         setStyle()
         setUI()
         setLayout()
+        setAction()
     }
     
     required init?(coder: NSCoder) {
@@ -36,14 +38,30 @@ final class ScenarioListItemCell: UITableViewCell {
             $0.edges.equalToSuperview()
         }
     }
+    
+    private func setAction() {
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(cellDidTap))
+        self.do {
+            $0.isUserInteractionEnabled = true
+            $0.addGestureRecognizer(tapGesture)
+        }
+    }
 }
 
 extension ScenarioListItemCell {
     
-    func bind(type: ScenarioType) {
+    @objc
+    private func cellDidTap() {
+        onDidTap?()
+    }
+}
+
+extension ScenarioListItemCell {
+    
+    func bind(name: String, memo: String) {
         scenarioItemView.do {
-            $0.titleLabel.text = type.rawValue
-            $0.subtitleLabel.text = type.subtitle
+            $0.titleLabel.text = name
+            $0.subtitleLabel.text = memo
         }
     }
 }

@@ -12,18 +12,16 @@ import UIKit
 final class HomeViewController: BaseViewController {
     
     private let rootView = HomeView()
-    private let viewModel: HomeViewModel
-    private var items: [(title: String, state: ListItemState, beforeState: ListItemState)] = [
-        ("우산 챙기기", .today, .today),
-        ("콘센트 빼기", .normal, .normal),
-        ("난방 끄기", .normal, .normal),
-        ("준비물 챙기기", .normal, .normal),
-        ("물 한 잔 마시기", .normal, .normal)
-    ]
+    private let homeViewModel: HomeViewModel
+    private let getScenariosViewModel: GetScenariosViewModel
     private let locationManager = CLLocationManager()
     
-    init(viewModel: HomeViewModel) {
-        self.viewModel = viewModel
+    init(
+        homeViewModel: HomeViewModel,
+        getScenariosViewModel: GetScenariosViewModel
+    ) {
+        self.homeViewModel = homeViewModel
+        self.getScenariosViewModel = getScenariosViewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -35,20 +33,58 @@ final class HomeViewController: BaseViewController {
         view = rootView
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        Task { @MainActor in
+            let result = try await getScenariosViewModel.action(input: .viewWillAppear)
+            
+            switch result.scenariosResult {
+            case .success(let scenarios):
+                rootView.modalView.headerView.clear()
+                
+                for (index, scenario) in scenarios.enumerated() {
+                    let tapGesture = UITapGestureRecognizer(
+                        target: self,
+                        action: #selector(scenarioNameDidTap)
+                    )
+                    
+                    rootView.modalView.headerView.createScenarioItem(
+                        title: scenario.scenarioName,
+                        tag: index,
+                        tapGesture: tapGesture
+                    )
+                }
+                
+                let _ = try await homeViewModel.action(
+                    input: .scenarioDidTap(
+                        scenarioID: getScenariosViewModel.firstScenarioID,
+                        date: DateUtil.getCurrentDate(format: "yyyy-MM-dd")
+                    )
+                )
+                rootView.modalView.listTableView.reloadData()
+            case .failure(let error):
+                BeforeGoingLogger.error(error)
+            }
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setLocationManager()
         
-Task {
-    do {
-        guard let result = try await viewModel.action(input: .requestDate) as? HomeViewModel.DateOutput else {
-            return
+        Task {
+            do {
+                guard let result = try await homeViewModel.action(
+                    input: .requestDate
+                ) as? HomeViewModel.DateOutput else {
+                    return
+                }
+                rootView.headerView.updateDateUI(date: result.date)
+            } catch {
+                BeforeGoingLogger.error(error)
+            }
         }
-        rootView.headerView.updateDateUI(date: result.date)
-    } catch {
-        BeforeGoingLogger.error(error)
-    }
-}
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -99,7 +135,7 @@ Task {
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         let status = manager.authorizationStatus
         if status == .authorizedWhenInUse || status == .authorizedAlways,
-        CLLocationManager.locationServicesEnabled() {
+           CLLocationManager.locationServicesEnabled() {
             manager.requestLocation()
         }
     }
@@ -141,14 +177,61 @@ extension HomeViewController {
     
     @objc
     private func addTaskButtonDidTap() {
-        guard let task = rootView.modalView.taskTextField.text, !task.isEmpty else {
+        guard let content = rootView.modalView.taskTextField.text,
+              !content.isEmpty else {
             return
         }
         
         clearTaskTextField()
-        items.insert((title: task, state: .today, beforeState: .today), at: 0)
-        rootView.modalView.listTableView.reloadData()
+        let date = DateUtil.getCurrentDate(format: "yyyy-MM-dd")
+        
+        Task {
+            guard let result = try await homeViewModel.action(
+                input: .addTodayMissionButtonDidTap(
+                    scenarioID: getScenariosViewModel.getScenarioID(),
+                    date: date,
+                    content: content
+                )
+            ) as? HomeViewModel.TodayMissionOutput else {
+                return
+            }
+            
+            switch result.todayMissionResult {
+            case .success:
+                rootView.modalView.listTableView.reloadData()
+            case .failure(let error):
+                BeforeGoingLogger.error(error)
+            }
+        }
         self.view.endEditing(true)
+    }
+    
+    @objc
+    private func scenarioNameDidTap(_ sender: UITapGestureRecognizer) {
+        guard let view = sender.view else { return }
+        
+        let tag = view.tag
+        let scenarioID = getScenariosViewModel.getScenarioID(at: tag)
+        let currentDate = DateUtil.getCurrentDate(format: "yyyy-MM-dd")
+        
+        rootView.modalView.headerView.updateTappedLabel(tag: tag)
+        
+        Task {
+            guard let result = try await homeViewModel.action(
+                input: .scenarioDidTap(
+                    scenarioID: scenarioID,
+                    date: currentDate
+                )
+            ) as? HomeViewModel.MissionsOutput else { return }
+            
+            switch result.missionsResult {
+            case .success:
+                getScenariosViewModel.updatePointer(to: tag)
+                rootView.modalView.listTableView.reloadData()
+            case .failure(let error):
+                BeforeGoingLogger.error(error)
+            }
+        }
     }
 }
 
@@ -161,13 +244,13 @@ extension HomeViewController: CLLocationManagerDelegate {
             
             Task {
                 do {
-                    guard let result = try await viewModel.action(
+                    guard let result = try await homeViewModel.action(
                         input: .requestWeather(latitude: latitude, longitude: longitude)
                     ) as? HomeViewModel.WeatherOutput else {
                         return
                     }
                     self.rootView.headerView.updateWeatherUI(weather: result.weatherResult)
-manager.stopUpdatingLocation()
+                    manager.stopUpdatingLocation()
                 } catch (let error) {
                     BeforeGoingLogger.error(error)
                     BeforeGoingLogger.error(BeforeGoingError.requestWeatherFailed)
@@ -197,7 +280,7 @@ extension HomeViewController: UITableViewDelegate {
 extension HomeViewController: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return items.count
+        return homeViewModel.missionsCount
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -211,20 +294,31 @@ extension HomeViewController: UITableViewDataSource {
         ) as? ListItemCell else {
             return UITableViewCell()
         }
+        
+        let missionState = homeViewModel.getMissionState(at: indexPath.section)
+        let beforeMissionState = homeViewModel.getBeforeMissionState(at: indexPath.section)
+        
         cell.bind(
-            itemTitle: items[indexPath.section].title,
-            state: items[indexPath.section].state,
-            beforeState: items[indexPath.section].beforeState
+            itemTitle: homeViewModel.getMissionTitle(at: indexPath.section),
+            state: missionState,
+            beforeState: beforeMissionState
         )
         
         cell.onCellDidTap = { [weak self] in
             guard let self = self else { return }
             
-            var selectedItem = self.items.remove(at: indexPath.section)
-            selectedItem.state = .completed
-            items.append(selectedItem)
+            let missionID = self.homeViewModel.getMissionID(at: indexPath.section)
+            let date = DateUtil.getCurrentDate(format: "yyyy-MM-dd")
             
-            tableView.reloadData()
+            Task {
+                let _ = try await self.homeViewModel.action(
+                    input: .missionChecked(
+                        missionID: missionID,
+                        date: date
+                    )
+                )
+                tableView.reloadData()
+            }
         }
         return cell
     }
@@ -237,7 +331,7 @@ extension HomeViewController: UITableViewDataSource {
                    trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath)
     -> UISwipeActionsConfiguration? {
         
-        if self.items[indexPath.section].state != .today {
+        if !homeViewModel.isTodayMission(at: indexPath.section) {
             return nil
         }
         let deleteAction = createDeleteAction(tableView: tableView, indexPath: indexPath)
@@ -254,8 +348,23 @@ extension HomeViewController: UITableViewDataSource {
             style: .normal,
             title: nil
         ) { [weak self] (_, view, completion) in
-            self?.items.remove(at: indexPath.section)
-            tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
+            Task {
+                guard let missionID = self?.homeViewModel.getMissionID(at: indexPath.section),
+                      let result = try await self?.homeViewModel.action(
+                        input: .deleteTodayMissionButtonDidTap(
+                            missionID: missionID
+                        )
+                      ) as? HomeViewModel.DeleteTodayMissionOutput else {
+                    return
+                }
+                
+                switch result.deleteTodayMissionResult {
+                case .success:
+                    tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
+                case .failure(let error):
+                    BeforeGoingLogger.error(error)
+                }
+            }
             completion(true)
         }
     }

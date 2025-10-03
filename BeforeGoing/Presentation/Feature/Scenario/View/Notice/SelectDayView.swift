@@ -127,6 +127,16 @@ extension SelectDayView {
         }
     }
     
+    func updateDayOfWeekState(daysOfWeek: [Int]?) {
+        guard let daysOfWeek = daysOfWeek else { return }
+        
+        for (_, day) in daysOfWeek.enumerated() {
+            guard let dayOfWeek = DaysOfWeek(rawValue: day) else { return }
+            dayOfWeeksState[dayOfWeek.string] = true
+            updateUI(index: day, condition: true)
+        }
+    }
+    
     func updateAllDay(condition: Bool) {
         for (index, day) in dayOfWeeks.enumerated() {
             dayOfWeeksState[day] = condition
@@ -144,5 +154,10 @@ extension SelectDayView {
     func checkAllSelected() {
         let isAllSelected = dayOfWeeks.allSatisfy { dayOfWeeksState[$0] == true }
         everydayButton.toggle(isOn: isAllSelected)
+    }
+    
+    var selected: [Int] {
+        let selected = dayOfWeeks.indices.filter { dayOfWeeksState[dayOfWeeks[$0]] == true }
+        return selected
     }
 }

@@ -45,17 +45,58 @@ final class ViewControllerFactory {
     }
     
     func makeHomeViewController() -> HomeViewController {
-        let viewModel = resolveViewModel(HomeViewModel.self)
-        return HomeViewController(viewModel: viewModel)
+        let homeViewModel = resolveViewModel(HomeViewModel.self)
+        let getScenariosViewModel = resolveViewModel(GetScenariosViewModel.self)
+        return HomeViewController(
+            homeViewModel: homeViewModel,
+            getScenariosViewModel: getScenariosViewModel
+        )
     }
     
     func makeMyScenarioViewController() -> MyScenarioViewController {
-        return MyScenarioViewController()
+        let getSingleScenarioViewModel = resolveViewModel(GetSingleScenarioViewModel.self)
+        let getScenariosViewModel = resolveViewModel(GetScenariosViewModel.self)
+        let deleteScenarioViewModel = resolveViewModel(DeleteScenarioViewModel.self)
+        let updateScenarioOrderViewModel = resolveViewModel(UpdateScenarioOrderViewModel.self)
+        
+        return MyScenarioViewController(
+            getSingleScenarioViewModel: getSingleScenarioViewModel,
+            getScenariosViewModel: getScenariosViewModel,
+            deleteScenarioViewModel: deleteScenarioViewModel,
+            updateScenarioOrderViewModel: updateScenarioOrderViewModel
+        )
     }
     
     func makeSettingViewController() -> SettingViewController {
         let viewModel = resolveViewModel(SettingViewModel.self)
         return .init(viewModel: viewModel)
+    }
+    
+    func makeSettingScenarioViewController() -> SettingScenarioViewController {
+        let addScenarioViewModel = resolveViewModel(AddScenarioViewModel.self)
+        let updateScenarioViewModel = resolveViewModel(UpdateScenarioViewModel.self)
+        return .init(
+            addScenarioViewModel: addScenarioViewModel,
+            updateScnearioViewModel: updateScenarioViewModel
+        )
+    }
+    
+    func makeSetNoticeMethodViewController() -> SetNoticeMethodViewController {
+        let addScenarioViewModel = resolveViewModel(AddScenarioViewModel.self)
+        let updateScenarioViewModel = resolveViewModel(UpdateScenarioViewModel.self)
+        return .init(
+            addScenarioViewModel: addScenarioViewModel,
+            updateScenarioViewModel: updateScenarioViewModel
+        )
+    }
+    
+    func makeNoticeViewController() -> NoticeViewController {
+        let addScenarioViewModel = resolveViewModel(AddScenarioViewModel.self)
+        let updateScenarioViewModel = resolveViewModel(UpdateScenarioViewModel.self)
+        return .init(
+            addScenarioViewModel: addScenarioViewModel,
+            updateScenarioViewModel: updateScenarioViewModel
+        )
     }
 }
 
