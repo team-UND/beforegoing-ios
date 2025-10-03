@@ -236,8 +236,11 @@ extension SettingScenarioViewController {
             return
         }
         
-        enterType.isAddScenarioType ?
-        addScenario(scenarioName: scenarioName, memo: memo) : updateScenario(scenarioName: scenarioName, memo: memo)
+        if enterType.isAddScenarioType {
+            addScenario(scenarioName: scenarioName, memo: memo)
+            return
+        }
+        updateScenario(scenarioName: scenarioName, memo: memo)
     }
     
     private func checkNextButtonState() {

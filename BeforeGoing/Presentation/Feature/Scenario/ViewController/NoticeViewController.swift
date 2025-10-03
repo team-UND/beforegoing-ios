@@ -159,7 +159,11 @@ extension NoticeViewController {
         switch text {
         case "저장하기":
             Task {
-                let _ = enterType.isAddScenarioType ? try await addScenarioViewModel.action(input: .saveButtonInSetNoticeDidTap) : try await updateScenarioViewModel.action(input: .saveButtonInSetNoticeDidTap)
+                if enterType.isAddScenarioType {
+                    let _ = try await addScenarioViewModel.action(input: .saveButtonInSetNoticeDidTap)
+                } else {
+                    let _ = try await updateScenarioViewModel.action(input: .saveButtonInSetNoticeDidTap)
+                }
                 self.navigationController?.popToRootViewController(animated: false)
             }
         case "다음":
