@@ -10,19 +10,58 @@ import UIKit
 final class NoticeViewController: BaseViewController {
     
     private let rootView = NoticeView()
-    private let viewModel: AddScenarioViewModel
     
-    init(viewModel: AddScenarioViewModel) {
-        self.viewModel = viewModel
+    private var isNotificationActive: Bool?
+    private var daysOfWeek: [Int]?
+    private var startHour: Int?
+    private var startMinute: Int?
+    private var notificationMethod: NoticeMethodType?
+    private var enterType: SettingScenarioEnterType?
+    
+    private let addScenarioViewModel: AddScenarioViewModel
+    private let updateScenarioViewModel: UpdateScenarioViewModel
+    
+    init(
+        addScenarioViewModel: AddScenarioViewModel,
+        updateScenarioViewModel: UpdateScenarioViewModel
+    ) {
+        self.addScenarioViewModel = addScenarioViewModel
+        self.updateScenarioViewModel = updateScenarioViewModel
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     override func loadView() {
         view = rootView
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        guard let isNotificationActive = isNotificationActive,
+              let enterType = enterType else {
+            return
+        }
+        if !enterType.isAddScenarioType && isNotificationActive {
+            guard let daysOfWeek = daysOfWeek,
+                  let startHour = startHour,
+                  let startMinute = startMinute else {
+                return
+            }
+            let setTimeAlarmRadioButton = rootView.selectNoticeOptionView.setTimeAlarmView.radioButton
+            radioButtonDidTap(setTimeAlarmRadioButton)
+            rootView.do {
+                $0.setNoticeTimeView.selectDayView.updateDayOfWeekState(daysOfWeek: daysOfWeek)
+                $0.updateNextButtonState()
+                $0.setNoticeTimeView.timePickerView.updateTime(
+                    startHour: startHour,
+                    startMinute: startMinute
+                )
+            }
+        }
     }
     
     override func setAction() {
@@ -69,7 +108,7 @@ extension NoticeViewController {
     @objc
     private func alarmViewDidTap(_ gesture: UITapGestureRecognizer) {
         guard let optionView = gesture.view as? NoticeOptionView else { return }
-
+        
         let radioButton = optionView.radioButton
         radioButtonDidTap(radioButton)
     }
@@ -112,12 +151,15 @@ extension NoticeViewController {
     
     @objc
     private func saveNextButtonDidTap(_ sender: UIButton) {
-        guard let text = sender.titleLabel?.text else { return }
+        guard let text = sender.titleLabel?.text,
+              let enterType = enterType else {
+            return
+        }
         
         switch text {
         case "저장하기":
             Task {
-                let _ = try await viewModel.action(input: .saveButtonInSetNoticeDidTap)
+                let _ = enterType.isAddScenarioType ? try await addScenarioViewModel.action(input: .saveButtonInSetNoticeDidTap) : try await updateScenarioViewModel.action(input: .saveButtonInSetNoticeDidTap)
                 self.navigationController?.popToRootViewController(animated: false)
             }
         case "다음":
@@ -125,20 +167,89 @@ extension NoticeViewController {
             let startHour = rootView.setNoticeTimeView.timePickerView.getHour()
             let startMinute = rootView.setNoticeTimeView.timePickerView.getMinute()
             
-            Task {
-                let _ = try await viewModel.action(
-                    input: .nextButtonInSetNoticeDidTap(
-                        daysOfWeek: daysOfWeek,
-                        startHour: startHour,
-                        startMinute: startMinute
-                    )
-                )
-                let viewController = ViewControllerFactory.shared.makeSetNoticeMethodViewController()
-                viewController.navigationItem.hidesBackButton = true
-                self.navigationController?.pushViewController(viewController, animated: false)
-            }
+            enterType.isAddScenarioType ? saveNoticeInformationForAddScenario(
+                daysOfWeek: daysOfWeek,
+                startHour: startHour,
+                startMinute: startMinute
+            ) : saveNoticeInformationForUpdateScenario(
+                daysOfWeek: daysOfWeek,
+                startHour: startHour,
+                startMinute: startMinute
+            )
         default:
             break
         }
+    }
+    
+    private func saveNoticeInformationForAddScenario(
+        daysOfWeek: [Int],
+        startHour: Int?,
+        startMinute: Int?
+    ) {
+        Task {
+            let _ = try await addScenarioViewModel.action(
+                input: .nextButtonInSetNoticeDidTap(
+                    daysOfWeek: daysOfWeek,
+                    startHour: startHour,
+                    startMinute: startMinute
+                )
+            )
+            moveSetNoticeMethod(
+                enterType: .addScenario,
+                notificationMethod: notificationMethod
+            )
+        }
+    }
+    
+    private func saveNoticeInformationForUpdateScenario(
+        daysOfWeek: [Int],
+        startHour: Int?,
+        startMinute: Int?
+    ) {
+        Task {
+            let _ = try await updateScenarioViewModel.action(
+                input: .nextButtonInSetNoticeDidTap(
+                    daysOfWeek: daysOfWeek,
+                    startHour: startHour,
+                    startMinute: startMinute
+                )
+            )
+            moveSetNoticeMethod(
+                enterType: .updateScenario,
+                notificationMethod: notificationMethod
+            )
+        }
+    }
+    
+    private func moveSetNoticeMethod(
+        enterType: SettingScenarioEnterType,
+        notificationMethod: NoticeMethodType?
+    ) {
+        let viewController = ViewControllerFactory.shared.makeSetNoticeMethodViewController()
+        viewController.navigationItem.hidesBackButton = true
+        viewController.configure(
+            enterType: enterType,
+            notificationMethod: notificationMethod
+        )
+        self.navigationController?.pushViewController(viewController, animated: false)
+    }
+}
+
+extension NoticeViewController {
+    
+    func configure(
+        isNotificationActive: Bool?,
+        daysOfWeek: [Int]?,
+        startHour: Int?,
+        startMinute: Int?,
+        notificationMethod: NoticeMethodType?,
+        enterType: SettingScenarioEnterType
+    ) {
+        self.isNotificationActive = isNotificationActive
+        self.daysOfWeek = daysOfWeek
+        self.startHour = startHour
+        self.startMinute = startMinute
+        self.notificationMethod = notificationMethod
+        self.enterType = enterType
     }
 }

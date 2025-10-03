@@ -127,6 +127,16 @@ extension SelectDayView {
         }
     }
     
+    func updateDayOfWeekState(daysOfWeek: [Int]?) {
+        guard let daysOfWeek = daysOfWeek else { return }
+        
+        for (_, day) in daysOfWeek.enumerated() {
+            guard let dayOfWeek = DaysOfWeek(rawValue: day) else { return }
+            dayOfWeeksState[dayOfWeek.string] = true
+            updateUI(index: day, condition: true)
+        }
+    }
+    
     func updateAllDay(condition: Bool) {
         for (index, day) in dayOfWeeks.enumerated() {
             dayOfWeeksState[day] = condition

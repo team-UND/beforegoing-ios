@@ -10,10 +10,19 @@ import UIKit
 final class SetNoticeMethodViewController: BaseViewController {
     
     private let rootView = SetNoticeMethodView()
-    private let viewModel: AddScenarioViewModel
     
-    init(viewModel: AddScenarioViewModel) {
-        self.viewModel = viewModel
+    private var enterType: SettingScenarioEnterType?
+    private var notificationMethod: NoticeMethodType?
+    
+    private let addScenarioViewModel: AddScenarioViewModel
+    private let updateScenarioViewModel: UpdateScenarioViewModel
+    
+    init(
+        addScenarioViewModel: AddScenarioViewModel,
+        updateScenarioViewModel: UpdateScenarioViewModel
+    ) {
+        self.addScenarioViewModel = addScenarioViewModel
+        self.updateScenarioViewModel = updateScenarioViewModel
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -23,6 +32,20 @@ final class SetNoticeMethodViewController: BaseViewController {
         
     override func loadView() {
         view = rootView
+    }
+        
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        guard let enterType = enterType,
+              let notificationMethod = notificationMethod else {
+            return
+        }
+        if !enterType.isAddScenarioType {
+            notificationMethod.isPush ?
+            radioButtonDidTap(rootView.selectNoticeMethodView.pushNoticeView.radioButton) :
+            radioButtonDidTap(rootView.selectNoticeMethodView.alarmView.radioButton)
+        }
     }
     
     override func setAction() {
@@ -50,6 +73,17 @@ extension SetNoticeMethodViewController: Backable {
 
 extension SetNoticeMethodViewController {
     
+    func configure(
+        enterType: SettingScenarioEnterType,
+        notificationMethod: NoticeMethodType?
+    ) {
+        self.enterType = enterType
+        self.notificationMethod = notificationMethod
+    }
+}
+
+extension SetNoticeMethodViewController {
+    
     @objc
     private func imageViewDidTap(_ sender: UITapGestureRecognizer) {
         guard
@@ -69,10 +103,29 @@ extension SetNoticeMethodViewController {
     
     @objc
     private func saveButtonDidTap() {
+        guard let enterType = enterType else { return }
+        enterType.isAddScenarioType ? addScenario() : updateScenario()
+    }
+    
+    private func addScenario() {
         Task {
             let noticeMethodType = rootView.selectNoticeMethodView.getSelectedNoticeMethodType()
             do {
-                let _ = try await viewModel.action(
+                let _ = try await addScenarioViewModel.action(
+                    input: .saveButtonInSetNoticeMethodDidTap(noticeMethodType: noticeMethodType)
+                )
+                self.navigationController?.popToRootViewController(animated: false)
+            } catch {
+                BeforeGoingLogger.error(error)
+            }
+        }
+    }
+    
+    private func updateScenario() {
+        Task {
+            let noticeMethodType = rootView.selectNoticeMethodView.getSelectedNoticeMethodType()
+            do {
+                let _ = try await updateScenarioViewModel.action(
                     input: .saveButtonInSetNoticeMethodDidTap(noticeMethodType: noticeMethodType)
                 )
                 self.navigationController?.popToRootViewController(animated: false)

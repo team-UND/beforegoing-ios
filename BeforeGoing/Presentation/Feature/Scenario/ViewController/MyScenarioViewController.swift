@@ -116,9 +116,16 @@ extension MyScenarioViewController {
             $0.navigationItem.hidesBackButton = true
             $0.hidesBottomBarWhenPushed = true
             $0.configure(
+                scenarioID: scenario.scenarioID,
                 scenarioName: scenario.scenarioName,
                 memo: scenario.memo,
-                missions: scenario.basicMissions.map { $0.content }
+                missions: scenario.basicMissions.map { (missionID: $0.missionId, content: $0.content) },
+                isNotificationActive: scenario.notification.isActive,
+                daysOfWeek: scenario.notification.activeData?.daysOfWeekOrdinal,
+                startHour: scenario.notificationCondition?.startHour,
+                startMinute: scenario.notificationCondition?.startMinute,
+                notificationMethod: scenario.notification.activeData?.notificationMethodType,
+                enterType: .updateScenario
             )
         }
         self.navigationController?.pushViewController(viewController, animated: false)
