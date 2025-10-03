@@ -10,17 +10,20 @@ struct ScenarioRepository: ScenarioInterface {
     private let networkService: NetworkService
     private let keyChainService: KeyChainService
     private let addScenarioRequestMapper: AddScenarioRequestMapper
+    private let updateScenarioRequestMapper: UpdateScenarioRequestMapper
     private let updateScenarioOrderRequestMapper: UpdateScenarioOrderRequestMapper
     
     init(
         networkService: NetworkService,
         keyChainService: KeyChainService,
         addScenarioRequestMapper: AddScenarioRequestMapper,
+        updateScenarioRequestMapper: UpdateScenarioRequestMapper,
         updateScenarioOrderRequestMapper: UpdateScenarioOrderRequestMapper
     ) {
         self.networkService = networkService
         self.keyChainService = keyChainService
         self.addScenarioRequestMapper = addScenarioRequestMapper
+        self.updateScenarioRequestMapper = updateScenarioRequestMapper
         self.updateScenarioOrderRequestMapper = updateScenarioOrderRequestMapper
     }
     
@@ -106,6 +109,45 @@ struct ScenarioRepository: ScenarioInterface {
         )
     }
     
+    func updateScenario(
+        scenarioID: Int,
+        scenarioName: String,
+        memo: String,
+        missions: [(missionID: Int?, content: String)],
+        isNotificationActive: Bool,
+        noticeMethodType: String?,
+        daysOfWeekOrdinal: [Int]?,
+        startHour: Int?,
+        startMinute: Int?
+    ) async throws -> ScenarioEntity {
+        guard let accessToken = keyChainService.load(key: .accessToken) else {
+            BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
+            return .stub()
+        }
+        
+        let requestDTO = updateScenarioRequestMapper.map(
+            (
+                scenarioName: scenarioName,
+                memo: memo,
+                missions: missions,
+                isNotificationActive: isNotificationActive,
+                noticeMethodType: noticeMethodType,
+                daysOfWeekOrdinal: daysOfWeekOrdinal,
+                startHour: startHour,
+                startMinute: startMinute
+            )
+        )
+        let result = try await networkService.request(
+            endPoint: decideEndPoint(
+                dto: requestDTO,
+                accessToken: accessToken,
+                scenarioID: scenarioID
+            ),
+            responseType: [ScenarioResponseDTO].self
+        )
+        return result.first?.toEntity() ?? .stub()
+    }
+    
     func updateScenarioOrder(
         scenarioID: Int,
         prevOrder: Int?,
@@ -137,10 +179,31 @@ struct ScenarioRepository: ScenarioInterface {
                 accessToken: accessToken,
                 dto: withNotificationAddScenarioRequestDTO
             )
-        case .withoutNotification(let WithoutNotificationAddScenarioRequestDTO):
+        case .withoutNotification(let withoutNotificationAddScenarioRequestDTO):
             return ScenarioAPI.addScnearioWithoutNotification(
                 accessToken: accessToken,
-                dto: WithoutNotificationAddScenarioRequestDTO
+                dto: withoutNotificationAddScenarioRequestDTO
+            )
+        }
+    }
+    
+    private func decideEndPoint(
+        dto: UpdateScenarioRequestDTO,
+        accessToken: String,
+        scenarioID: Int
+    ) -> EndPoint {
+        switch dto {
+        case .withNotification(let withNotificationUpdateScenarioRequestDTO):
+            return ScenarioAPI.updateScenarioWithNotification(
+                accessToken: accessToken,
+                scenarioID: scenarioID,
+                dto: withNotificationUpdateScenarioRequestDTO
+            )
+        case .withoutNotification(let withoutNotificationAddScenarioRequestDTO):
+            return ScenarioAPI.updateScenarioWithoutNotification(
+                accessToken: accessToken,
+                scenarioID: scenarioID,
+                dto: withoutNotificationAddScenarioRequestDTO
             )
         }
     }

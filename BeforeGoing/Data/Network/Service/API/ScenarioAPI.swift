@@ -13,6 +13,8 @@ enum ScenarioAPI {
     case addScnearioWithNotification(accessToken: String, dto: WithNotificationAddScenarioRequestDTO)
     case addScnearioWithoutNotification(accessToken: String, dto: WithoutNotificationAddScenarioRequestDTO)
     case deleteScenario(accessToken: String, scenarioID: Int)
+    case updateScenarioWithNotification(accessToken: String, scenarioID: Int, dto: WithNotificationUpdateScenarioRequestDTO)
+    case updateScenarioWithoutNotification(accessToken: String, scenarioID: Int, dto: WithoutNotificationUpdateScenarioRequestDTO)
     case updateOrder(accessToken: String, scenarioID: Int, dto: UpdateScenarioOrderRequestDTO)
 }
 
@@ -28,7 +30,10 @@ extension ScenarioAPI: EndPoint {
         switch self {
         case .getScenarios, .addScnearioWithNotification, .addScnearioWithoutNotification:
             return basePath
-        case .getScenario(_, let scenarioID), .deleteScenario(_, let scenarioID):
+        case .getScenario(_, let scenarioID),
+                .deleteScenario(_, let scenarioID),
+                .updateScenarioWithNotification(_, let scenarioID, _),
+                .updateScenarioWithoutNotification(_, let scenarioID, _):
             return basePath + "/\(scenarioID)"
         case .updateOrder(_, let scenarioID, _):
             return basePath + "/\(scenarioID)" + "/order"
@@ -43,6 +48,8 @@ extension ScenarioAPI: EndPoint {
             return .post
         case .deleteScenario:
             return .delete
+        case .updateScenarioWithNotification, .updateScenarioWithoutNotification:
+            return .put
         case .updateOrder:
             return .patch
         }
@@ -59,6 +66,8 @@ extension ScenarioAPI: EndPoint {
                 .addScnearioWithNotification(let accessToken, _),
                 .addScnearioWithoutNotification(let accessToken, _),
                 .deleteScenario(let accessToken, _),
+                .updateScenarioWithoutNotification(let accessToken, _, _),
+                .updateScenarioWithNotification(let accessToken, _, _),
                 .updateOrder(let accessToken, _, _):
             return [
                 "Content-Type": "application/json",
@@ -71,7 +80,7 @@ extension ScenarioAPI: EndPoint {
         switch self {
         case .getScenario, .getScenarios, .deleteScenario:
             return URLEncoding.default
-        case .addScnearioWithNotification, .addScnearioWithoutNotification, .updateOrder:
+        case .addScnearioWithNotification, .addScnearioWithoutNotification, .updateScenarioWithNotification, .updateScenarioWithoutNotification, .updateOrder:
             return JSONEncoding.default
         }
     }
@@ -83,6 +92,8 @@ extension ScenarioAPI: EndPoint {
                 .addScnearioWithNotification,
                 .addScnearioWithoutNotification,
                 .deleteScenario,
+                .updateScenarioWithNotification,
+                .updateScenarioWithoutNotification,
                 .updateOrder:
             return nil
         }
@@ -95,6 +106,10 @@ extension ScenarioAPI: EndPoint {
         case .addScnearioWithNotification(_, let dto):
             return try? dto.toBodyParameters()
         case .addScnearioWithoutNotification(_, let dto):
+            return try? dto.toBodyParameters()
+        case .updateScenarioWithNotification(_, _, let dto):
+            return try? dto.toBodyParameters()
+        case .updateScenarioWithoutNotification(_, _, let dto):
             return try? dto.toBodyParameters()
         case .updateOrder(_, _, let dto):
             return try? dto.toBodyParameters()
