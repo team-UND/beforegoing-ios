@@ -7,7 +7,7 @@
 
 import UIKit
 
-enum NoticeMethodType: String {
+enum NoticeMethodType: String, CaseIterable {
     
     case push, alarm
     
@@ -28,6 +28,19 @@ enum NoticeMethodType: String {
                 radioButton: RadioButton(state: .disable)
             )
         }
+    }
+    
+    static func findMethod(value: String) -> Self? {
+        for method in Self.allCases {
+            if method.rawValue.uppercased() == value {
+                return method
+            }
+        }
+        return nil
+    }
+    
+    var isPush: Bool {
+        self == .push
     }
 }
 
