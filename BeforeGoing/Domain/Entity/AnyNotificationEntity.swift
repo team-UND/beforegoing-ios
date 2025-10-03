@@ -27,7 +27,7 @@ struct ActiveNotificationEntity {
     let notificationID: Int
     var isActive: Bool = true
     let notificationType: String
-    let notificationMethodType: String
+    let notificationMethodType: NoticeMethodType
     let daysOfWeekOrdinal: [Int]
 }
 
@@ -50,8 +50,8 @@ extension ActiveNotificationEntity {
         return .init(
             notificationID: 1,
             notificationType: "TIME",
-            notificationMethodType: "PUSH",
-            daysOfWeekOrdinal: [0, 1, 2, 3, 4, 5, 6, 7]
+            notificationMethodType: .push,
+            daysOfWeekOrdinal: [0, 1, 2, 3, 4, 5, 6]
         )
     }
 }

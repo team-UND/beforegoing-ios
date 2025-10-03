@@ -65,6 +65,9 @@ extension AnyNotificationDTO {
 extension ActiveNotificationResponseDTO {
     
     func toEntity() -> ActiveNotificationEntity {
+        guard let notificationMethodType = NoticeMethodType.findMethod(value: notificationMethodType) else {
+            return .stub()
+        }
         return .init(
             notificationID: notificationId,
             notificationType: notificationType,
