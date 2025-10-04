@@ -54,7 +54,7 @@ final class SplashViewController: BaseViewController {
         let viewController = ViewControllerFactory.shared.makeLoginViewController()
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             viewController.navigationItem.hidesBackButton = true
-            self.navigationController?.pushViewController(viewController, animated: true)
+            self.navigationController?.pushViewController(viewController, animated: false)
         }
     }
 }

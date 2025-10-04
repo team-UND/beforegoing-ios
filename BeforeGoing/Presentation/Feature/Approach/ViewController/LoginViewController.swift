@@ -26,6 +26,11 @@ final class LoginViewController: BaseViewController {
         view = rootView
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        rootView.startAnimating()
+    }
+    
     override func setAction() {
         rootView.do {
             $0.kakaoLoginButton.addTarget(self, action: #selector(kakaoLoginButtonDidTap), for: .touchUpInside)
