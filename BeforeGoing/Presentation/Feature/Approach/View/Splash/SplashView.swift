@@ -7,10 +7,12 @@
 
 import UIKit
 
+import Lottie
+
 final class SplashView: BaseView {
     
     private let backgrounImageView = UIImageView()
-    private let appIconImageView = UIImageView()
+    private let appIconImageView = LottieAnimationView(name: "splashMotion")
     private let subtitleLabel = UILabel()
     private let mainTitleLabel = UILabel()
     
@@ -19,8 +21,8 @@ final class SplashView: BaseView {
             $0.image = .bgSplash
         }
         appIconImageView.do {
-            $0.image = .character
-            $0.contentMode = .scaleAspectFit
+            $0.play()
+            $0.loopMode = .loop
         }
         subtitleLabel.do {
             $0.text = ApproachLiteral.subtitle.rawValue
