@@ -71,4 +71,14 @@ extension ScenarioListView {
             $0.height.equalTo(249.adjustedH)
         }
     }
+    
+    func replaceScenarioView() {
+        emptyView.removeFromSuperview()
+        addSubview(scenarioListTableView)
+        scenarioListTableView.snp.makeConstraints {
+            $0.top.equalTo(addScenarioButton.snp.bottom).offset(12.adjustedH)
+            $0.horizontalEdges.equalToSuperview().inset(20.adjustedW)
+            $0.bottom.equalToSuperview()
+        }
+    }
 }

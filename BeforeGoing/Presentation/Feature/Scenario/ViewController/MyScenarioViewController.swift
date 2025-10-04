@@ -45,6 +45,7 @@ final class MyScenarioViewController: BaseViewController {
                 
                 switch result.scenariosResult {
                 case .success:
+                    rootView.replaceScenarioView()
                     rootView.scenarioListTableView.reloadData()
                 case .failure(let error):
                     if let error = error as? BeforeGoingError,
