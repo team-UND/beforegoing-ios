@@ -57,7 +57,7 @@ extension ManageScenarioViewController {
         let scenarioType = templates[selectedIndex]
         
         viewController.navigationItem.hidesBackButton = true
-        viewController.configure(scenarioType: scenarioType)
+        viewController.configure(scenarioType: scenarioType, enterType: .addScenario)
         
         self.navigationController?.pushViewController(viewController, animated: false)
     }

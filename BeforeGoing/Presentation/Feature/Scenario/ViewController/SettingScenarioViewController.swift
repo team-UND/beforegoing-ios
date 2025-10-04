@@ -117,7 +117,12 @@ extension SettingScenarioViewController: Backable {
 
 extension SettingScenarioViewController {
     
-    func configure(scenarioType: ScenarioType) {
+    func configure(
+        scenarioType: ScenarioType,
+        enterType: SettingScenarioEnterType
+    ) {
+        self.enterType = enterType
+        
         switch scenarioType {
         case .mine:
             rootView.inputScenarioView.do {
