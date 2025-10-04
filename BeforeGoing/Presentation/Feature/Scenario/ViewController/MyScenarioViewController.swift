@@ -53,7 +53,7 @@ final class MyScenarioViewController: BaseViewController {
                         rootView.replaceEmptyView()
                     }
                 }
-            } catch(let error) {
+            } catch {
                 BeforeGoingLogger.error(BeforeGoingError.getScenariosFailed)
             }
         }
@@ -214,6 +214,11 @@ extension MyScenarioViewController: UITableViewDataSource {
                     )
                     self.getScenariosViewModel.removeScenario(at: indexPath.section)
                     tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
+                    
+                    if self.getScenariosViewModel.isEmpty {
+                        self.rootView.replaceEmptyView()
+                    }
+                    
                 } catch {
                     BeforeGoingLogger.error(error)
                 }

@@ -51,6 +51,10 @@ extension GetScenariosViewModel {
         scenarios?.first?.scenarioId ?? 0
     }
     
+    var isEmpty: Bool {
+        scenariosCount == 0
+    }
+    
     func getScenarioName(section: Int) -> String {
         scenarios?[section].scenarioName ?? ""
     }
