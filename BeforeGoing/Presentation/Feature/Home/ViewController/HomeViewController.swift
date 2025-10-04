@@ -382,7 +382,7 @@ extension HomeViewController: UITableViewDataSource {
             $0.image = UIImage(
                 systemName: "trash",
                 withConfiguration: largeConfig
-            )?.withTintColor(.white, renderingMode: .alwaysTemplate).addBackgroundCircle(.warning600)
+            )?.withTintColor(.white, renderingMode: .alwaysTemplate).addBackgroundCircle(.warning500)
         }
     }
     
