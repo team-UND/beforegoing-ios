@@ -50,17 +50,12 @@ final class SettingViewController: BaseViewController {
         )
         rootView.supportView.seemoreView.moveButton.addTarget(
             self,
-            action: #selector(inqureButtonDidTap),
+            action: #selector(supportButtonDidTap),
             for: .touchUpInside
         )
         rootView.settingNoticeView.basicPushNoticeView.switchButton.addTarget(
             self,
             action: #selector(pushNoticeButtonDidTap),
-            for: .touchUpInside
-        )
-        rootView.settingNoticeView.nightPushNoticeView.switchButton.addTarget(
-            self,
-            action: #selector(nightPushNoticeButtonDidTap),
             for: .touchUpInside
         )
         rootView.policyView.termView.moveButton.addTarget(
@@ -98,11 +93,6 @@ extension SettingViewController {
         Task {
             try await viewModel.action(input: .switchButtonDidTap(isSwitchedOn))
         }
-    }
-    
-    @objc
-    private func nightPushNoticeButtonDidTap() {
-        
     }
     
     @objc
