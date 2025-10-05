@@ -82,8 +82,8 @@ extension SettingViewController {
     }
     
     @objc
-    private func inqureButtonDidTap() {
-        
+    private func supportButtonDidTap() {
+        ExternalLink.support.openURL(for: self)
     }
     
     @objc
@@ -97,11 +97,11 @@ extension SettingViewController {
     
     @objc
     private func termButtonDidTap() {
-        
+        ExternalLink.term.openURL(for: self)
     }
     
     @objc
     private func privacyButtonDidTap() {
-        
+        ExternalLink.privacy.openURL(for: self)
     }
 }
