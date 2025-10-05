@@ -12,6 +12,7 @@ import SnapKit
 final class UserScenarioModalView: BaseView {
     
     private(set) var headerView = UserScenarioModalHeaderView()
+    private(set) var emptyView = ScenarioEmptyView(type: .home)
     private(set) var taskTextField = TextField(type: .enableAddField)
     private(set) var addTaskButton = UIButton()
     private(set) var deleteTaskButton = UIButton()
@@ -149,5 +150,27 @@ extension UserScenarioModalView {
         UIView.animate(withDuration: 0.3) {
             self.superview?.layoutIfNeeded()
         }
+    }
+    
+    func replaceEmptyView(target: UIViewController) {
+        [
+            headerView,
+            listTableView,
+            taskTextField,
+            addTaskButton,
+            deleteTaskButton
+        ].forEach { $0.removeFromSuperview() }
+        addSubview(emptyView)
+        emptyView.snp.makeConstraints {
+            $0.top.equalToSuperview().inset(80.adjustedH)
+            $0.horizontalEdges.equalToSuperview().inset(20.adjustedW)
+            $0.height.equalTo(285.adjustedH)
+        }
+    }
+    
+    func replaceModalView() {
+        emptyView.removeFromSuperview()
+        setUI()
+        setLayout()
     }
 }

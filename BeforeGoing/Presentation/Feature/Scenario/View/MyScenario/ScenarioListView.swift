@@ -12,7 +12,7 @@ final class ScenarioListView: BaseView {
     private let backgroundImageView = UIImageView()
     private let titleLabel = UILabel()
     private(set) var addScenarioButton = CustomButton(state: .addScenarioButton, title: "+ 시나리오 추가")
-    private let emptyView = ScenarioEmptyView()
+    private let emptyView = ScenarioEmptyView(type: .myScenario)
     private(set) var scenarioListTableView = UITableView()
     
     override func setStyle() {

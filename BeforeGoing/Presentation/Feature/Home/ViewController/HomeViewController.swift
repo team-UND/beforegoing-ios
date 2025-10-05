@@ -42,28 +42,21 @@ final class HomeViewController: BaseViewController {
             switch result.scenariosResult {
             case .success(let scenarios):
                 rootView.modalView.headerView.clear()
-                
-                for (index, scenario) in scenarios.enumerated() {
-                    let tapGesture = UITapGestureRecognizer(
-                        target: self,
-                        action: #selector(scenarioNameDidTap)
-                    )
-                    
-                    rootView.modalView.headerView.createScenarioItem(
-                        title: scenario.scenarioName,
-                        tag: index,
-                        tapGesture: tapGesture
-                    )
-                }
-                
+                setGesture(scenarios: scenarios)
                 let _ = try await homeViewModel.action(
                     input: .scenarioDidTap(
                         scenarioID: getScenariosViewModel.firstScenarioID,
                         date: DateUtil.getCurrentDate(format: "yyyy-MM-dd")
                     )
                 )
+                rootView.modalView.replaceModalView()
                 rootView.modalView.listTableView.reloadData()
             case .failure(let error):
+                if let error = error as? BeforeGoingError,
+                   error == .notFoundError {
+                    rootView.modalView.replaceEmptyView(target: self)
+                    return
+                }
                 BeforeGoingLogger.error(error)
             }
         }
@@ -113,6 +106,11 @@ final class HomeViewController: BaseViewController {
             action: #selector(addTaskButtonDidTap),
             for: .touchUpInside
         )
+        rootView.modalView.emptyView.moveButton.addTarget(
+            self,
+            action: #selector(moveButtonDidTap),
+            for: .touchUpInside
+        )
     }
     
     override func setDelegate() {
@@ -121,6 +119,21 @@ final class HomeViewController: BaseViewController {
             $0.dataSource = self
             $0.register(ListItemCell.self, forCellReuseIdentifier: ListItemCell.identifier)
             $0.reloadData()
+        }
+    }
+    
+    private func setGesture(scenarios: [ScenarioEntity]) {
+        for (index, scenario) in scenarios.enumerated() {
+            let tapGesture = UITapGestureRecognizer(
+                target: self,
+                action: #selector(scenarioNameDidTap)
+            )
+            
+            rootView.modalView.headerView.createScenarioItem(
+                title: scenario.scenarioName,
+                tag: index,
+                tapGesture: tapGesture
+            )
         }
     }
     
@@ -232,6 +245,14 @@ extension HomeViewController {
                 BeforeGoingLogger.error(error)
             }
         }
+    }
+    
+    @objc
+    private func moveButtonDidTap() {
+        guard let bottomViewController = self.tabBarController as? BottomNavigationViewController else {
+            return
+        }
+        bottomViewController.selectTab(item: .scenario)
     }
 }
 
