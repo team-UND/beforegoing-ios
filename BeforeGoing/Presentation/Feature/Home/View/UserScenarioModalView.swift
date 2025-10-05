@@ -100,6 +100,25 @@ final class UserScenarioModalView: BaseView {
 
 extension UserScenarioModalView {
     
+    @objc
+    private func handlePan(_ gesture: UIPanGestureRecognizer) {
+        guard let superview = superview else { return }
+        
+        let translation = gesture.translation(in: superview)
+        var newOffset = (bottomConstraint?.layoutConstraints.first?.constant ?? 0) + translation.y
+        newOffset = min(max(newOffset, 0), maxHeight - minHeight)
+        
+        bottomConstraint?.update(offset: newOffset)
+        gesture.setTranslation(.zero, in: superview)
+        
+        if gesture.state == .ended {
+            newOffset < (maxHeight - minHeight) / 2 ? show() : hide()
+        }
+    }
+}
+
+extension UserScenarioModalView {
+    
     func enableAddTaskButton() {
         addTaskButton.setImage(.plusCircle.withTintColor(.blue500), for: .normal)
     }
@@ -114,21 +133,6 @@ extension UserScenarioModalView {
     
     func hideDeleteTaskButton() {
         deleteTaskButton.isHidden = true
-    }
-    
-    @objc private func handlePan(_ gesture: UIPanGestureRecognizer) {
-        guard let superview = superview else { return }
-        
-        let translation = gesture.translation(in: superview)
-        var newOffset = (bottomConstraint?.layoutConstraints.first?.constant ?? 0) + translation.y
-        newOffset = min(max(newOffset, 0), maxHeight - minHeight)
-        
-        bottomConstraint?.update(offset: newOffset)
-        gesture.setTranslation(.zero, in: superview)
-        
-        if gesture.state == .ended {
-            newOffset < (maxHeight - minHeight) / 2 ? show() : hide()
-        }
     }
     
     func show() {
