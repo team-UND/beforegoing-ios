@@ -49,8 +49,10 @@ final class HomeViewController: BaseViewController {
                         date: DateUtil.getCurrentDate(format: "yyyy-MM-dd")
                     )
                 )
-                rootView.modalView.replaceModalView()
-                rootView.modalView.listTableView.reloadData()
+                rootView.modalView.do {
+                    $0.replaceModalView()
+                    $0.listTableView.reloadData()
+                }
             case .failure(let error):
                 if let error = error as? BeforeGoingError,
                    error == .notFoundError {
