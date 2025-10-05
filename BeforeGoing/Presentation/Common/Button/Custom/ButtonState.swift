@@ -11,6 +11,7 @@ enum ButtonState {
     case enableLongButton
     case disableLongButton
     case addScenarioButton
+    case enableShortButton
     
     var component: ButtonComponent {
         switch self {
@@ -46,6 +47,18 @@ enum ButtonState {
                 borderWidth: 1.5,
                 width: 350.adjustedW,
                 height: 48.adjustedH,
+                cornerRadius: 14,
+                font: .custom(.bodyLGSemiBold),
+                isEnabled: true
+            )
+        case .enableShortButton:
+            return ButtonComponent(
+                backgroundColor: .blue400,
+                textColor: .white,
+                borderColor: nil,
+                borderWidth: 0,
+                width: 200.adjustedW,
+                height: 35.adjustedH,
                 cornerRadius: 14,
                 font: .custom(.bodyLGSemiBold),
                 isEnabled: true
