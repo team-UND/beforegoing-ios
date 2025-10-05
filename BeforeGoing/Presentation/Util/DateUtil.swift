@@ -9,7 +9,16 @@ import Foundation
 
 struct DateUtil {
     
+    private static let dateFormat = "yyyy년 MM월 dd일"
+    private static let seoul = "Asia/Seoul"
     private static let calendar = Calendar.current
+    
+    private static let formatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = dateFormat
+        formatter.timeZone = TimeZone(identifier: seoul)
+        return formatter
+    }()
     
     static func getCurrentDate() -> Date {
         let now = Date()
@@ -26,6 +35,23 @@ struct DateUtil {
         dateFormatter.dateFormat = format
         
         return dateFormatter.string(from: date)
+    }
+    
+    static func toString(date: Date) -> String {
+        return formatter.string(from: date)
+    }
+    
+    static func convertDateFormat(dateString: String?) -> String? {
+        guard let dateString = dateString,
+              let date = formatter.date(from: dateString) else {
+            return nil
+        }
+        
+        let outputFormatter = DateFormatter()
+        outputFormatter.dateFormat = "yyyy-MM-dd"
+        let resultString = outputFormatter.string(from: date)
+        
+        return resultString
     }
     
     static func getPreviousMonth(from date: Date) -> Date {
