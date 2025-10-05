@@ -39,21 +39,27 @@ final class ProfileViewController: BaseViewController {
     }
     
     override func setAction() {
+        setGesture()
+        
         rootView.modifyNameButton.addTarget(
             self,
             action: #selector(modifyNameButtonDidTap),
             for: .touchUpInside
         )
-        rootView.logoutView.seeMoreButton.addTarget(
-            self,
-            action: #selector(logoutButtonDidTap),
-            for: .touchUpInside
-        )
-        rootView.withdrawView.seeMoreButton.addTarget(
-            self,
-            action: #selector(withdrawButtonDidTap),
-            for: .touchUpInside
-        )
+    }
+    
+    private func setGesture() {
+        let logoutTapGesture = UITapGestureRecognizer(target: self, action: #selector(logoutDidTap))
+        rootView.logoutView.do {
+            $0.addGestureRecognizer(logoutTapGesture)
+            $0.isUserInteractionEnabled = true
+        }
+        
+        let withdrawTapGesture = UITapGestureRecognizer(target: self, action: #selector(withdrawDidTap))
+        rootView.withdrawView.do {
+            $0.addGestureRecognizer(withdrawTapGesture)
+            $0.isUserInteractionEnabled = true
+        }
     }
 }
 
@@ -79,12 +85,12 @@ extension ProfileViewController {
     }
     
     @objc
-    private func logoutButtonDidTap() {
+    private func logoutDidTap() {
         presentModal(modalType: .logout)
     }
     
     @objc
-    private func withdrawButtonDidTap() {
+    private func withdrawDidTap() {
         presentModal(modalType: .withdraw)
     }
     

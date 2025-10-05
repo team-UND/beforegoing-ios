@@ -17,6 +17,14 @@ final class BottomNavigationViewController: UITabBarController {
         setAppearance()
     }
     
+    func selectTab(item: BottomNavigationItem) {
+        guard item.rawValue >= 0, item.rawValue < (self.viewControllers?.count ?? 0) else {
+            return
+        }
+
+        self.selectedIndex = item.rawValue
+    }
+    
     private func setViewControllers() { 
         self.viewControllers = BottomNavigationItem.allCases.map {
              createViewController(

@@ -16,6 +16,8 @@ final class HomeViewController: BaseViewController {
     private let getScenariosViewModel: GetScenariosViewModel
     private let locationManager = CLLocationManager()
     
+    private var homeDate: String?
+    
     init(
         homeViewModel: HomeViewModel,
         getScenariosViewModel: GetScenariosViewModel
@@ -36,37 +38,7 @@ final class HomeViewController: BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        Task { @MainActor in
-            let result = try await getScenariosViewModel.action(input: .viewWillAppear)
-            
-            switch result.scenariosResult {
-            case .success(let scenarios):
-                rootView.modalView.headerView.clear()
-                
-                for (index, scenario) in scenarios.enumerated() {
-                    let tapGesture = UITapGestureRecognizer(
-                        target: self,
-                        action: #selector(scenarioNameDidTap)
-                    )
-                    
-                    rootView.modalView.headerView.createScenarioItem(
-                        title: scenario.scenarioName,
-                        tag: index,
-                        tapGesture: tapGesture
-                    )
-                }
-                
-                let _ = try await homeViewModel.action(
-                    input: .scenarioDidTap(
-                        scenarioID: getScenariosViewModel.firstScenarioID,
-                        date: DateUtil.getCurrentDate(format: "yyyy-MM-dd")
-                    )
-                )
-                rootView.modalView.listTableView.reloadData()
-            case .failure(let error):
-                BeforeGoingLogger.error(error)
-            }
-        }
+        getScenarios(currentDate: DateUtil.getCurrentDate(format: "yyyy-MM-dd"))
     }
     
     override func viewDidLoad() {
@@ -80,6 +52,7 @@ final class HomeViewController: BaseViewController {
                 ) as? HomeViewModel.DateOutput else {
                     return
                 }
+                self.homeDate = result.date
                 rootView.headerView.updateDateUI(date: result.date)
             } catch {
                 BeforeGoingLogger.error(error)
@@ -98,6 +71,11 @@ final class HomeViewController: BaseViewController {
             action: #selector(viewCalendarButtonDidTap),
             for: .touchUpInside
         )
+        rootView.modalView.headerView.addScenarioButton.addTarget(
+            self,
+            action: #selector(addScenarioButtonDidTap),
+            for: .touchUpInside
+        )
         rootView.modalView.taskTextField.addTarget(
             self,
             action: #selector(taskTextFieldEditingChanged),
@@ -113,6 +91,11 @@ final class HomeViewController: BaseViewController {
             action: #selector(addTaskButtonDidTap),
             for: .touchUpInside
         )
+        rootView.modalView.emptyView.moveButton.addTarget(
+            self,
+            action: #selector(moveButtonDidTap),
+            for: .touchUpInside
+        )
     }
     
     override func setDelegate() {
@@ -121,6 +104,50 @@ final class HomeViewController: BaseViewController {
             $0.dataSource = self
             $0.register(ListItemCell.self, forCellReuseIdentifier: ListItemCell.identifier)
             $0.reloadData()
+        }
+    }
+    
+    private func getScenarios(currentDate: String) {
+        Task {
+            let result = try await getScenariosViewModel.action(input: .viewWillAppear)
+            
+            switch result.scenariosResult {
+            case .success(let scenarios):
+                rootView.modalView.headerView.clear()
+                setGesture(scenarios: scenarios)
+                let _ = try await homeViewModel.action(
+                    input: .scenarioDidTap(
+                        scenarioID: getScenariosViewModel.firstScenarioID,
+                        date: currentDate
+                    )
+                )
+                rootView.modalView.do {
+                    $0.replaceModalView()
+                    $0.listTableView.reloadData()
+                }
+            case .failure(let error):
+                if let error = error as? BeforeGoingError,
+                   error == .notFoundError {
+                    rootView.modalView.replaceEmptyView(target: self)
+                    return
+                }
+                BeforeGoingLogger.error(error)
+            }
+        }
+    }
+    
+    private func setGesture(scenarios: [ScenarioEntity]) {
+        for (index, scenario) in scenarios.enumerated() {
+            let tapGesture = UITapGestureRecognizer(
+                target: self,
+                action: #selector(scenarioNameDidTap)
+            )
+            
+            rootView.modalView.headerView.createScenarioItem(
+                title: scenario.scenarioName,
+                tag: index,
+                tapGesture: tapGesture
+            )
         }
     }
     
@@ -147,7 +174,25 @@ extension HomeViewController {
     private func viewCalendarButtonDidTap() {
         let calendar = CalendarViewController()
         calendar.modalPresentationStyle = .overFullScreen
+        calendar.onDayDidTap = { [weak self] date in
+            let dateString = DateUtil.toString(date: date)
+            self?.homeDate = dateString
+            self?.rootView.headerView.updateDateUI(date: dateString)
+        }
+        calendar.onDismiss = { [weak self] in
+            guard let homeDate = self?.homeDate,
+                  let date = DateUtil.convertDateFormat(dateString: homeDate) else {
+                return
+            }
+            
+            self?.getScenarios(currentDate: date)
+        }
         self.present(calendar, animated: true)
+    }
+    
+    @objc
+    private func addScenarioButtonDidTap() {
+        moveMySceario()
     }
     
     @objc
@@ -178,18 +223,18 @@ extension HomeViewController {
     @objc
     private func addTaskButtonDidTap() {
         guard let content = rootView.modalView.taskTextField.text,
-              !content.isEmpty else {
+              !content.isEmpty,
+              let homeDate = DateUtil.convertDateFormat(dateString: homeDate) else {
             return
         }
         
         clearTaskTextField()
-        let date = DateUtil.getCurrentDate(format: "yyyy-MM-dd")
         
         Task {
             guard let result = try await homeViewModel.action(
                 input: .addTodayMissionButtonDidTap(
                     scenarioID: getScenariosViewModel.getScenarioID(),
-                    date: date,
+                    date: homeDate,
                     content: content
                 )
             ) as? HomeViewModel.TodayMissionOutput else {
@@ -208,11 +253,13 @@ extension HomeViewController {
     
     @objc
     private func scenarioNameDidTap(_ sender: UITapGestureRecognizer) {
-        guard let view = sender.view else { return }
+        guard let view = sender.view,
+              let homeDate = DateUtil.convertDateFormat(dateString: homeDate) else {
+            return
+        }
         
         let tag = view.tag
         let scenarioID = getScenariosViewModel.getScenarioID(at: tag)
-        let currentDate = DateUtil.getCurrentDate(format: "yyyy-MM-dd")
         
         rootView.modalView.headerView.updateTappedLabel(tag: tag)
         
@@ -220,7 +267,7 @@ extension HomeViewController {
             guard let result = try await homeViewModel.action(
                 input: .scenarioDidTap(
                     scenarioID: scenarioID,
-                    date: currentDate
+                    date: homeDate
                 )
             ) as? HomeViewModel.MissionsOutput else { return }
             
@@ -232,6 +279,18 @@ extension HomeViewController {
                 BeforeGoingLogger.error(error)
             }
         }
+    }
+    
+    @objc
+    private func moveButtonDidTap() {
+        moveMySceario()
+    }
+    
+    private func moveMySceario() {
+        guard let bottomViewController = self.tabBarController as? BottomNavigationViewController else {
+            return
+        }
+        bottomViewController.selectTab(item: .scenario)
     }
 }
 
@@ -305,16 +364,18 @@ extension HomeViewController: UITableViewDataSource {
         )
         
         cell.onCellDidTap = { [weak self] in
-            guard let self = self else { return }
+            guard let self = self,
+                  let homeDate = DateUtil.convertDateFormat(dateString: homeDate) else {
+                return
+            }
             
             let missionID = self.homeViewModel.getMissionID(at: indexPath.section)
-            let date = DateUtil.getCurrentDate(format: "yyyy-MM-dd")
             
             Task {
                 let _ = try await self.homeViewModel.action(
                     input: .missionChecked(
                         missionID: missionID,
-                        date: date
+                        date: homeDate
                     )
                 )
                 tableView.reloadData()
@@ -382,7 +443,7 @@ extension HomeViewController: UITableViewDataSource {
             $0.image = UIImage(
                 systemName: "trash",
                 withConfiguration: largeConfig
-            )?.withTintColor(.white, renderingMode: .alwaysTemplate).addBackgroundCircle(.warning600)
+            )?.withTintColor(.white, renderingMode: .alwaysTemplate).addBackgroundCircle(.warning500)
         }
     }
     

@@ -38,6 +38,8 @@ final class CalendarViewController: BaseViewController {
     private let calendarView = CalendarView()
     private let blurEffect = UIBlurEffect(style: .systemMaterialLight)
     private lazy var blurView: UIVisualEffectView = UIVisualEffectView(effect: blurEffect)
+    var onDayDidTap: ((Date) -> Void)?
+    var onDismiss: (() -> Void)?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -180,6 +182,7 @@ extension CalendarViewController {
         let location = sender.location(in: view)
         if !calendarView.frame.contains(location) {
             self.dismiss(animated: true)
+            onDismiss?()
         }
     }
 }
@@ -192,6 +195,7 @@ extension CalendarViewController: UICollectionViewDelegate {
         let date = formatter.date(from: dateString)!
         if isDateInSelectableRange(date: date) {
             selectedDate = date
+            onDayDidTap?(date)
             reload()
         }
     }

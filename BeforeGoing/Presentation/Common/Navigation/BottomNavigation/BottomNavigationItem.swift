@@ -5,8 +5,8 @@
 //  Created by APPLE on 7/24/25.
 //
 
-enum BottomNavigationItem: CaseIterable {
-    case home
+enum BottomNavigationItem: Int, CaseIterable {
+    case home = 0
     case scenario
     case setting
     

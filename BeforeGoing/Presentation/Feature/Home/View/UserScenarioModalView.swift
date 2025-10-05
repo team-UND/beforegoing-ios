@@ -12,6 +12,7 @@ import SnapKit
 final class UserScenarioModalView: BaseView {
     
     private(set) var headerView = UserScenarioModalHeaderView()
+    private(set) var emptyView = ScenarioEmptyView(type: .home)
     private(set) var taskTextField = TextField(type: .enableAddField)
     private(set) var addTaskButton = UIButton()
     private(set) var deleteTaskButton = UIButton()
@@ -100,6 +101,25 @@ final class UserScenarioModalView: BaseView {
 
 extension UserScenarioModalView {
     
+    @objc
+    private func handlePan(_ gesture: UIPanGestureRecognizer) {
+        guard let superview = superview else { return }
+        
+        let translation = gesture.translation(in: superview)
+        var newOffset = (bottomConstraint?.layoutConstraints.first?.constant ?? 0) + translation.y
+        newOffset = min(max(newOffset, 0), maxHeight - minHeight)
+        
+        bottomConstraint?.update(offset: newOffset)
+        gesture.setTranslation(.zero, in: superview)
+        
+        if gesture.state == .ended {
+            newOffset < (maxHeight - minHeight) / 2 ? show() : hide()
+        }
+    }
+}
+
+extension UserScenarioModalView {
+    
     func enableAddTaskButton() {
         addTaskButton.setImage(.plusCircle.withTintColor(.blue500), for: .normal)
     }
@@ -116,21 +136,6 @@ extension UserScenarioModalView {
         deleteTaskButton.isHidden = true
     }
     
-    @objc private func handlePan(_ gesture: UIPanGestureRecognizer) {
-        guard let superview = superview else { return }
-        
-        let translation = gesture.translation(in: superview)
-        var newOffset = (bottomConstraint?.layoutConstraints.first?.constant ?? 0) + translation.y
-        newOffset = min(max(newOffset, 0), maxHeight - minHeight)
-        
-        bottomConstraint?.update(offset: newOffset)
-        gesture.setTranslation(.zero, in: superview)
-        
-        if gesture.state == .ended {
-            newOffset < (maxHeight - minHeight) / 2 ? show() : hide()
-        }
-    }
-    
     func show() {
         bottomConstraint?.update(offset: 0)
         animateLayout()
@@ -145,5 +150,27 @@ extension UserScenarioModalView {
         UIView.animate(withDuration: 0.3) {
             self.superview?.layoutIfNeeded()
         }
+    }
+    
+    func replaceEmptyView(target: UIViewController) {
+        [
+            headerView,
+            listTableView,
+            taskTextField,
+            addTaskButton,
+            deleteTaskButton
+        ].forEach { $0.removeFromSuperview() }
+        addSubview(emptyView)
+        emptyView.snp.makeConstraints {
+            $0.top.equalToSuperview().inset(80.adjustedH)
+            $0.horizontalEdges.equalToSuperview().inset(20.adjustedW)
+            $0.height.equalTo(285.adjustedH)
+        }
+    }
+    
+    func replaceModalView() {
+        emptyView.removeFromSuperview()
+        setUI()
+        setLayout()
     }
 }

@@ -41,8 +41,18 @@ final class MyScenarioViewController: BaseViewController {
         
         Task {
             do {
-                let _ = try await getScenariosViewModel.action(input: .viewWillAppear)
-                rootView.scenarioListTableView.reloadData()
+                let result = try await getScenariosViewModel.action(input: .viewWillAppear)
+                
+                switch result.scenariosResult {
+                case .success:
+                    rootView.replaceScenarioView()
+                    rootView.scenarioListTableView.reloadData()
+                case .failure(let error):
+                    if let error = error as? BeforeGoingError,
+                       error == .notFoundError {
+                        rootView.replaceEmptyView()
+                    }
+                }
             } catch {
                 BeforeGoingLogger.error(BeforeGoingError.getScenariosFailed)
             }
@@ -204,6 +214,11 @@ extension MyScenarioViewController: UITableViewDataSource {
                     )
                     self.getScenariosViewModel.removeScenario(at: indexPath.section)
                     tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
+                    
+                    if self.getScenariosViewModel.isEmpty {
+                        self.rootView.replaceEmptyView()
+                    }
+                    
                 } catch {
                     BeforeGoingLogger.error(error)
                 }
@@ -226,7 +241,7 @@ extension MyScenarioViewController: UITableViewDataSource {
             $0.image = UIImage(
                 systemName: "trash",
                 withConfiguration: largeConfig
-            )?.withTintColor(.white, renderingMode: .alwaysTemplate).addBackgroundCircle(.warning600)
+            )?.withTintColor(.white, renderingMode: .alwaysTemplate).addBackgroundCircle(.warning500)
         }
     }
     

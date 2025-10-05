@@ -57,7 +57,7 @@ extension ManageScenarioViewController {
         let scenarioType = templates[selectedIndex]
         
         viewController.navigationItem.hidesBackButton = true
-        viewController.configure(scenarioType: scenarioType)
+        viewController.configure(scenarioType: scenarioType, enterType: .addScenario)
         
         self.navigationController?.pushViewController(viewController, animated: false)
     }
@@ -159,7 +159,7 @@ extension ManageScenarioViewController: UITableViewDataSource {
             $0.image = UIImage(
                 systemName: "trash",
                 withConfiguration: largeConfig
-            )?.withTintColor(.white, renderingMode: .alwaysTemplate).addBackgroundCircle(.warning600)
+            )?.withTintColor(.white, renderingMode: .alwaysTemplate).addBackgroundCircle(.warning500)
         }
     }
     

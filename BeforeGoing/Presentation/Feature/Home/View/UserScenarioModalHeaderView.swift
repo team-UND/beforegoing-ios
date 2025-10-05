@@ -12,7 +12,7 @@ final class UserScenarioModalHeaderView: BaseView {
     private(set) var scenarioStackView = UIStackView()
     private let scenarioScrollView = UIScrollView()
     private let addScenarioView = UIView()
-    private let addScenarioButton = UIButton()
+    private(set) var addScenarioButton = UIButton()
     
     override func setStyle() {
         scenarioScrollView.do {

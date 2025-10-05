@@ -25,6 +25,9 @@ final class OnboardingContentView: BaseView {
             $0.textAlignment = .center
             $0.numberOfLines = 2
         }
+        imageView.do {
+            $0.contentMode = .scaleAspectFit
+        }
     }
     
     override func setUI() {
@@ -89,8 +92,8 @@ extension OnboardingContentView {
             imageView.snp.remakeConstraints {
                 $0.top.equalTo(descriptionLabel.snp.bottom).offset(34.adjustedH)
                 $0.centerX.equalToSuperview()
-                $0.width.equalTo(292.adjustedW)
-                $0.height.equalTo(607.adjustedH)
+                $0.width.equalTo(322.adjustedW)
+                $0.height.equalTo(596.adjustedH)
             }
         }
     }

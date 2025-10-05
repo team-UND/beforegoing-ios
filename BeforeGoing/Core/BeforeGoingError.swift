@@ -1,4 +1,4 @@
-enum BeforeGoingError: Error {
+enum BeforeGoingError: Error, Equatable {
     case urlNotFound
     case decodingError
     case loginFailed
@@ -18,4 +18,10 @@ enum BeforeGoingError: Error {
     case invalidParameter
     case getScenariosFailed
     case missionNotFound
+    case networkError(statusCode: Int)
+    case notFoundError
+    case notModifiedError
+    case badRequestError
+    case weatherServiceError
+    case unknownError
 }

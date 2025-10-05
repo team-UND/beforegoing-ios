@@ -52,7 +52,7 @@ final class SettingView: BaseView {
         settingNoticeView.snp.makeConstraints {
             $0.top.equalTo(supportView.snp.bottom).offset(8.adjustedH)
             $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(175.adjustedH)
+            $0.height.equalTo(129.adjustedH)
         }
         policyView.snp.makeConstraints {
             $0.top.equalTo(settingNoticeView.snp.bottom).offset(20.adjustedH)

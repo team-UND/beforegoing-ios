@@ -50,17 +50,12 @@ final class SettingViewController: BaseViewController {
         )
         rootView.supportView.seemoreView.moveButton.addTarget(
             self,
-            action: #selector(inqureButtonDidTap),
+            action: #selector(supportButtonDidTap),
             for: .touchUpInside
         )
         rootView.settingNoticeView.basicPushNoticeView.switchButton.addTarget(
             self,
             action: #selector(pushNoticeButtonDidTap),
-            for: .touchUpInside
-        )
-        rootView.settingNoticeView.nightPushNoticeView.switchButton.addTarget(
-            self,
-            action: #selector(nightPushNoticeButtonDidTap),
             for: .touchUpInside
         )
         rootView.policyView.termView.moveButton.addTarget(
@@ -87,8 +82,8 @@ extension SettingViewController {
     }
     
     @objc
-    private func inqureButtonDidTap() {
-        
+    private func supportButtonDidTap() {
+        ExternalLink.support.openURL(for: self)
     }
     
     @objc
@@ -101,17 +96,12 @@ extension SettingViewController {
     }
     
     @objc
-    private func nightPushNoticeButtonDidTap() {
-        
-    }
-    
-    @objc
     private func termButtonDidTap() {
-        
+        ExternalLink.term.openURL(for: self)
     }
     
     @objc
     private func privacyButtonDidTap() {
-        
+        ExternalLink.privacy.openURL(for: self)
     }
 }

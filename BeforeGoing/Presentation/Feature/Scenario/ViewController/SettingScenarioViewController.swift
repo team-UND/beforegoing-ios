@@ -117,7 +117,12 @@ extension SettingScenarioViewController: Backable {
 
 extension SettingScenarioViewController {
     
-    func configure(scenarioType: ScenarioType) {
+    func configure(
+        scenarioType: ScenarioType,
+        enterType: SettingScenarioEnterType
+    ) {
+        self.enterType = enterType
+        
         switch scenarioType {
         case .mine:
             rootView.inputScenarioView.do {
@@ -373,7 +378,7 @@ extension SettingScenarioViewController: UITableViewDataSource {
             $0.image = UIImage(
                 systemName: "trash",
                 withConfiguration: largeConfig
-            )?.withTintColor(.white, renderingMode: .alwaysTemplate).addBackgroundCircle(.warning600)
+            )?.withTintColor(.white, renderingMode: .alwaysTemplate).addBackgroundCircle(.warning500)
         }
     }
     

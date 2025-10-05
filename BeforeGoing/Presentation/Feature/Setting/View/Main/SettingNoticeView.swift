@@ -11,7 +11,6 @@ final class SettingNoticeView: BaseView {
     
     private let titleLabel = UILabel()
     private(set) var basicPushNoticeView = SettingPushNoticeView(title: "푸시 알림 설정")
-    private(set) var nightPushNoticeView = SettingPushNoticeView(title: "(야간)푸시 알림 설정")
     private let divider = UILabel()
     
     override func setStyle() {
@@ -29,7 +28,6 @@ final class SettingNoticeView: BaseView {
         addSubviews(
             titleLabel,
             basicPushNoticeView,
-            nightPushNoticeView,
             divider
         )
     }
@@ -44,13 +42,8 @@ final class SettingNoticeView: BaseView {
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(46.adjustedH)
         }
-        nightPushNoticeView.snp.makeConstraints {
-            $0.top.equalTo(basicPushNoticeView.snp.bottom).offset(16.adjustedH)
-            $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(46.adjustedH)
-        }
         divider.snp.makeConstraints {
-            $0.top.equalTo(nightPushNoticeView.snp.bottom).offset(20.adjustedH)
+            $0.top.equalTo(basicPushNoticeView.snp.bottom).offset(20.adjustedH)
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(6.adjustedH)
             $0.bottom.equalToSuperview()

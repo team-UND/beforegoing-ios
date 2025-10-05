@@ -12,6 +12,7 @@ final class ScenarioListView: BaseView {
     private let backgroundImageView = UIImageView()
     private let titleLabel = UILabel()
     private(set) var addScenarioButton = CustomButton(state: .addScenarioButton, title: "+ 시나리오 추가")
+    private let emptyView = ScenarioEmptyView(type: .myScenario)
     private(set) var scenarioListTableView = UITableView()
     
     override func setStyle() {
@@ -50,6 +51,30 @@ final class ScenarioListView: BaseView {
             $0.top.equalTo(titleLabel.snp.bottom).offset(16.adjustedH)
             $0.centerX.equalToSuperview()
         }
+        scenarioListTableView.snp.makeConstraints {
+            $0.top.equalTo(addScenarioButton.snp.bottom).offset(12.adjustedH)
+            $0.horizontalEdges.equalToSuperview().inset(20.adjustedW)
+            $0.bottom.equalToSuperview()
+        }
+    }
+}
+
+extension ScenarioListView {
+    
+    func replaceEmptyView() {
+        scenarioListTableView.removeFromSuperview()
+        addSubview(emptyView)
+        emptyView.snp.makeConstraints {
+            $0.top.equalTo(addScenarioButton.snp.bottom).offset(144.adjustedH)
+            $0.horizontalEdges.equalToSuperview().inset(20.adjustedW)
+            $0.bottom.equalToSuperview().inset(10.adjustedH)
+            $0.height.equalTo(249.adjustedH)
+        }
+    }
+    
+    func replaceScenarioView() {
+        emptyView.removeFromSuperview()
+        addSubview(scenarioListTableView)
         scenarioListTableView.snp.makeConstraints {
             $0.top.equalTo(addScenarioButton.snp.bottom).offset(12.adjustedH)
             $0.horizontalEdges.equalToSuperview().inset(20.adjustedW)

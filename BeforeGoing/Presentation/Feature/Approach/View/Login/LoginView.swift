@@ -5,6 +5,8 @@
 //  Created by APPLE on 8/2/25.
 //
 
+import SnapKit
+
 import UIKit
 
 final class LoginView: BaseView {
@@ -16,6 +18,8 @@ final class LoginView: BaseView {
     private(set) var kakaoLoginButton = UIButton()
     private(set) var appleLoginButton = UIButton()
     private var buttonConfiguration = UIButton.Configuration.plain()
+    
+    private var iconTopConstraint: Constraint?
     
     override func setStyle() {
         backgrounImageView.do {
@@ -39,10 +43,12 @@ final class LoginView: BaseView {
         kakaoLoginButton.do {
             $0.setImage(.kakaoLogin, for: .normal)
             $0.configuration = buttonConfiguration
+            $0.alpha = 0
         }
         appleLoginButton.do {
             $0.setImage(.appleLogin, for: .normal)
             $0.configuration = buttonConfiguration
+            $0.alpha = 0
         }
     }
     
@@ -62,7 +68,7 @@ final class LoginView: BaseView {
             $0.edges.equalToSuperview()
         }
         appIconImageView.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(200.adjustedH)
+            self.iconTopConstraint = $0.top.equalToSuperview().inset(311.adjustedH).constraint
             $0.centerX.equalToSuperview()
             $0.width.equalTo(180.adjustedW)
             $0.height.equalTo(150.adjustedH)
@@ -85,6 +91,20 @@ final class LoginView: BaseView {
             $0.leading.trailing.equalToSuperview().inset(20.adjustedW)
             $0.bottom.equalToSuperview().inset(120.adjustedH)
             $0.height.equalTo(54.adjustedH)
+        }
+    }
+}
+
+extension LoginView {
+    
+    func startAnimating() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            UIView.animate(withDuration: 0.6, delay: 0, options: [.curveEaseOut]) {
+                self.iconTopConstraint?.update(inset: 200.adjustedH)
+                self.appleLoginButton.alpha = 1
+                self.kakaoLoginButton.alpha = 1
+                self.layoutIfNeeded()
+            }
         }
     }
 }

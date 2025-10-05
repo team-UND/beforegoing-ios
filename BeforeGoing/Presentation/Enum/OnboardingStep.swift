@@ -53,7 +53,7 @@ enum OnboardingStep: Int, CaseIterable {
         case .second: return .onboardingFirst
         case .third: return .onboardingSecond
         case .fourth: return .onboardingThird
-        case .fifth: return .alarmBlue
+        case .fifth: return .onboardingFourth
         case .end: return .worryOnboarding
         }
     }
