@@ -93,6 +93,11 @@ final class HomeViewController: BaseViewController {
             action: #selector(viewCalendarButtonDidTap),
             for: .touchUpInside
         )
+        rootView.modalView.headerView.addScenarioButton.addTarget(
+            self,
+            action: #selector(addScenarioButtonDidTap),
+            for: .touchUpInside
+        )
         rootView.modalView.taskTextField.addTarget(
             self,
             action: #selector(taskTextFieldEditingChanged),
@@ -163,6 +168,11 @@ extension HomeViewController {
         let calendar = CalendarViewController()
         calendar.modalPresentationStyle = .overFullScreen
         self.present(calendar, animated: true)
+    }
+    
+    @objc
+    private func addScenarioButtonDidTap() {
+        moveMySceario()
     }
     
     @objc
@@ -251,6 +261,10 @@ extension HomeViewController {
     
     @objc
     private func moveButtonDidTap() {
+        moveMySceario()
+    }
+    
+    private func moveMySceario() {
         guard let bottomViewController = self.tabBarController as? BottomNavigationViewController else {
             return
         }
