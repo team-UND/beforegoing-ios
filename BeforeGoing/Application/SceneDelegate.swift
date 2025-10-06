@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import UserNotifications
+
 import KakaoSDKAuth
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
