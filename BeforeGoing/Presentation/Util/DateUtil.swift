@@ -9,13 +9,21 @@ import Foundation
 
 struct DateUtil {
     
-    private static let dateFormat = "yyyy년 MM월 dd일"
+    private static let homeDateFormat = "yyyy년 MM월 dd일"
+    private static let apiDateFormat = "yyyy-MM-dd"
     private static let seoul = "Asia/Seoul"
     private static let calendar = Calendar.current
     
-    private static let formatter: DateFormatter = {
+    private static let homeDateformatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = dateFormat
+        formatter.dateFormat = homeDateFormat
+        formatter.timeZone = TimeZone(identifier: seoul)
+        return formatter
+    }()
+    
+    private static let apiDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = apiDateFormat
         formatter.timeZone = TimeZone(identifier: seoul)
         return formatter
     }()
@@ -38,18 +46,16 @@ struct DateUtil {
     }
     
     static func toString(date: Date) -> String {
-        return formatter.string(from: date)
+        return homeDateformatter.string(from: date)
     }
     
     static func convertDateFormat(dateString: String?) -> String? {
         guard let dateString = dateString,
-              let date = formatter.date(from: dateString) else {
+              let date = homeDateformatter.date(from: dateString) else {
             return nil
         }
         
-        let outputFormatter = DateFormatter()
-        outputFormatter.dateFormat = "yyyy-MM-dd"
-        let resultString = outputFormatter.string(from: date)
+        let resultString = apiDateFormatter.string(from: date)
         
         return resultString
     }
