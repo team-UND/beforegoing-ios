@@ -155,7 +155,7 @@ final class HomeViewController: BaseViewController {
         locationManager.do {
             $0.delegate = self
             $0.desiredAccuracy = kCLLocationAccuracyBest
-            $0.requestAlwaysAuthorization()
+            checkLocationAuthorizationStatus()
         }
     }
     
@@ -165,6 +165,23 @@ final class HomeViewController: BaseViewController {
            CLLocationManager.locationServicesEnabled() {
             manager.requestLocation()
         }
+    }
+    
+    private func checkLocationAuthorizationStatus() {
+        switch locationManager.authorizationStatus {
+        case .notDetermined:
+            locationManager.requestAlwaysAuthorization()
+        case .authorizedWhenInUse, .authorizedAlways:
+            locationManager.requestLocation()
+        case .restricted, .denied:
+            handleLocationAccessDenied()
+        @unknown default:
+            break
+        }
+    }
+    
+    private func handleLocationAccessDenied() {
+        BeforeGoingLogger.error(BeforeGoingError.weatherServiceError)
     }
 }
 
