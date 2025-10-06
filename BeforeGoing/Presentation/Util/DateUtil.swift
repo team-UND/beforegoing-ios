@@ -68,6 +68,26 @@ struct DateUtil {
         return getMonth(from: date, offset: 1)
     }
     
+    static func createDateFromTime(
+        hour: Int,
+        minute: Int,
+        on date: Date = Date()
+    ) -> Date? {
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone.current
+
+        let year = calendar.component(.year, from: date)
+        let month = calendar.component(.month, from: date)
+        let day = calendar.component(.day, from: date)
+
+        var dateComponents = DateComponents()
+        dateComponents.hour = hour
+        dateComponents.minute = minute
+        dateComponents.second = 0
+
+        return calendar.date(from: dateComponents)
+    }
+    
     private static func getMonth(from date: Date, offset: Int) -> Date {
         guard let date = calendar.date(byAdding: .month, value: offset, to: date) else {
             fatalError("Failed to create date from components. This should not happen.")
