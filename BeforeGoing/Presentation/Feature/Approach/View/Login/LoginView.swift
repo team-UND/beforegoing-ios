@@ -76,10 +76,12 @@ final class LoginView: BaseView {
         subtitleLabel.snp.makeConstraints {
             $0.top.equalTo(appIconImageView.snp.bottom).offset(20.adjustedH)
             $0.centerX.equalToSuperview()
+            $0.height.equalTo(17.adjustedH)
         }
         mainTitleLabel.snp.makeConstraints {
             $0.top.equalTo(subtitleLabel.snp.bottom).offset(6.adjustedH)
             $0.centerX.equalToSuperview()
+            $0.height.equalTo(28.adjustedH)
         }
         kakaoLoginButton.snp.makeConstraints {
             $0.top.equalTo(mainTitleLabel.snp.bottom).offset(151.adjustedH)

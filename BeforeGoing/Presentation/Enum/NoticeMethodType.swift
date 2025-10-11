@@ -42,6 +42,11 @@ enum NoticeMethodType: String, CaseIterable {
     var isPush: Bool {
         self == .push
     }
+    
+    func convertIdentifier() -> String {
+        isPush ? NotificationIdentifier.pushNotice.identifier : NotificationIdentifier
+            .callNotice(sequence: .first).identifier
+    }
 }
 
 struct NoticeMethodComponent {

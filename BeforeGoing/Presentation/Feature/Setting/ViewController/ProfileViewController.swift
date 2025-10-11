@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class ProfileViewController: BaseViewController {
+final class ProfileViewController: BaseViewController, NetworkRequestable {
     
     private let rootView = ProfileView()
     private let viewModel: ProfileViewModel
@@ -44,6 +44,16 @@ final class ProfileViewController: BaseViewController {
         rootView.modifyNameButton.addTarget(
             self,
             action: #selector(modifyNameButtonDidTap),
+            for: .touchUpInside
+        )
+        rootView.logoutView.seeMoreButton.addTarget(
+            self,
+            action: #selector(logoutDidTap),
+            for: .touchUpInside
+        )
+        rootView.withdrawView.seeMoreButton.addTarget(
+            self,
+            action: #selector(withdrawDidTap),
             for: .touchUpInside
         )
     }
@@ -118,17 +128,24 @@ extension ProfileViewController {
         return { [weak self] in
             guard let self = self else { return }
             Task {
-                guard let result = try await self.viewModel.action(
-                    input: .logoutButtonDidTap
-                ) as? ProfileViewModel.LogoutOutput else {
-                    return
+                do {
+                    guard let result = try await self.viewModel.action(
+                        input: .logoutButtonDidTap
+                    ) as? ProfileViewModel.LogoutOutput else {
+                        return
+                    }
+                    if result.isSucceedLogout {
+                        let loginViewController = ViewControllerFactory.shared.makeLoginViewController()
+                        ViewControllerUtil.replaceRootViewController(to: loginViewController)
+                        return
+                    }
+                } catch {
+                    if let error = error as? BeforeGoingError,
+                       error == .loginExpired {
+                        self.presentLoginExpired()
+                    }
+                    BeforeGoingLogger.error(BeforeGoingError.logoutFailed)
                 }
-                if result.isSucceedLogout {
-                    let loginViewController = ViewControllerFactory.shared.makeLoginViewController()
-                    ViewControllerUtil.replaceRootViewController(to: loginViewController)
-                    return
-                }
-                BeforeGoingLogger.error(BeforeGoingError.logoutFailed)
             }
         }
     }
@@ -137,18 +154,24 @@ extension ProfileViewController {
         return { [weak self] in
             guard let self = self else { return }
             Task {
-                guard let result = try await self.viewModel.action(
-                    input: .withdrawButtonDidTap
-                ) as? ProfileViewModel.WithdrawOutput else {
-                    return
-                }
-                if result.isSucceedWithdraw {
-                    self.dismiss(animated: false)
-                    
-                    let viewController = ViewControllerFactory.shared.makeLoginViewController()
-                    let navigationController = UINavigationController(rootViewController: viewController)
-                    ViewControllerUtil.replaceRootViewController(to: navigationController)
-                    return
+                do {
+                    guard let result = try await self.viewModel.action(
+                        input: .withdrawButtonDidTap
+                    ) as? ProfileViewModel.WithdrawOutput else {
+                        return
+                    }
+                    if result.isSucceedWithdraw {
+                        self.dismiss(animated: false)
+                        
+                        let viewController = ViewControllerFactory.shared.makeLoginViewController()
+                        let navigationController = UINavigationController(rootViewController: viewController)
+                        ViewControllerUtil.replaceRootViewController(to: navigationController)
+                    }
+                } catch {
+                    if let error = error as? BeforeGoingError,
+                       error == .loginExpired {
+                        self.presentLoginExpired()
+                    }
                 }
             }
         }

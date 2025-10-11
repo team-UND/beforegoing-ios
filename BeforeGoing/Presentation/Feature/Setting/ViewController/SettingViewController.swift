@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class SettingViewController: BaseViewController {
+final class SettingViewController: BaseViewController, NetworkRequestable {
     
     private let rootView = SettingView()
     private let viewModel: SettingViewModel
@@ -37,6 +37,9 @@ final class SettingViewController: BaseViewController {
             case .success(let eventPushAgreed):
                 rootView.settingNoticeView.basicPushNoticeView.updateButtonState(condition: eventPushAgreed)
             case .failure(let error):
+                if error == .loginExpired {
+                    self.presentLoginExpired()
+                }
                 BeforeGoingLogger.error(error)
             }
         }
@@ -91,7 +94,14 @@ extension SettingViewController {
         let isSwitchedOn = rootView.isSwitchedOn
         
         Task {
-            try await viewModel.action(input: .switchButtonDidTap(isSwitchedOn))
+            do {
+                let _ = try await viewModel.action(input: .switchButtonDidTap(isSwitchedOn))
+            } catch {
+                if let error = error as? BeforeGoingError,
+                   error == .loginExpired {
+                    self.presentLoginExpired()
+                }
+            }
         }
     }
     

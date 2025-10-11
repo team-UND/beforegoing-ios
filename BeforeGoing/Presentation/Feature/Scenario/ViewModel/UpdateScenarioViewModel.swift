@@ -41,8 +41,8 @@ final class UpdateScenarioViewModel: ViewModeling {
     
     typealias Output = UpdateScenarioOutput
     
-    struct AddScenarioOutput: UpdateScenarioOutput {
-        let addScenarioResult: ScenarioEntity
+    struct ScenarioOutput: UpdateScenarioOutput {
+        let updateScenarioResult: ScenarioEntity
     }
     
     struct EmptyOutput: UpdateScenarioOutput {}
@@ -76,7 +76,7 @@ final class UpdateScenarioViewModel: ViewModeling {
                     startHour: nil,
                     startMinute: nil
                 )
-                return AddScenarioOutput(addScenarioResult: result)
+                return ScenarioOutput(updateScenarioResult: result)
             } catch {
                 BeforeGoingLogger.error(error)
                 return EmptyOutput()
@@ -111,7 +111,18 @@ final class UpdateScenarioViewModel: ViewModeling {
                     startHour: startHour,
                     startMinute: startMinute
                 )
-                return AddScenarioOutput(addScenarioResult: result)
+                if let date = DateUtil.createDateFromTime(hour: startHour, minute: startMinute) {
+                    let identifier = noticeMethodType.convertIdentifier()
+                    
+                    NotificationManager.shared.pushDailyNotification(
+                        title: "\(scenarioName)",
+                        body: "미션을 수행하러 가볼까요?",
+                        daysOfWeek: daysOfWeek,
+                        date: date,
+                        identifier: identifier
+                    )
+                }
+                return ScenarioOutput(updateScenarioResult: result)
             } catch {
                 BeforeGoingLogger.error(error)
                 return EmptyOutput()

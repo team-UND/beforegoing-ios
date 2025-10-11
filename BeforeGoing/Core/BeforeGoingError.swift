@@ -24,4 +24,5 @@ enum BeforeGoingError: Error, Equatable {
     case badRequestError
     case weatherServiceError
     case unknownError
+    case loginExpired
 }

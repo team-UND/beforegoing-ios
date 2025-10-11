@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class SetNoticeMethodViewController: BaseViewController {
+final class SetNoticeMethodViewController: BaseViewController, NetworkRequestable {
     
     private let rootView = SetNoticeMethodView()
     
@@ -116,6 +116,10 @@ extension SetNoticeMethodViewController {
                 )
                 self.navigationController?.popToRootViewController(animated: false)
             } catch {
+                if let error = error as? BeforeGoingError,
+                   error == .loginExpired {
+                    self.presentLoginExpired()
+                }
                 BeforeGoingLogger.error(error)
             }
         }
@@ -130,6 +134,10 @@ extension SetNoticeMethodViewController {
                 )
                 self.navigationController?.popToRootViewController(animated: false)
             } catch {
+                if let error = error as? BeforeGoingError,
+                   error == .loginExpired {
+                    self.presentLoginExpired()
+                }
                 BeforeGoingLogger.error(error)
             }
         }

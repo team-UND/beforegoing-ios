@@ -5,7 +5,7 @@
 //  Created by APPLE on 10/2/25.
 //
 
-enum DaysOfWeek: Int {
+enum DaysOfWeek: Int, CaseIterable {
     case monday = 0, tuesday, wednesday, thursday, friday, saturday, sunday
     
     var string: String {
