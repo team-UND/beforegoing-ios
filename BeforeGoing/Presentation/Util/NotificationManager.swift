@@ -31,12 +31,15 @@ final class NotificationManager {
             withIdentifiers: daysOfWeek.map { _ in "\(identifier)" }
         )
         
-        let notificationContent = createNotificationContent(title: title, body: body)
+        let notificationContent = createNotificationContent(
+            title: title,
+            body: body,
+            identifier: identifier
+        )
         
         for day in daysOfWeek {
             let triggerComponents = createTriggerComponents(date: date, day: day)
             let trigger = createCalendarTrigger(components: triggerComponents)
-            
             let request = createNotificationRequest(
                 identifier: identifier,
                 notificationContent: notificationContent,
@@ -47,16 +50,46 @@ final class NotificationManager {
         }
     }
     
+    func reserveSnooze(
+        originalContent: UNNotificationContent,
+        identifier: String,
+        delayMinutes: Double
+    ) {
+        guard let notificationIdentifier = NotificationIdentifier.convertIdentifier(from: identifier),
+              let callNoticeIdentifier = notificationIdentifier.nextCallNotice() else {
+            return
+        }
+        
+        let newContent = originalContent.mutableCopy() as! UNMutableNotificationContent
+        let timeInterval = delayMinutes * 60.0
+        let trigger = createIntervalTrigger(timeInterval: timeInterval)
+        let request = createNotificationRequest(
+            identifier: callNoticeIdentifier.identifier,
+            notificationContent: newContent,
+            trigger: trigger
+        )
+        
+        addRequest(request)
+    }
+    
     func removeDeliveredNotification(identifiers: [String]){
         UNUserNotificationCenter
             .current()
             .removeDeliveredNotifications(withIdentifiers: identifiers)
     }
     
-    private func createNotificationContent(title: String, body: String) -> UNMutableNotificationContent {
-        let notificationContent = UNMutableNotificationContent()
-        notificationContent.title = title
-        notificationContent.body = body
+    private func createNotificationContent(
+        title: String,
+        body: String,
+        identifier: String
+    ) -> UNMutableNotificationContent {
+        let notificationContent: UNMutableNotificationContent = {
+            let content = UNMutableNotificationContent()
+            content.title = title
+            content.body = body
+            content.userInfo["identifier"] = identifier
+            return content
+        }()
         
         return notificationContent
     }
@@ -71,10 +104,24 @@ final class NotificationManager {
         UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
     }
     
+    private func createIntervalTrigger(timeInterval: TimeInterval) -> UNTimeIntervalNotificationTrigger {
+        UNTimeIntervalNotificationTrigger(timeInterval: timeInterval, repeats: false)
+    }
+    
     private func createNotificationRequest(
         identifier: String,
         notificationContent: UNMutableNotificationContent,
         trigger: UNCalendarNotificationTrigger
+    ) -> UNNotificationRequest {
+        UNNotificationRequest(identifier: identifier,
+                              content: notificationContent,
+                              trigger: trigger)
+    }
+    
+    private func createNotificationRequest(
+        identifier: String,
+        notificationContent: UNMutableNotificationContent,
+        trigger: UNTimeIntervalNotificationTrigger
     ) -> UNNotificationRequest {
         UNNotificationRequest(identifier: identifier,
                               content: notificationContent,

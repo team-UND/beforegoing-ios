@@ -79,6 +79,50 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification
     ) async -> UNNotificationPresentationOptions {
+        HapticManager.shared.impact()
         return [.banner, .sound, .badge]
+    }
+    
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        let notificationRequest = response.notification.request
+        navigateToScreen(for: notificationRequest)
+        
+        HapticManager.shared.impact()
+        
+        completionHandler()
+    }
+    
+    private func navigateToScreen(for request: UNNotificationRequest) {
+        guard let window = self.window,
+              let rootVC = window.rootViewController,
+              let notificationIdentifier = NotificationIdentifier.convertIdentifier(from: request.identifier) else {
+            return
+        }
+                
+        switch notificationIdentifier {
+        case .pushNotice:
+            guard let bottomVC = rootVC.tabBarController as? BottomNavigationViewController else {
+                return
+            }
+            bottomVC.selectTab(item: .home)
+            
+        case .callNotice(let sequence):
+            ViewControllerUtil.replaceRootViewController(
+                to: NotificationViewController(
+                    notificationViewType: .init(sequence: sequence),
+                    content: request.content,
+                    identifier: notificationIdentifier.identifier
+                )
+            )
+            
+        default:
+            break
+        }
+        
+        HapticManager.shared.impact()
     }
 }
