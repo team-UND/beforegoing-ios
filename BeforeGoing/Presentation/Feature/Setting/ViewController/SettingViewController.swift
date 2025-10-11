@@ -95,7 +95,7 @@ extension SettingViewController {
         
         Task {
             do {
-                try await viewModel.action(input: .switchButtonDidTap(isSwitchedOn))
+                let _ = try await viewModel.action(input: .switchButtonDidTap(isSwitchedOn))
             } catch {
                 if let error = error as? BeforeGoingError,
                    error == .loginExpired {
