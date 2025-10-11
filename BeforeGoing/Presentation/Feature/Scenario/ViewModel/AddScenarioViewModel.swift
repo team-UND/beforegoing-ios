@@ -106,12 +106,14 @@ final class AddScenarioViewModel: ViewModeling {
                 )
                 
                 if let date = DateUtil.createDateFromTime(hour: startHour, minute: startMinute) {
+                    let identifier = noticeMethodType.convertIdentifier()
+                    
                     NotificationManager.shared.pushDailyNotification(
                         title: "\(scenarioName)",
                         body: "미션을 수행하러 가볼까요?",
                         daysOfWeek: daysOfWeek,
                         date: date,
-                        identifier: "PUSH_NOTICE"
+                        identifier: identifier
                     )
                 }
                 return AddScenarioOutput(addScenarioResult: result)
