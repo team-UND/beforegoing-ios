@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class NoticeViewController: BaseViewController {
+final class NoticeViewController: BaseViewController, NetworkRequestable {
     
     private let rootView = NoticeView()
     
@@ -160,9 +160,23 @@ extension NoticeViewController {
         case "저장하기":
             Task {
                 if enterType.isAddScenarioType {
-                    let _ = try await addScenarioViewModel.action(input: .saveButtonInSetNoticeDidTap)
+                    do {
+                        let _ = try await addScenarioViewModel.action(input: .saveButtonInSetNoticeDidTap)
+                    } catch {
+                        if let error = error as? BeforeGoingError,
+                           error == .loginExpired {
+                            self.presentLoginExpired()
+                        }
+                    }
                 } else {
-                    let _ = try await updateScenarioViewModel.action(input: .saveButtonInSetNoticeDidTap)
+                    do {
+                        let _ = try await updateScenarioViewModel.action(input: .saveButtonInSetNoticeDidTap)
+                    } catch {
+                        if let error = error as? BeforeGoingError,
+                           error == .loginExpired {
+                            self.presentLoginExpired()
+                        }
+                    }
                 }
                 self.navigationController?.popToRootViewController(animated: false)
             }
@@ -191,17 +205,24 @@ extension NoticeViewController {
         startMinute: Int?
     ) {
         Task {
-            let _ = try await addScenarioViewModel.action(
-                input: .nextButtonInSetNoticeDidTap(
-                    daysOfWeek: daysOfWeek,
-                    startHour: startHour,
-                    startMinute: startMinute
+            do {
+                let _ = try await addScenarioViewModel.action(
+                    input: .nextButtonInSetNoticeDidTap(
+                        daysOfWeek: daysOfWeek,
+                        startHour: startHour,
+                        startMinute: startMinute
+                    )
                 )
-            )
-            moveSetNoticeMethod(
-                enterType: .addScenario,
-                notificationMethod: notificationMethod
-            )
+                moveSetNoticeMethod(
+                    enterType: .addScenario,
+                    notificationMethod: notificationMethod
+                )
+            } catch {
+                if let error = error as? BeforeGoingError,
+                   error == .loginExpired {
+                    self.presentLoginExpired()
+                }
+            }
         }
     }
     
@@ -211,17 +232,24 @@ extension NoticeViewController {
         startMinute: Int?
     ) {
         Task {
-            let _ = try await updateScenarioViewModel.action(
-                input: .nextButtonInSetNoticeDidTap(
-                    daysOfWeek: daysOfWeek,
-                    startHour: startHour,
-                    startMinute: startMinute
+            do {
+                let _ = try await updateScenarioViewModel.action(
+                    input: .nextButtonInSetNoticeDidTap(
+                        daysOfWeek: daysOfWeek,
+                        startHour: startHour,
+                        startMinute: startMinute
+                    )
                 )
-            )
-            moveSetNoticeMethod(
-                enterType: .updateScenario,
-                notificationMethod: notificationMethod
-            )
+                moveSetNoticeMethod(
+                    enterType: .updateScenario,
+                    notificationMethod: notificationMethod
+                )
+            } catch {
+                if let error = error as? BeforeGoingError,
+                   error == .loginExpired {
+                    self.presentLoginExpired()
+                }
+            }
         }
     }
     

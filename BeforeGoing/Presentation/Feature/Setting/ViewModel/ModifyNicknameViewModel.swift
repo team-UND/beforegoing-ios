@@ -17,8 +17,8 @@ final class ModifyNicknameViewModel: ViewModeling {
         case confirmButtonDidTap(nickname: String)
     }
     
-    enum Output {
-        case updateNicknameResult(Bool)
+    struct Output {
+        let updateNicknameResult: Result<Void, Error>
     }
     
     func action(input: Input) async throws -> Output {
@@ -26,10 +26,10 @@ final class ModifyNicknameViewModel: ViewModeling {
         case .confirmButtonDidTap(let nickname):
             do {
                 try await useCase.execute(nickname: nickname)
-                return .updateNicknameResult(true)
+                return .init(updateNicknameResult: .success(()))
             } catch(let error) {
                 BeforeGoingLogger.error(error)
-                return .updateNicknameResult(false)
+                return .init(updateNicknameResult: .failure(error))
             }
         }
     }

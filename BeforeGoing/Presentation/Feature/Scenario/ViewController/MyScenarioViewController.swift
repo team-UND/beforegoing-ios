@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class MyScenarioViewController: BaseViewController {
+final class MyScenarioViewController: BaseViewController, NetworkRequestable {
     
     private let rootView = ScenarioListView()
     private let getSingleScenarioViewModel: GetSingleScenarioViewModel
@@ -48,9 +48,13 @@ final class MyScenarioViewController: BaseViewController {
                     rootView.replaceScenarioView()
                     rootView.scenarioListTableView.reloadData()
                 case .failure(let error):
-                    if let error = error as? BeforeGoingError,
-                       error == .notFoundError {
-                        rootView.replaceEmptyView()
+                    if let error = error as? BeforeGoingError {
+                        if error == .notFoundError {
+                            rootView.replaceEmptyView()
+                        }
+                        if error == .loginExpired {
+                            self.presentLoginExpired()
+                        }
                     }
                 }
             } catch {
@@ -102,12 +106,19 @@ extension MyScenarioViewController {
     @objc
     private func scenarioListItemCellDidTap(at: Int) {
         Task {
-            let result = try await getSingleScenarioViewModel.action(
-                input: .scenarioListItemCellDidTap(
-                    scenarioID: getScenariosViewModel.getScenarioID(at: at)
+            do {
+                let result = try await getSingleScenarioViewModel.action(
+                    input: .scenarioListItemCellDidTap(
+                        scenarioID: getScenariosViewModel.getScenarioID(at: at)
+                    )
                 )
-            )
-            handleGetScenarioResult(result: result.getScenarioResult)
+                handleGetScenarioResult(result: result.getScenarioResult)
+            } catch {
+                if let error = error as? BeforeGoingError,
+                   error == .loginExpired {
+                    self.presentLoginExpired()
+                }
+            }
         }
     }
     
@@ -220,6 +231,10 @@ extension MyScenarioViewController: UITableViewDataSource {
                     }
                     
                 } catch {
+                    if let error = error as? BeforeGoingError,
+                       error == .loginExpired {
+                        self.presentLoginExpired()
+                    }
                     BeforeGoingLogger.error(error)
                 }
                 completion(true)
@@ -303,14 +318,21 @@ extension MyScenarioViewController: UITableViewDropDelegate {
         let nextOrder = getScenariosViewModel.getNextScenarioOrder(current: section)
         
         Task {
-            let result = try await updateScenarioOrderViewModel.action(
-                input: .scenarioDidDrag(
-                    scenarioID: scenarioID,
-                    prevOrder: prevOrder,
-                    nextOrder: nextOrder
+            do {
+                let result = try await updateScenarioOrderViewModel.action(
+                    input: .scenarioDidDrag(
+                        scenarioID: scenarioID,
+                        prevOrder: prevOrder,
+                        nextOrder: nextOrder
+                    )
                 )
-            )
-            handleUpdateScenarioOrderResult(result: result.updateScenarioOrderResult)
+                handleUpdateScenarioOrderResult(result: result.updateScenarioOrderResult)
+            } catch {
+                if let error = error as? BeforeGoingError,
+                   error == .loginExpired {
+                    self.presentLoginExpired()
+                }
+            }
         }
     }
     

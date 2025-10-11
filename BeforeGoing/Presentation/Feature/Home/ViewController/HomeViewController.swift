@@ -55,6 +55,10 @@ final class HomeViewController: BaseViewController {
                 self.homeDate = result.date
                 rootView.headerView.updateDateUI(date: result.date)
             } catch {
+                if let error = error as? BeforeGoingError,
+                   error == .loginExpired {
+                    self.presentLoginExpired()
+                }
                 BeforeGoingLogger.error(error)
             }
         }
@@ -262,6 +266,10 @@ extension HomeViewController {
             case .success:
                 rootView.modalView.listTableView.reloadData()
             case .failure(let error):
+                if let error = error as? BeforeGoingError,
+                   error == .loginExpired {
+                    self.presentLoginExpired()
+                }
                 BeforeGoingLogger.error(error)
             }
         }
@@ -293,6 +301,10 @@ extension HomeViewController {
                 getScenariosViewModel.updatePointer(to: tag)
                 rootView.modalView.listTableView.reloadData()
             case .failure(let error):
+                if let error = error as? BeforeGoingError,
+                   error == .loginExpired {
+                    self.presentLoginExpired()
+                }
                 BeforeGoingLogger.error(error)
             }
         }
@@ -311,7 +323,7 @@ extension HomeViewController {
     }
 }
 
-extension HomeViewController: CLLocationManagerDelegate {
+extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.first {
@@ -328,6 +340,10 @@ extension HomeViewController: CLLocationManagerDelegate {
                     self.rootView.headerView.updateWeatherUI(weather: result.weatherResult)
                     manager.stopUpdatingLocation()
                 } catch (let error) {
+                    if let error = error as? BeforeGoingError,
+                       error == .loginExpired {
+                        self.presentLoginExpired()
+                    }
                     BeforeGoingLogger.error(error)
                     BeforeGoingLogger.error(BeforeGoingError.requestWeatherFailed)
                 }
@@ -389,13 +405,20 @@ extension HomeViewController: UITableViewDataSource {
             let missionID = self.homeViewModel.getMissionID(at: indexPath.section)
             
             Task {
-                let _ = try await self.homeViewModel.action(
-                    input: .missionChecked(
-                        missionID: missionID,
-                        date: homeDate
+                do {
+                    let _ = try await self.homeViewModel.action(
+                        input: .missionChecked(
+                            missionID: missionID,
+                            date: homeDate
+                        )
                     )
-                )
-                tableView.reloadData()
+                    tableView.reloadData()
+                } catch {
+                    if let error = error as? BeforeGoingError,
+                       error == .loginExpired {
+                        self.presentLoginExpired()
+                    }
+                }
             }
         }
         return cell
@@ -440,6 +463,10 @@ extension HomeViewController: UITableViewDataSource {
                 case .success:
                     tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
                 case .failure(let error):
+                    if let error = error as? BeforeGoingError,
+                       error == .loginExpired {
+                        self?.presentLoginExpired()
+                    }
                     BeforeGoingLogger.error(error)
                 }
             }

@@ -51,7 +51,7 @@ extension ModifyNameViewController: Backable {
     }
 }
 
-extension ModifyNameViewController {
+extension ModifyNameViewController: NetworkRequestable {
     
     @objc
     private func nameTextFieldDidChange() {
@@ -76,11 +76,13 @@ extension ModifyNameViewController {
         }
         Task {
             let result = try await viewModel.action(input: .confirmButtonDidTap(nickname: nickname))
-            switch result {
-            case .updateNicknameResult(let isSucceedUpdateNickname):
-                if isSucceedUpdateNickname {
-                    self.navigationController?.popViewController(animated: true)
-                    return
+            switch result.updateNicknameResult {
+            case .success:
+                self.navigationController?.popViewController(animated: true)
+            case .failure(let error):
+                if let error = error as? BeforeGoingError,
+                   error == .loginExpired {
+                    self.presentLoginExpired()
                 }
                 BeforeGoingLogger.error(BeforeGoingError.updateNicknameFailed)
             }
