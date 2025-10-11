@@ -46,20 +46,6 @@
 			);
 			target = 186E06DA2DDDF10500E32490 /* BeforeGoing */;
 		};
-		18A2D9742E7E317C0034D7B9 /* Exceptions for "BeforeGoing" folder in "BeforeGoingTests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Data/Config.xcconfig,
-			);
-			target = 186E06F02DDDF10600E32490 /* BeforeGoingTests */;
-		};
-		18A2D9752E7E317C0034D7B9 /* Exceptions for "BeforeGoing" folder in "BeforeGoingUITests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Data/Config.xcconfig,
-			);
-			target = 186E06FA2DDDF10600E32490 /* BeforeGoingUITests */;
-		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -67,8 +53,6 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				186E07032DDDF10600E32490 /* Exceptions for "BeforeGoing" folder in "BeforeGoing" target */,
-				18A2D9742E7E317C0034D7B9 /* Exceptions for "BeforeGoing" folder in "BeforeGoingTests" target */,
-				18A2D9752E7E317C0034D7B9 /* Exceptions for "BeforeGoing" folder in "BeforeGoingUITests" target */,
 			);
 			path = BeforeGoing;
 			sourceTree = "<group>";
