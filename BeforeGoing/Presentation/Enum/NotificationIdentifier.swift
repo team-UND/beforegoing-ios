@@ -38,14 +38,16 @@ enum NotificationIdentifier: CaseIterable {
     }
     
     static func convertIdentifier(from identifier: String) -> Self? {
-        Self.allCases.first { $0.identifier == identifier }
+        Self.allCases.first(where: { identifier.hasPrefix($0.identifier) })
     }
     
-    func nextCallNotice() -> Self? {
+    func nextCallNotice(text: String) -> String? {
         guard case .callNotice(let sequence) = self,
               let newSequence = sequence.next() else {
             return nil
         }
-        return .callNotice(sequence: newSequence)
+        let prefix = Self.callNotice(sequence: newSequence).identifier
+        let suffix = text.dropFirst(prefix.count)
+        return prefix + suffix
     }
 }

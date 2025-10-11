@@ -27,9 +27,8 @@ final class NotificationManager {
         date: Date,
         identifier: String
     ) {
-        UNUserNotificationCenter.current().removePendingNotificationRequests(
-            withIdentifiers: daysOfWeek.map { _ in "\(identifier)" }
-        )
+        let identifiersToRemove = (0...6).map { "\(identifier)_\($0)" }
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiersToRemove)
         
         let notificationContent = createNotificationContent(
             title: title,
@@ -38,10 +37,11 @@ final class NotificationManager {
         )
         
         for day in daysOfWeek {
+            let requestIdentifier = "\(identifier)_\(day)"
             let triggerComponents = createTriggerComponents(date: date, day: day)
             let trigger = createCalendarTrigger(components: triggerComponents)
             let request = createNotificationRequest(
-                identifier: identifier,
+                identifier: requestIdentifier,
                 notificationContent: notificationContent,
                 trigger: trigger
             )
@@ -56,7 +56,7 @@ final class NotificationManager {
         delayMinutes: Double
     ) {
         guard let notificationIdentifier = NotificationIdentifier.convertIdentifier(from: identifier),
-              let callNoticeIdentifier = notificationIdentifier.nextCallNotice() else {
+              let callNoticeIdentifier = notificationIdentifier.nextCallNotice(text: identifier) else {
             return
         }
         
@@ -64,7 +64,7 @@ final class NotificationManager {
         let timeInterval = delayMinutes * 60.0
         let trigger = createIntervalTrigger(timeInterval: timeInterval)
         let request = createNotificationRequest(
-            identifier: callNoticeIdentifier.identifier,
+            identifier: callNoticeIdentifier,
             notificationContent: newContent,
             trigger: trigger
         )
