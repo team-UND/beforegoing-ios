@@ -46,6 +46,16 @@ final class ProfileViewController: BaseViewController, NetworkRequestable {
             action: #selector(modifyNameButtonDidTap),
             for: .touchUpInside
         )
+        rootView.logoutView.seeMoreButton.addTarget(
+            self,
+            action: #selector(logoutDidTap),
+            for: .touchUpInside
+        )
+        rootView.withdrawView.seeMoreButton.addTarget(
+            self,
+            action: #selector(withdrawDidTap),
+            for: .touchUpInside
+        )
     }
     
     private func setGesture() {
