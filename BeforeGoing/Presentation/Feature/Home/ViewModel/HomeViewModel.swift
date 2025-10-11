@@ -222,9 +222,9 @@ final class HomeViewModel: ViewModeling {
             $0.append(administrativeArea)
             $0.append(NSAttributedString(string: "는 지금 "))
             $0.append(weatherInformation)
-            $0.append(NSAttributedString(string: "\n"))
             
             if !supplies.string.isEmpty {
+                $0.append(NSAttributedString(string: "\n"))
                 $0.append(supplies)
                 $0.append(NSAttributedString(string: " 챙겨보세요!"))
             }
