@@ -121,8 +121,6 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
             
         default:
             break
-        }
-        
-        HapticManager.shared.impact()
+        }        
     }
 }
