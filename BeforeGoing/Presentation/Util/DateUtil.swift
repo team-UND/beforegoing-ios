@@ -76,10 +76,6 @@ struct DateUtil {
         var calendar = Calendar.current
         calendar.timeZone = TimeZone.current
 
-        let year = calendar.component(.year, from: date)
-        let month = calendar.component(.month, from: date)
-        let day = calendar.component(.day, from: date)
-
         var dateComponents = DateComponents()
         dateComponents.hour = hour
         dateComponents.minute = minute
