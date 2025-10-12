@@ -46,20 +46,6 @@
 			);
 			target = 186E06DA2DDDF10500E32490 /* BeforeGoing */;
 		};
-		18A2D9742E7E317C0034D7B9 /* Exceptions for "BeforeGoing" folder in "BeforeGoingTests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Data/Config.xcconfig,
-			);
-			target = 186E06F02DDDF10600E32490 /* BeforeGoingTests */;
-		};
-		18A2D9752E7E317C0034D7B9 /* Exceptions for "BeforeGoing" folder in "BeforeGoingUITests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Data/Config.xcconfig,
-			);
-			target = 186E06FA2DDDF10600E32490 /* BeforeGoingUITests */;
-		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -67,8 +53,6 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				186E07032DDDF10600E32490 /* Exceptions for "BeforeGoing" folder in "BeforeGoing" target */,
-				18A2D9742E7E317C0034D7B9 /* Exceptions for "BeforeGoing" folder in "BeforeGoingTests" target */,
-				18A2D9752E7E317C0034D7B9 /* Exceptions for "BeforeGoing" folder in "BeforeGoingUITests" target */,
 			);
 			path = BeforeGoing;
 			sourceTree = "<group>";
@@ -333,6 +317,8 @@
 /* Begin XCBuildConfiguration section */
 		186E07052DDDF10600E32490 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 186E06DD2DDDF10500E32490 /* BeforeGoing */;
+			baseConfigurationReferenceRelativePath = Data/Config.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -369,6 +355,8 @@
 		};
 		186E07062DDDF10600E32490 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 186E06DD2DDDF10500E32490 /* BeforeGoing */;
+			baseConfigurationReferenceRelativePath = Data/Config.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -528,6 +516,8 @@
 		};
 		186E070A2DDDF10600E32490 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 186E06DD2DDDF10500E32490 /* BeforeGoing */;
+			baseConfigurationReferenceRelativePath = Data/Config.xcconfig;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -549,6 +539,8 @@
 		};
 		186E070B2DDDF10600E32490 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 186E06DD2DDDF10500E32490 /* BeforeGoing */;
+			baseConfigurationReferenceRelativePath = Data/Config.xcconfig;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -570,6 +562,8 @@
 		};
 		186E070D2DDDF10600E32490 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 186E06DD2DDDF10500E32490 /* BeforeGoing */;
+			baseConfigurationReferenceRelativePath = Data/Config.xcconfig;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -589,6 +583,8 @@
 		};
 		186E070E2DDDF10600E32490 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 186E06DD2DDDF10500E32490 /* BeforeGoing */;
+			baseConfigurationReferenceRelativePath = Data/Config.xcconfig;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
