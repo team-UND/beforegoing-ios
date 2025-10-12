@@ -62,6 +62,11 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan github.com >> ~/.ssh/known_hosts
 
+      - name: Generate Config Files
+        run: |
+          echo "BASE_URL = ${{ secrets.BASE_URL }}" > BeforeGoing/Data/Config.xcconfig
+          cat BeforeGoing/Data/Config.xcconfig
+
       - name: Run Fastlane
         run: bundle exec fastlane beta
 
