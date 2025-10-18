@@ -8,7 +8,7 @@
 struct AgreeComponent {
     
     var checkBox: CheckBox = CheckBox()
-    let text: String
+    let text: AgreeItemLiteral
     let isNecessary: Bool
     let canMoveToSetting: Bool
 }
