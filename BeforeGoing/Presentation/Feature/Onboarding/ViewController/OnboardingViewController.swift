@@ -34,7 +34,7 @@ extension OnboardingViewController {
     private func bottomButtonDidTap() {
         let updateResult = rootView.updateUI()
         if !updateResult {
-            let viewController = BottomNavigationViewController()
+            let viewController = ViewControllerFactory.shared.makeAlarmAuthorizationViewController()
             viewController.navigationItem.hidesBackButton = true
             self.navigationController?.pushViewController(viewController, animated: false)
         }

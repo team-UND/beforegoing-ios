@@ -158,34 +158,9 @@ final class HomeViewController: BaseViewController {
     private func setLocationManager() {
         locationManager.do {
             $0.delegate = self
-            $0.desiredAccuracy = kCLLocationAccuracyBest
-            checkLocationAuthorizationStatus()
+            $0.requestWhenInUseAuthorization()
+            checkStatus()
         }
-    }
-    
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        let status = manager.authorizationStatus
-        if status == .authorizedWhenInUse || status == .authorizedAlways,
-           CLLocationManager.locationServicesEnabled() {
-            manager.requestLocation()
-        }
-    }
-    
-    private func checkLocationAuthorizationStatus() {
-        switch locationManager.authorizationStatus {
-        case .notDetermined:
-            locationManager.requestAlwaysAuthorization()
-        case .authorizedWhenInUse, .authorizedAlways:
-            locationManager.requestLocation()
-        case .restricted, .denied:
-            handleLocationAccessDenied()
-        @unknown default:
-            break
-        }
-    }
-    
-    private func handleLocationAccessDenied() {
-        BeforeGoingLogger.error(BeforeGoingError.weatherServiceError)
     }
 }
 
@@ -325,6 +300,21 @@ extension HomeViewController {
 
 extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable {
     
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        let status = manager.authorizationStatus
+        
+        switch status {
+        case .authorizedAlways, .authorizedWhenInUse:
+            locationManager.requestLocation()
+        case .restricted, .denied:
+            break
+        case .notDetermined:
+            break
+        @unknown default:
+            break
+        }
+    }
+    
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.first {
             let latitude = location.coordinate.latitude
@@ -353,6 +343,13 @@ extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable {
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
         BeforeGoingLogger.error(error)
+    }
+    
+    private func checkStatus() {
+        let status = locationManager.authorizationStatus
+        if status == .authorizedAlways || status == .authorizedWhenInUse {
+            locationManager.requestLocation()
+        }
     }
 }
 

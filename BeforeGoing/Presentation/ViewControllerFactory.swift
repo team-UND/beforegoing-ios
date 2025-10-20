@@ -98,6 +98,14 @@ final class ViewControllerFactory {
             updateScenarioViewModel: updateScenarioViewModel
         )
     }
+    
+    func makeAlarmAuthorizationViewController() -> AlarmAuthorizationViewController {
+        return .init()
+    }
+    
+    func makeLocationAuthorizationViewController() -> LocationAuthorizationViewController {
+        return .init()
+    }
 }
 
 extension ViewControllerFactory {

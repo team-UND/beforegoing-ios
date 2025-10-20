@@ -30,8 +30,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         self.window = window
         
         UNUserNotificationCenter.current().delegate = self
-        
-        NotificationManager.shared.setPermission()
     }
     
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {

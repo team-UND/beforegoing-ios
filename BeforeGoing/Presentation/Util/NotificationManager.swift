@@ -12,12 +12,13 @@ final class NotificationManager {
     static let shared = NotificationManager()
     private init() {}
     
-    func setPermission() {
+    func setPermission(completion: @escaping () -> Void) {
         let authOptions: UNAuthorizationOptions = [.alert, .sound, .badge]
-        UNUserNotificationCenter.current().requestAuthorization(
-            options: authOptions,
-            completionHandler: { _, _ in }
-        )
+        UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { _, _ in
+            DispatchQueue.main.async {
+                completion()
+            }
+        }
     }
     
     func pushDailyNotification(
