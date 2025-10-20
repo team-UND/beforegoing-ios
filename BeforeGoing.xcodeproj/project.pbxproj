@@ -516,8 +516,6 @@
 		};
 		186E070A2DDDF10600E32490 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 186E06DD2DDDF10500E32490 /* BeforeGoing */;
-			baseConfigurationReferenceRelativePath = Data/Config.xcconfig;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -539,8 +537,6 @@
 		};
 		186E070B2DDDF10600E32490 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 186E06DD2DDDF10500E32490 /* BeforeGoing */;
-			baseConfigurationReferenceRelativePath = Data/Config.xcconfig;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -562,8 +558,6 @@
 		};
 		186E070D2DDDF10600E32490 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 186E06DD2DDDF10500E32490 /* BeforeGoing */;
-			baseConfigurationReferenceRelativePath = Data/Config.xcconfig;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -583,8 +577,6 @@
 		};
 		186E070E2DDDF10600E32490 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 186E06DD2DDDF10500E32490 /* BeforeGoing */;
-			baseConfigurationReferenceRelativePath = Data/Config.xcconfig;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;

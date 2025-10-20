@@ -64,9 +64,9 @@ extension OnboardingContentView {
     
     private func setLayout(step: OnboardingStep) {
         switch step {
-        case .first, .end:
+        case .first:
             titleLabel.snp.remakeConstraints {
-                $0.top.equalToSuperview()
+                $0.top.equalToSuperview().inset(50.adjustedH)
                 $0.centerX.equalToSuperview()
             }
             descriptionLabel.snp.remakeConstraints {
@@ -94,6 +94,20 @@ extension OnboardingContentView {
                 $0.centerX.equalToSuperview()
                 $0.width.equalTo(322.adjustedW)
                 $0.height.equalTo(596.adjustedH)
+            }
+        case .end:
+            titleLabel.snp.remakeConstraints {
+                $0.top.equalToSuperview()
+                $0.centerX.equalToSuperview()
+            }
+            descriptionLabel.snp.remakeConstraints {
+                $0.top.equalTo(titleLabel.snp.bottom).offset(8.adjustedH)
+                $0.centerX.equalToSuperview()
+            }
+            imageView.snp.remakeConstraints {
+                $0.top.equalTo(descriptionLabel.snp.bottom).offset(94.adjustedH)
+                $0.centerX.equalToSuperview()
+                $0.size.equalTo(260.adjustedH)
             }
         }
     }

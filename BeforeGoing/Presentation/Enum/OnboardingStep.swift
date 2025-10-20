@@ -21,7 +21,7 @@ enum OnboardingStep: Int, CaseIterable {
             title: self.title,
             description: self.description,
             image: self.image,
-            buttonTitle: self.buttonTitle
+            bottomButton: self.bottomButton
         )
     }
     
@@ -58,10 +58,12 @@ enum OnboardingStep: Int, CaseIterable {
         }
     }
     
-    private var buttonTitle: String {
+    private var bottomButton: CustomButton? {
         switch self {
-        case .end: "시작하기"
-        default: "다음"
+        case .end:
+            return CustomButton(state: .enableLongButton, title: "시작하기")
+        default:
+            return nil
         }
     }
 }

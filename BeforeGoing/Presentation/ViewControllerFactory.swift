@@ -10,11 +10,6 @@ final class ViewControllerFactory {
     static let shared = ViewControllerFactory()
     private init() {}
     
-    func makeSplashViewController() -> SplashViewController {
-        let viewModel = resolveViewModel(SplashViewModel.self)
-        return .init(viewModel: viewModel)
-    }
-    
     func makeLoginViewController() -> LoginViewController {
         let viewModel = resolveViewModel(LoginViewModel.self)
         return .init(viewModel: viewModel)
@@ -97,6 +92,14 @@ final class ViewControllerFactory {
             addScenarioViewModel: addScenarioViewModel,
             updateScenarioViewModel: updateScenarioViewModel
         )
+    }
+    
+    func makeAlarmAuthorizationViewController() -> AlarmAuthorizationViewController {
+        return .init()
+    }
+    
+    func makeLocationAuthorizationViewController() -> LocationAuthorizationViewController {
+        return .init()
     }
 }
 

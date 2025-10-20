@@ -118,11 +118,17 @@ extension AgreeTermsViewController: UITableViewDataSource {
             item: item,
             checkBoxState: viewModel.getState(item: item)
         )
-        cell.onDidTap = { [weak self] checkBoxState in
+        cell.onCheckBoxDidTap = { [weak self] checkBoxState in
             guard let self = self else { return }
             self.viewModel.toggleItem(item: item, checkBoxState: checkBoxState)
             updateAgreementButtonState()
             updateCheckBoxState()
+        }
+        cell.onTermDidTap = {
+            ExternalLink.term.openURL(for: self)
+        }
+        cell.onPrivacyDidTap = {
+            ExternalLink.privacy.openURL(for: self)
         }
         
         return cell
