@@ -11,19 +11,29 @@ import AuthenticationServices
 
 final class LoginViewModel: NSObject, ViewModeling {
     
+    private let autoLoginUseCase: AutoLoginType
     private let loginUseCase: LoginType
     var onAppleLoginPerformed: ((Bool) -> Void)?
     
-    init(loginUseCase: LoginType) {
+    init(
+        autoLoginUseCase: AutoLoginType,
+        loginUseCase: LoginType
+    ) {
+        self.autoLoginUseCase = autoLoginUseCase
         self.loginUseCase = loginUseCase
     }
     
     enum Input {
+        case viewDidLoad
         case kakaoLoginDidTap
         case appleLoginDidTap
     }
     
     typealias Output = LoginOutput
+    
+    struct AutoLoginOutput: LoginOutput {
+        let isSucceed: Bool
+    }
     
     struct SocialLoginOutput: LoginOutput  {
         let isRegisteredMember: Bool
@@ -33,6 +43,10 @@ final class LoginViewModel: NSObject, ViewModeling {
     
     func action(input: Input) async throws -> Output {
         switch input {
+        case .viewDidLoad:
+            let isSucceedAutoLogin = try await autoLoginUseCase.execute()
+            return AutoLoginOutput(isSucceed: isSucceedAutoLogin)
+            
         case .kakaoLoginDidTap:
             let isRegisteredMember = try await loginUseCase.login(provider: .kakao)
             return SocialLoginOutput(isRegisteredMember: isRegisteredMember)

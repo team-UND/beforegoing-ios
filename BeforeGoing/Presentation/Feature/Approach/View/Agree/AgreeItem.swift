@@ -16,25 +16,25 @@ enum AgreeItem: CaseIterable {
         switch self {
         case .isTermsOfServiceAgreed:
             return AgreeComponent(
-                text: AgreeItemLiteral.termsOfServiceAgreed.rawValue,
+                text: AgreeItemLiteral.termsOfServiceAgreed,
                 isNecessary: true,
                 canMoveToSetting: true
             )
         case .isPrivacyPolicyAgreed:
             return AgreeComponent(
-                text: AgreeItemLiteral.privacyPolicyAgreed.rawValue,
+                text: AgreeItemLiteral.privacyPolicyAgreed,
                 isNecessary: true,
                 canMoveToSetting: true
             )
         case .isOverFourteen:
             return AgreeComponent(
-                text: AgreeItemLiteral.overFourteen.rawValue,
+                text: AgreeItemLiteral.overFourteen,
                 isNecessary: true,
                 canMoveToSetting: false
             )
         case .isPushAgreed:
             return AgreeComponent(
-                text: AgreeItemLiteral.pushAgreed.rawValue,
+                text: AgreeItemLiteral.pushAgreed,
                 isNecessary: false,
                 canMoveToSetting: false
             )

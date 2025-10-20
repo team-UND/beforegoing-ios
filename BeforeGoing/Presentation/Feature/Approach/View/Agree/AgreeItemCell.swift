@@ -12,9 +12,11 @@ final class AgreeItemCell: UITableViewCell {
     private let checkBox = CheckBox()
     private let titleLabel = UILabel()
     private let isNecessaryLabel = UILabel()
-    private let goToSettingButton = UIButton()
+    private(set) var goToSettingButton = UIButton()
     
-    var onDidTap: ((CheckBoxState) -> Void)?
+    var onCheckBoxDidTap: ((CheckBoxState) -> Void)?
+    var onTermDidTap: (() -> Void)?
+    var onPrivacyDidTap: (() -> Void)?
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -100,7 +102,7 @@ extension AgreeItemCell {
     private func bindData(item: AgreeItem) {
         let component = item.component
         
-        titleLabel.text = component.text
+        titleLabel.text = component.text.rawValue
         if component.isNecessary {
             isNecessaryLabel.do {
                 $0.text = "(필수)"
@@ -115,6 +117,23 @@ extension AgreeItemCell {
         if component.canMoveToSetting {
             goToSettingButton.isHidden = false
         }
+        
+        switch component.text {
+        case .termsOfServiceAgreed:
+            goToSettingButton.addTarget(
+                self,
+                action: #selector(termsOfServiceDidTap),
+                for: .touchUpInside
+            )
+        case .privacyPolicyAgreed:
+            goToSettingButton.addTarget(
+                self,
+                action: #selector(privacyDidTap),
+                for: .touchUpInside
+            )
+        default:
+            break
+        }
     }
     
     private func bindCheckBox(state: CheckBoxState) {
@@ -126,6 +145,16 @@ extension AgreeItemCell {
     
     @objc
     private func checkBoxDidTap() {
-        onDidTap?(checkBox.toggle())
+        onCheckBoxDidTap?(checkBox.toggle())
+    }
+    
+    @objc
+    private func termsOfServiceDidTap() {
+        onTermDidTap?()
+    }
+    
+    @objc
+    private func privacyDidTap() {
+        onPrivacyDidTap?()
     }
 }

@@ -117,8 +117,12 @@ struct PresentationDependencyAssembler: DependencyAssembler {
         }
         
         DIContainer.shared.register(AgreeItemViewModel(useCase: agreeTermsUseCase))
-        DIContainer.shared.register(LoginViewModel(loginUseCase: loginUseCase))
-        DIContainer.shared.register(SplashViewModel(useCase: autoLoginUseCase))
+        DIContainer.shared.register(
+            LoginViewModel(
+                autoLoginUseCase: autoLoginUseCase,
+                loginUseCase: loginUseCase
+            )
+        )
         DIContainer.shared.register(
             HomeViewModel(
                 weatherUseCase: requestWeatherUseCase,

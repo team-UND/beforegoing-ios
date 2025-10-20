@@ -10,7 +10,7 @@ import UIKit
 
 final class LoginViewController: BaseViewController {
     
-    private let rootView = LoginView()
+    private(set) var rootView = LoginView()
     private let viewModel: LoginViewModel
     
     init(viewModel: LoginViewModel) {
@@ -28,13 +28,43 @@ final class LoginViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        rootView.startAnimating()
+        
+        Task {
+            do {
+                if let output = try await viewModel.action(input: .viewDidLoad) as? LoginViewModel.AutoLoginOutput,
+                   output.isSucceed {
+                    moveHome()
+                }
+            } catch {
+                BeforeGoingLogger.error(BeforeGoingError.autoLoginFailed)
+            }
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        setAnimation()
     }
     
     override func setAction() {
         rootView.do {
             $0.kakaoLoginButton.addTarget(self, action: #selector(kakaoLoginButtonDidTap), for: .touchUpInside)
             $0.appleLoginButton.addTarget(self, action: #selector(appleLoginButtonDidTap), for: .touchUpInside)
+        }
+    }
+    
+    private func setAnimation() {
+        DispatchQueue.main.async {
+            UIView.animate(withDuration: 0.5, delay: 1.5, options: [.curveEaseOut]) {
+                self.rootView.do {
+                    $0.appIconTopConstraint?.update(inset: 230.adjustedH)
+                    $0.kakaoLoginTopConstraint?.update(offset: 151.adjustedH)
+                    
+                    $0.kakaoLoginButton.alpha = 1
+                    $0.appleLoginButton.alpha = 1
+                    $0.layoutIfNeeded()
+                }
+            }
         }
     }
 }
