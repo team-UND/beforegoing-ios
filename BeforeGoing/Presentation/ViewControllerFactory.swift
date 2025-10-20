@@ -10,11 +10,6 @@ final class ViewControllerFactory {
     static let shared = ViewControllerFactory()
     private init() {}
     
-    func makeSplashViewController() -> SplashViewController {
-        let viewModel = resolveViewModel(SplashViewModel.self)
-        return .init(viewModel: viewModel)
-    }
-    
     func makeLoginViewController() -> LoginViewController {
         let viewModel = resolveViewModel(LoginViewModel.self)
         return .init(viewModel: viewModel)

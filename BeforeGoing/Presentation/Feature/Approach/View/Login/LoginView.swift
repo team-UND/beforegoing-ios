@@ -7,27 +7,28 @@
 
 import SnapKit
 
+import Lottie
 import UIKit
 
 final class LoginView: BaseView {
     
     private let backgrounImageView = UIImageView()
-    private let appIconImageView = UIImageView()
+    private let appIconImageView = LottieAnimationView(name: "splashMotion")
     private let subtitleLabel = UILabel()
-    private let mainTitleLabel = UILabel()
+    private(set) var mainTitleLabel = UILabel()
     private(set) var kakaoLoginButton = UIButton()
     private(set) var appleLoginButton = UIButton()
-    private var buttonConfiguration = UIButton.Configuration.plain()
     
-    private var iconTopConstraint: Constraint?
-    
+    private(set) var appIconTopConstraint: Constraint?
+    private(set) var kakaoLoginTopConstraint: Constraint?
+        
     override func setStyle() {
         backgrounImageView.do {
             $0.image = .bgSplash
         }
         appIconImageView.do {
-            $0.image = .character
-            $0.contentMode = .scaleAspectFit
+            $0.play()
+            $0.loopMode = .loop
         }
         subtitleLabel.do {
             $0.text = ApproachLiteral.subtitle.rawValue
@@ -39,15 +40,12 @@ final class LoginView: BaseView {
             $0.makeStrokeTextAttributes()
             $0.textAlignment = .center
         }
-        buttonConfiguration.background.backgroundColor = .clear
         kakaoLoginButton.do {
             $0.setImage(.kakaoLogin, for: .normal)
-            $0.configuration = buttonConfiguration
             $0.alpha = 0
         }
         appleLoginButton.do {
             $0.setImage(.appleLogin, for: .normal)
-            $0.configuration = buttonConfiguration
             $0.alpha = 0
         }
     }
@@ -68,7 +66,7 @@ final class LoginView: BaseView {
             $0.edges.equalToSuperview()
         }
         appIconImageView.snp.makeConstraints {
-            self.iconTopConstraint = $0.top.equalToSuperview().inset(311.adjustedH).constraint
+            self.appIconTopConstraint = $0.top.equalToSuperview().inset(296.adjustedH).constraint
             $0.centerX.equalToSuperview()
             $0.width.equalTo(180.adjustedW)
             $0.height.equalTo(150.adjustedH)
@@ -84,7 +82,7 @@ final class LoginView: BaseView {
             $0.height.equalTo(28.adjustedH)
         }
         kakaoLoginButton.snp.makeConstraints {
-            $0.top.equalTo(mainTitleLabel.snp.bottom).offset(151.adjustedH)
+            self.kakaoLoginTopConstraint = $0.top.equalTo(mainTitleLabel.snp.bottom).offset(85.adjustedH).constraint
             $0.leading.trailing.equalToSuperview().inset(20.adjustedW)
             $0.height.equalTo(54.adjustedH)
         }
@@ -93,20 +91,6 @@ final class LoginView: BaseView {
             $0.leading.trailing.equalToSuperview().inset(20.adjustedW)
             $0.bottom.equalToSuperview().inset(120.adjustedH)
             $0.height.equalTo(54.adjustedH)
-        }
-    }
-}
-
-extension LoginView {
-    
-    func startAnimating() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            UIView.animate(withDuration: 0.6, delay: 0, options: [.curveEaseOut]) {
-                self.iconTopConstraint?.update(inset: 200.adjustedH)
-                self.appleLoginButton.alpha = 1
-                self.kakaoLoginButton.alpha = 1
-                self.layoutIfNeeded()
-            }
         }
     }
 }
