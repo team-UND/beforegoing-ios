@@ -9,6 +9,9 @@ env:
   SCHEME_NAME: ${{ vars.SCHEME_NAME }}
   APP_IDENTIFIER: ${{ vars.APP_IDENTIFIER }}
 
+  BASE_URL: ${{ secrets.BASE_URL }}
+  KAKAO_NATIVE_APP_KEY: ${{ secrets.KAKAO_NATIVE_APP_KEY }}
+
   APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
   APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
   APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
@@ -64,7 +67,9 @@ jobs:
 
       - name: Generate Config Files
         run: |
-          echo "BASE_URL = ${{ secrets.BASE_URL }}" > BeforeGoing/Data/Config.xcconfig
+          echo "BASE_URL = ${{ env.BASE_URL }}" > BeforeGoing/Data/Config.xcconfig
+          echo "KAKAO_NATIVE_APP_KEY = ${{ env.KAKAO_NATIVE_APP_KEY }}" >> BeforeGoing/Data/Config.xcconfig
+          echo "Generated Config.xcconfig:"
           cat BeforeGoing/Data/Config.xcconfig
 
       - name: Run Fastlane
