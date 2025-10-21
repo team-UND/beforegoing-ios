@@ -65,6 +65,8 @@ jobs:
       - name: Generate Config Files
         run: |
           echo "BASE_URL = ${{ secrets.BASE_URL }}" > BeforeGoing/Data/Config.xcconfig
+          echo "KAKAO_NATIVE_APP_KEY = ${{ secrets.KAKAO_NATIVE_APP_KEY }}" >> BeforeGoing/Data/Config.xcconfig
+          echo "Generated Config.xcconfig:"
           cat BeforeGoing/Data/Config.xcconfig
 
       - name: Run Fastlane
