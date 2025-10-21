@@ -73,11 +73,11 @@ struct BeforeGoingLogger {
     
         switch level {
         case .network:
-            logger.log("[🛜 Network] [Date: \(date, privacy: .public)] [\(fileName, privacy: .public) -> \(function, privacy: .public)]: \(logMessage, privacy: .public)")
+            logger.log("[🛜 Network] [Date: \(date)] [\(fileName) -> \(function)]: \(logMessage)")
         case .data:
-            logger.info("[📊 Data] [Date: \(date, privacy: .public)] [\(fileName, privacy: .public) -> \(function, privacy: .public)]: \(logMessage, privacy: .public)")
+            logger.info("[📊 Data] [Date: \(date)] [\(fileName) -> \(function)]: \(logMessage)")
         case .error(let error):
-            logger.error("[❌ Error] [Date: \(date, privacy: .public)] [\(fileName, privacy: .public) -> \(function, privacy: .public)]: \(error.localizedDescription, privacy: .public)")
+            logger.error("[❌ Error] [Date: \(date)] [\(fileName) -> \(function)]: \(error.localizedDescription)")
         }
     }
     
