@@ -49,3 +49,6 @@ report.junit
 # Other
 *.swp
 *.xcuserstate
+
+# Config files with sensitive data
+Config.xcconfig
