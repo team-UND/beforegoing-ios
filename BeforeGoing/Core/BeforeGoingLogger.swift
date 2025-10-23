@@ -77,7 +77,7 @@ struct BeforeGoingLogger {
         case .data:
             logger.info("[📊 Data] [Date: \(date)] [\(fileName, privacy: .public) -> \(function, privacy: .public)]: \(logMessage, privacy: .public)")
         case .error(let error):
-            logger.error("[❌ Error] [Date: \(date)] [\(fileName, privacy: .public) -> \(function, privacy: .public)]: \(error.localizedDescription)")
+            logger.error("[❌ Error] [Date: \(date)] [\(fileName, privacy: .public) -> \(function, privacy: .public)]: \(error.localizedDescription, privacy: .public)")
         }
     }
     
