@@ -10,32 +10,30 @@ import UIKit
 final class LocationAuthorizationView: BaseView {
     
     private let backgroundImageView = UIImageView()
-    private let backgroundCharacterView = UIImageView()
     private let mainLabel = UILabel()
     private let subLabel = UILabel()
-    private let notificationsImageView = UIImageView()
+    private let noticeWeatherImageView = UIImageView()
     private(set) var agreeButton = UIButton()
     private(set) var disagreeButton = UIButton()
     
     override func setStyle() {
         backgroundImageView.image = .bgSplash
-        backgroundCharacterView.image = .bgCharacter
         mainLabel.do {
-            $0.text = "날씨에 대비할 수 있도록,\n위치 권한을 허용해보세요"
+            $0.text = "현재 위치의 날씨 소식과\n날씨별 추천 준비물을 알려드려요"
             $0.textColor = .gray900
             $0.textAlignment = .left
             $0.font = .custom(.headingH3)
             $0.numberOfLines = 2
         }
         subLabel.do {
-            $0.text = "위치 권한 허용 유무는 언제든지 바꿀 수 있어요!"
+            $0.text = "워리의 추천을 위해 위치 접근을 허용해주세요!"
             $0.textColor = .gray400
             $0.textAlignment = .left
             $0.font = .custom(.bodyMDMedium)
         }
-        notificationsImageView.image = .notifications
+        noticeWeatherImageView.image = .locationAuthorization
         agreeButton.do {
-            $0.setTitle("위치 권한을 허용할래!", for: .normal)
+            $0.setTitle("날씨 소식을 받을래!", for: .normal)
             $0.setTitleColor(.gray900, for: .normal)
             $0.titleLabel?.font = .custom(.bodyLGSemiBold)
             $0.backgroundColor = .blue400
@@ -51,10 +49,9 @@ final class LocationAuthorizationView: BaseView {
     override func setUI() {
         addSubviews(
             backgroundImageView,
-            backgroundCharacterView,
             mainLabel,
             subLabel,
-            notificationsImageView,
+            noticeWeatherImageView,
             agreeButton,
             disagreeButton
         )
@@ -63,11 +60,6 @@ final class LocationAuthorizationView: BaseView {
     override func setLayout() {
         backgroundImageView.snp.makeConstraints {
             $0.edges.equalToSuperview()
-        }
-        backgroundCharacterView.snp.makeConstraints {
-            $0.top.equalTo(safeAreaLayoutGuide.snp.top).offset(79.adjustedH)
-            $0.horizontalEdges.equalToSuperview()
-            $0.bottom.equalToSuperview().inset(112.adjustedH)
         }
         mainLabel.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide.snp.top).offset(60.adjustedH)
@@ -79,10 +71,10 @@ final class LocationAuthorizationView: BaseView {
             $0.horizontalEdges.equalToSuperview().inset(20.adjustedW)
             $0.height.equalTo(17.adjustedH)
         }
-        notificationsImageView.snp.makeConstraints {
-            $0.top.equalTo(subLabel.snp.bottom).offset(244.adjustedH)
-            $0.horizontalEdges.equalToSuperview().inset(20.adjustedW)
-            $0.height.equalTo(133.4.adjustedH)
+        noticeWeatherImageView.snp.makeConstraints {
+            $0.top.equalTo(subLabel.snp.bottom).offset(30.adjustedH)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(403.adjustedH)
         }
         agreeButton.snp.makeConstraints {
             $0.bottom.equalToSuperview().inset(94.adjustedH)
