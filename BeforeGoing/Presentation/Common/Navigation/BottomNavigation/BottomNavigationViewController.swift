@@ -46,12 +46,14 @@ final class BottomNavigationViewController: UITabBarController {
         title: String,
         image: UIImage
     ) -> UIViewController {
-        let viewController = UINavigationController(rootViewController: rootViewController)
-        rootViewController.tabBarItem.do{
+        rootViewController.tabBarItem.do {
             $0.title = title
             $0.image = image.withRenderingMode(.alwaysTemplate)
         }
-        return viewController
+        if let viewController = rootViewController as? HomeViewController {
+            return viewController
+        }
+        return UINavigationController(rootViewController: rootViewController)
     }
     
     private func createTabBarAppearance() -> UITabBarAppearance {
