@@ -20,13 +20,16 @@ extension String {
     }
     
     func customText(
-        rangedText: String
+        rangedText: String,
+        color: CGColor? = UIColor.warning600.cgColor
     ) -> NSMutableAttributedString {
-        let attributedString = NSMutableAttributedString(string: self)
+        guard let color = color else { return NSMutableAttributedString(string: "") }
         
+        let attributedString = NSMutableAttributedString(string: self)
         let range = (self as NSString).range(of: rangedText)
+        
         if range.location != NSNotFound {
-            attributedString.addAttribute(.foregroundColor, value: UIColor.warning600.cgColor, range: range)
+            attributedString.addAttribute(.foregroundColor, value: color, range: range)
         }
         
         return attributedString

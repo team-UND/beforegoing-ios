@@ -166,7 +166,11 @@ extension HomeHeaderView {
         dateLabel.text = date
     }
     
-    func updateWeatherUI(weather: NSMutableAttributedString) {
-        wordLabel.attributedText = weather
+    func updateWeatherUI(information: NSMutableAttributedString) {
+        wordLabel.attributedText = information
+    }
+    
+    func updateWeatherUI(information: String) {
+        wordLabel.text = information
     }
 }

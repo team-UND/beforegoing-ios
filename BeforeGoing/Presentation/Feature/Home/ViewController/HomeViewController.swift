@@ -17,6 +17,7 @@ final class HomeViewController: BaseViewController {
     private let locationManager = CLLocationManager()
     
     private var homeDate: String?
+    private var memberName: String?
     
     init(
         homeViewModel: HomeViewModel,
@@ -44,6 +45,20 @@ final class HomeViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setLocationManager()
+        
+        Task {
+            do {
+                guard let result = try await homeViewModel.action(
+                    input: .requestName
+                ) as? HomeViewModel.MemberNameOutput else {
+                    return
+                }
+                
+                self.memberName = result.memberName
+            } catch {
+                BeforeGoingLogger.error(error)
+            }
+        }
         
         Task {
             do {
@@ -175,19 +190,19 @@ extension HomeViewController {
         calendar.modalPresentationStyle = .overFullScreen
         calendar.onDayDidTap = { [weak self] date in
             let dateString = DateUtil.toString(date: date)
-            guard let monthAndDay = DateUtil.toMonthAndDay(date: dateString) else {
-                return
-            }
-            
-            self?.homeDate = dateString
-            self?.rootView.headerView.updateDateUI(date: dateString)
-            
             let currentDate = DateUtil.getCurrentDate()
-            if date >= currentDate {
-                self?.rootView.modalView.updatePlaceHolder(text: "\(monthAndDay)에만 할 일을 추가해주세요")
+            
+            guard let self = self,
+                  let monthAndDay = DateUtil.toMonthAndDay(date: dateString),
+                  let memberName = memberName else {
                 return
             }
-            self?.rootView.modalView.updatePlaceHolder(text: "지난 날짜의 리스트는 추가할 수 없어요")
+            
+            self.homeDate = dateString
+            
+            updateHeaderDate(date: dateString)
+            updateWeatherByDate(condition: date >= currentDate, monthAndDay: monthAndDay)
+            updatePlaceHolderByDate(condition: date >= currentDate, monthAndDay: monthAndDay)
         }
         calendar.onDismiss = { [weak self] in
             guard let homeDate = self?.homeDate,
@@ -310,6 +325,39 @@ extension HomeViewController {
         }
         bottomViewController.selectTab(item: .scenario)
     }
+    
+    private func updateHeaderDate(date: String) {
+        self.rootView.headerView.updateDateUI(date: date)
+    }
+    
+    private func updateWeatherByDate(condition: Bool, monthAndDay: String) {
+        guard let memberName = memberName else { return }
+        
+        let scenarioIntroduce = "\(memberName)님의 \(monthAndDay) 시나리오예요!"
+        let pastDateIntroduce = "해당 날짜의 기상 정보는 확인하기 어려워요:("
+        let futureDateIntroduce = "지난 날짜의 기상 정보는 제공하지 않아요:("
+        let customColor = UIColor.blue700.cgColor
+        
+        if condition {
+            self.rootView.headerView.updateWeatherUI(
+                information: "\(pastDateIntroduce)\n\(scenarioIntroduce)"
+                    .customText(rangedText: memberName, color: customColor)
+            )
+            return
+        }
+        self.rootView.headerView.updateWeatherUI(
+            information: "\(futureDateIntroduce)\n\(scenarioIntroduce)"
+                .customText(rangedText: memberName, color: customColor)
+        )
+    }
+    
+    private func updatePlaceHolderByDate(condition: Bool, monthAndDay: String) {
+        if condition {
+            self.rootView.modalView.updatePlaceHolder(text: "\(monthAndDay)에만 할 일을 추가해주세요")
+            return
+        }
+        self.rootView.modalView.updatePlaceHolder(text: "지난 날짜의 리스트는 추가할 수 없어요")
+    }
 }
 
 extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable {
@@ -341,7 +389,7 @@ extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable {
                     ) as? HomeViewModel.WeatherOutput else {
                         return
                     }
-                    self.rootView.headerView.updateWeatherUI(weather: result.weatherResult)
+                    self.rootView.headerView.updateWeatherUI(information: result.weatherResult)
                     manager.stopUpdatingLocation()
                 } catch (let error) {
                     if let error = error as? BeforeGoingError,

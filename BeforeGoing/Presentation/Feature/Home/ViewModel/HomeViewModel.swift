@@ -14,6 +14,7 @@ final class HomeViewModel: ViewModeling {
     
     private static let seperator = ", "
     
+    private let getMemberNameUseCase: GetMemberNameType
     private let weatherUseCase: RequestWeatherType
     private let getMissionsUseCase: FetchMissionsType
     private let checkMissionUseCase: CheckMissionType
@@ -29,12 +30,14 @@ final class HomeViewModel: ViewModeling {
     )] = []
     
     init(
+        getMemberNameUseCase: GetMemberNameType,
         weatherUseCase: RequestWeatherType,
         getMissionsUseCase: FetchMissionsType,
         checkMissionUseCase: CheckMissionType,
         addTodayMissionUseCase: AddTodayMissionType,
         deleteTodayMissionUseCase: DeleteTodayMissionType
     ) {
+        self.getMemberNameUseCase = getMemberNameUseCase
         self.weatherUseCase = weatherUseCase
         self.getMissionsUseCase = getMissionsUseCase
         self.checkMissionUseCase = checkMissionUseCase
@@ -43,6 +46,7 @@ final class HomeViewModel: ViewModeling {
     }
     
     enum Input {
+        case requestName
         case requestDate
         case requestWeather(latitude: CLLocationDegrees, longitude: CLLocationDegrees)
         case scenarioDidTap(scenarioID: Int, date: String)
@@ -52,6 +56,10 @@ final class HomeViewModel: ViewModeling {
     }
     
     typealias Output = HomeOutput
+    
+    struct MemberNameOutput: HomeOutput {
+        let memberName: String
+    }
     
     struct DateOutput: HomeOutput {
         let date: String
@@ -77,6 +85,10 @@ final class HomeViewModel: ViewModeling {
     
     func action(input: Input) async throws -> Output {
         switch input {
+        case .requestName:
+            let memberName = getMemberNameUseCase.execute()
+            return MemberNameOutput(memberName: memberName)
+            
         case .requestDate:
             let date = DateUtil.getCurrentDate(format: "yyyy년 MM월 dd일")
             return DateOutput(date: date)

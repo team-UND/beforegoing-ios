@@ -125,6 +125,7 @@ struct PresentationDependencyAssembler: DependencyAssembler {
         )
         DIContainer.shared.register(
             HomeViewModel(
+                getMemberNameUseCase: getMemberNameUseCase,
                 weatherUseCase: requestWeatherUseCase,
                 getMissionsUseCase: getMissionUseCase,
                 checkMissionUseCase: checkMissionUseCase,
