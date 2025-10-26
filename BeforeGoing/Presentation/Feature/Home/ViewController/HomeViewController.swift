@@ -49,11 +49,14 @@ final class HomeViewController: BaseViewController {
             do {
                 guard let result = try await homeViewModel.action(
                     input: .requestDate
-                ) as? HomeViewModel.DateOutput else {
+                ) as? HomeViewModel.DateOutput,
+                      let monthAndDay = DateUtil.toMonthAndDay(date: result.date)
+                else {
                     return
                 }
                 self.homeDate = result.date
                 rootView.headerView.updateDateUI(date: result.date)
+                rootView.modalView.updatePlaceHolder(text: "\(monthAndDay)에만 할 일을 추가해주세요")
             } catch {
                 if let error = error as? BeforeGoingError,
                    error == .loginExpired {
@@ -172,8 +175,19 @@ extension HomeViewController {
         calendar.modalPresentationStyle = .overFullScreen
         calendar.onDayDidTap = { [weak self] date in
             let dateString = DateUtil.toString(date: date)
+            guard let monthAndDay = DateUtil.toMonthAndDay(date: dateString) else {
+                return
+            }
+            
             self?.homeDate = dateString
             self?.rootView.headerView.updateDateUI(date: dateString)
+            
+            let currentDate = DateUtil.getCurrentDate()
+            if date >= currentDate {
+                self?.rootView.modalView.updatePlaceHolder(text: "\(monthAndDay)에만 할 일을 추가해주세요")
+                return
+            }
+            self?.rootView.modalView.updatePlaceHolder(text: "지난 날짜의 리스트는 추가할 수 없어요")
         }
         calendar.onDismiss = { [weak self] in
             guard let homeDate = self?.homeDate,

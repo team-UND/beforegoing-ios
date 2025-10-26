@@ -42,7 +42,6 @@ final class UserScenarioModalView: BaseView {
         taskTextField.do {
             $0.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 20.adjustedW, height: 0))
             $0.leftViewMode = .always
-            $0.placeholder = "할 일을 추가해주세요"
         }
         addTaskButton.do {
             $0.setImage(.plusCircle.withTintColor(.gray400), for: .normal)
@@ -119,6 +118,10 @@ extension UserScenarioModalView {
 }
 
 extension UserScenarioModalView {
+    
+    func updatePlaceHolder(text: String) {
+        taskTextField.placeholder = text
+    }
     
     func enableAddTaskButton() {
         addTaskButton.setImage(.plusCircle.withTintColor(.blue500), for: .normal)

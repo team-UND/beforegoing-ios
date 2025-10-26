@@ -11,6 +11,7 @@ struct DateUtil {
     
     private static let homeDateFormat = "yyyy년 MM월 dd일"
     private static let apiDateFormat = "yyyy-MM-dd"
+    private static let monthAndDayDateFormat = "MM월 dd일"
     private static let seoul = "Asia/Seoul"
     private static let calendar = Calendar.current
     
@@ -24,6 +25,13 @@ struct DateUtil {
     private static let apiDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = apiDateFormat
+        formatter.timeZone = TimeZone(identifier: seoul)
+        return formatter
+    }()
+    
+    private static let monthAndDayDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = monthAndDayDateFormat
         formatter.timeZone = TimeZone(identifier: seoul)
         return formatter
     }()
@@ -82,6 +90,13 @@ struct DateUtil {
         dateComponents.second = 0
 
         return calendar.date(from: dateComponents)
+    }
+    
+    static func toMonthAndDay(date: String) -> String? {
+        guard let date = homeDateformatter.date(from: date) else {
+            return nil
+        }
+        return monthAndDayDateFormatter.string(from: date)
     }
     
     private static func getMonth(from date: Date, offset: Int) -> Date {
