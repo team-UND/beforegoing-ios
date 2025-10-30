@@ -60,26 +60,7 @@ final class HomeViewController: BaseViewController {
             }
         }
         
-        Task {
-            do {
-                guard let result = try await homeViewModel.action(
-                    input: .requestDate
-                ) as? HomeViewModel.DateOutput,
-                      let monthAndDay = DateUtil.toMonthAndDay(date: result.date)
-                else {
-                    return
-                }
-                self.homeDate = result.date
-                rootView.headerView.updateDateUI(date: result.date)
-                rootView.modalView.updatePlaceHolder(text: "\(monthAndDay)에만 할 일을 추가해주세요")
-            } catch {
-                if let error = error as? BeforeGoingError,
-                   error == .loginExpired {
-                    self.presentLoginExpired()
-                }
-                BeforeGoingLogger.error(error)
-            }
-        }
+        requestDate()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -126,6 +107,30 @@ final class HomeViewController: BaseViewController {
             $0.dataSource = self
             $0.register(ListItemCell.self, forCellReuseIdentifier: ListItemCell.identifier)
             $0.reloadData()
+        }
+    }
+    
+    private func requestDate() {
+        Task {
+            do {
+                guard let result = try await homeViewModel.action(
+                    input: .requestDate
+                ) as? HomeViewModel.DateOutput,
+                      let monthAndDay = DateUtil.toMonthAndDay(date: result.date)
+                else {
+                    return
+                }
+                self.homeDate = result.date
+                rootView.headerView.updateDateUI(date: result.date)
+                rootView.modalView.updatePlaceHolder(text: "\(monthAndDay)에만 할 일을 추가해주세요")
+                rootView.modalView.updateTaskField(isEnable: true)
+            } catch {
+                if let error = error as? BeforeGoingError,
+                   error == .loginExpired {
+                    self.presentLoginExpired()
+                }
+                BeforeGoingLogger.error(error)
+            }
         }
     }
     
