@@ -213,6 +213,7 @@ extension SettingScenarioViewController {
         rootView.settingMissionView.revealDeleteButton()
         guard let text = rootView.settingMissionView.missionTextField.text else { return }
         rootView.settingMissionView.deleteMissionButton.isHidden = text.isEmpty ? true : false
+        rootView.settingMissionView.updateText()
     }
     
     @objc
@@ -258,6 +259,9 @@ extension SettingScenarioViewController {
     }
     
     private func addScenario(scenarioName: String, memo: String) {
+        let scenarioName = scenarioName.removeTrailingSpaces()
+        let memo = memo.removeTrailingSpaces()
+
         Task {
             do {
                 let _ = try await addScenarioViewModel.action(
@@ -277,6 +281,9 @@ extension SettingScenarioViewController {
     private func updateScenario(scenarioName: String, memo: String) {
         guard let scenarioID = scenarioID else { return }
 
+        let scenarioName = scenarioName.removeTrailingSpaces()
+        let memo = memo.removeTrailingSpaces()
+        
         Task {
             do {
                 let _ = try await updateScenarioViewModel.action(

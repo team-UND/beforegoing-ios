@@ -84,7 +84,9 @@ final class InputInformationView: BaseView {
 extension InputInformationView {
     
     func trimText(_ text: String) -> String {
-        let trimmedText = text.trim(limit: maxLength)
+        let trimmedText = text
+            .trim(limit: maxLength)
+            .removeLeadingSpaces()
         if text != trimmedText {
             self.textField.text = trimmedText
         }

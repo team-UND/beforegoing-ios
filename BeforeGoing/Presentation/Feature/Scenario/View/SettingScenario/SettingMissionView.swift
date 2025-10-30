@@ -9,6 +9,8 @@ import UIKit
 
 final class SettingMissionView: BaseView {
     
+    private let maxLength = 20
+    
     private let missionTitleLabel = UILabel()
     private(set) var missionTextField = TextField(type: .enableAddField)
     private(set) var addMissionButton = UIButton()
@@ -91,6 +93,13 @@ extension SettingMissionView {
     
     func getUserMission() -> String? {
         guard let text = missionTextField.text else { return nil }
-        return text
+        return text.removeTrailingSpaces()
+    }
+    
+    func updateText() {
+        guard let text = missionTextField.text else { return }
+        missionTextField.text = text
+            .trim(limit: maxLength)
+            .removeLeadingSpaces()
     }
 }

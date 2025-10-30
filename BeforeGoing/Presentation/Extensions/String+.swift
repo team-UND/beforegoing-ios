@@ -16,7 +16,15 @@ extension String {
     }
     
     func trim(limit: Int) -> Self {
-        return String(self.prefix(limit))
+        String(self.prefix(limit))
+    }
+    
+    func removeTrailingSpaces() -> String {
+        self.replacingOccurrences(of: "\\s+$", with: "", options: .regularExpression)
+    }
+    
+    func removeLeadingSpaces() -> String {
+        self.replacingOccurrences(of: "^\\s+", with: "", options: .regularExpression)
     }
     
     func customText(
