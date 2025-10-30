@@ -230,6 +230,7 @@ extension SettingScenarioViewController {
             with: .automatic
         )
         checkNextButtonState()
+        rootView.settingMissionView.deleteAllText()
         self.view.endEditing(false)
     }
     
