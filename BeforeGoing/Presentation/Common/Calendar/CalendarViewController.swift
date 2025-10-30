@@ -17,7 +17,8 @@ final class CalendarViewController: BaseViewController {
         calendar.firstWeekday = 2
         return calendar
     }()
-    public var currentDate: Date = DateUtil.getCurrentDate()
+    var firstDate: Date = DateUtil.getCurrentDate()
+    var currentDate: Date = DateUtil.getCurrentDate()
     private var startOfMonth: Date {
         guard let date = calendar.date(from: calendar.dateComponents([.year, .month], from: currentDate)) else {
             fatalError("Unable to calculate the start of the month.")
@@ -36,8 +37,9 @@ final class CalendarViewController: BaseViewController {
     private var days: [String?] = []
     
     private let calendarView = CalendarView()
-    private let blurEffect = UIBlurEffect(style: .systemMaterialLight)
-    private lazy var blurView: UIVisualEffectView = UIVisualEffectView(effect: blurEffect)
+    private let blurEffect = UIBlurEffect(style: .light)
+    private lazy var blurView = UIVisualEffectView(effect: blurEffect)
+    private let dimView = UIView()
     var onDayDidTap: ((Date) -> Void)?
     var onDismiss: (() -> Void)?
     
@@ -51,17 +53,28 @@ final class CalendarViewController: BaseViewController {
     
     private func setStyle() {
         view.backgroundColor = .clear
+        blurView.do {
+            $0.alpha = 0.8
+        }
+        dimView.do {
+            $0.backgroundColor = .black
+            $0.alpha = 0.2
+        }
     }
     
     private func setUI() {
         view.addSubviews(
             blurView,
+            dimView,
             calendarView
         )
     }
     
     private func setLayout() {
         blurView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        dimView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
         calendarView.snp.makeConstraints {
@@ -153,7 +166,7 @@ extension CalendarViewController {
     }
     
     private func isDateInSelectableRange(date: Date) -> Bool {
-        guard let startDate =  selectableStartDate,
+        guard let startDate = selectableStartDate,
               let endDate = selectableEndDate else {
             return false
         }
@@ -187,9 +200,13 @@ extension CalendarViewController {
     private func backgroundDidTap(_ sender: UIGestureRecognizer) {
         let location = sender.location(in: view)
         if !calendarView.frame.contains(location) {
-            self.dismiss(animated: true)
-            onDismiss?()
+            dismiss()
         }
+    }
+    
+    private func dismiss() {
+        self.dismiss(animated: true)
+        onDismiss?()
     }
 }
 
@@ -203,6 +220,7 @@ extension CalendarViewController: UICollectionViewDelegate {
             selectedDate = date
             onDayDidTap?(date)
             reload()
+            dismiss()
         }
     }
 }
