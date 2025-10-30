@@ -166,6 +166,9 @@ extension CalendarViewController {
     @objc
     private func previousButtonDidTap() {
         let date = DateUtil.getPreviousMonth(from: currentDate)
+        if DateUtil.isTwoMonthsApart(from: date, to: firstDate) {
+            return
+        }
         currentDate = date
         reload()
     }
@@ -173,6 +176,9 @@ extension CalendarViewController {
     @objc
     private func nextButtonDidTap() {
         let date = DateUtil.getNextMonth(from: currentDate)
+        if DateUtil.isTwoMonthsApart(from: firstDate, to: date) {
+            return
+        }
         currentDate = date
         reload()
     }

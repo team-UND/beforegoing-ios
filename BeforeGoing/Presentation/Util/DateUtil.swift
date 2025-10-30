@@ -99,6 +99,13 @@ struct DateUtil {
         return monthAndDayDateFormatter.string(from: date)
     }
     
+    static func isTwoMonthsApart(from startDate: Date, to endDate: Date) -> Bool {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.month, .day], from: startDate, to: endDate)
+
+        return (components.month ?? 0) > 1
+    }
+    
     private static func getMonth(from date: Date, offset: Int) -> Date {
         guard let date = calendar.date(byAdding: .month, value: offset, to: date) else {
             fatalError("Failed to create date from components. This should not happen.")
