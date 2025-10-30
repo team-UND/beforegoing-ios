@@ -123,6 +123,11 @@ extension UserScenarioModalView {
         taskTextField.placeholder = text
     }
     
+    func updateTaskField(isEnable: Bool) {
+        taskTextField.currentType = isEnable ? .enableAddField : .disableAddField
+        taskTextField.isEnabled = isEnable
+    }
+    
     func enableAddTaskButton() {
         addTaskButton.setImage(.plusCircle.withTintColor(.blue500), for: .normal)
     }

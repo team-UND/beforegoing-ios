@@ -193,16 +193,20 @@ extension HomeViewController {
             let currentDate = DateUtil.getCurrentDate()
             
             guard let self = self,
-                  let monthAndDay = DateUtil.toMonthAndDay(date: dateString),
-                  let memberName = memberName else {
+                  let monthAndDay = DateUtil.toMonthAndDay(date: dateString) else {
                 return
             }
             
             self.homeDate = dateString
-            
             updateHeaderDate(date: dateString)
-            updateWeatherByDate(condition: date >= currentDate, monthAndDay: monthAndDay)
-            updatePlaceHolderByDate(condition: date >= currentDate, monthAndDay: monthAndDay)
+            
+            if date != currentDate {
+                updateWeatherByDate(condition: date > currentDate, monthAndDay: monthAndDay)
+                updatePlaceHolderByDate(condition: date > currentDate, monthAndDay: monthAndDay)
+                return
+            }
+            locationManager.requestLocation()
+            updatePlaceHolderByDate(condition: date == currentDate, monthAndDay: monthAndDay)
         }
         calendar.onDismiss = { [weak self] in
             guard let homeDate = self?.homeDate,
@@ -353,10 +357,16 @@ extension HomeViewController {
     
     private func updatePlaceHolderByDate(condition: Bool, monthAndDay: String) {
         if condition {
-            self.rootView.modalView.updatePlaceHolder(text: "\(monthAndDay)에만 할 일을 추가해주세요")
+            self.rootView.modalView.do {
+                $0.updatePlaceHolder(text: "\(monthAndDay)에만 할 일을 추가해주세요")
+                $0.updateTaskField(isEnable: true)
+            }
             return
         }
-        self.rootView.modalView.updatePlaceHolder(text: "지난 날짜의 리스트는 추가할 수 없어요")
+        self.rootView.modalView.do {
+            $0.updatePlaceHolder(text: "지난 날짜의 리스트는 추가할 수 없어요")
+            $0.updateTaskField(isEnable: false)
+        }
     }
 }
 
