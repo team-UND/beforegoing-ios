@@ -15,6 +15,10 @@ extension String {
         return predicate.evaluate(with: self)
     }
     
+    var isBlank: Bool {
+        self.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
     func trim(limit: Int) -> Self {
         String(self.prefix(limit))
     }

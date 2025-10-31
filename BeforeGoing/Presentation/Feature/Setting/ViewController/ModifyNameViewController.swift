@@ -60,7 +60,7 @@ extension ModifyNameViewController: NetworkRequestable {
                   let text = rootView.nameTextField.text else {
                 return
             }
-            rootView.updateDeleteButtonState(condition: text.isEmpty)
+            rootView.updateDeleteButtonState(condition: text.isBlank)
             
             let trimmedText = trimText(text)
             rootView.updateNameCount(trimmedText.count)
@@ -71,7 +71,7 @@ extension ModifyNameViewController: NetworkRequestable {
     @objc
     private func confirmButtonDidTap() {
         guard let nickname = rootView.nameTextField.text,
-              !nickname.isEmpty else {
+              !nickname.isBlank else {
             return
         }
         Task {

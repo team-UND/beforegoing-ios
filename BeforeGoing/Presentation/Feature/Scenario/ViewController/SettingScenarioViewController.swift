@@ -191,7 +191,7 @@ extension SettingScenarioViewController {
         DispatchQueue.main.async { [weak self] in
             guard self != nil else { return }
             
-            text.isEmpty ? view.hideDeleteButton() : view.revealDeleteButton()
+            text.isBlank ? view.hideDeleteButton() : view.revealDeleteButton()
             let trimmedText = view.trimText(text)
             view.updateTextCount(trimmedText.count)
         }
@@ -212,7 +212,7 @@ extension SettingScenarioViewController {
     private func missionTextFieldDidTap() {
         rootView.settingMissionView.revealDeleteButton()
         guard let text = rootView.settingMissionView.missionTextField.text else { return }
-        rootView.settingMissionView.deleteMissionButton.isHidden = text.isEmpty ? true : false
+        rootView.settingMissionView.deleteMissionButton.isHidden = text.isBlank ? true : false
         rootView.settingMissionView.updateText()
     }
     
@@ -224,7 +224,7 @@ extension SettingScenarioViewController {
     @objc
     private func addMissionButtonDidTap() {
         guard let mission = rootView.settingMissionView.getUserMission(),
-                !mission.isEmpty else { return }
+              !mission.isBlank else { return }
         missions.insert((nil, mission), at: 0)
         rootView.settingMissionView.missionTableView.insertSections(
             IndexSet(integer: 0),
@@ -253,7 +253,7 @@ extension SettingScenarioViewController {
     private func checkNextButtonState() {
         guard let scenario = rootView.inputScenarioView.textField.text,
               let memo = rootView.inputMemoView.textField.text else { return }
-        let isEnabled = !scenario.isEmpty && !memo.isEmpty && missions.count >= 1
+        let isEnabled = !scenario.isBlank && !memo.isBlank && missions.count >= 1
         
         rootView.updateUI(state: isEnabled ? .enableLongButton : .disableLongButton)
     }

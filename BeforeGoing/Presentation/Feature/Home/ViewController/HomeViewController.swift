@@ -232,7 +232,7 @@ extension HomeViewController {
     @objc
     private func taskTextFieldEditingChanged() {
         if let text = rootView.modalView.taskTextField.text,
-           !text.isEmpty {
+           !text.isBlank {
             rootView.modalView.do {
                 $0.enableAddTaskButton()
                 $0.revealDeleteTaskButton()
@@ -257,7 +257,7 @@ extension HomeViewController {
     @objc
     private func addTaskButtonDidTap() {
         guard let content = rootView.modalView.taskTextField.text,
-              !content.isEmpty,
+              !content.isBlank,
               let homeDate = DateUtil.convertDateFormat(dateString: homeDate) else {
             return
         }
