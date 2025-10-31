@@ -28,7 +28,7 @@ final class SettingPushNoticeView: BaseView {
             $0.font = .custom(.bodyLGMedium)
         }
         subtitleLabel.do {
-            $0.text = "설정하신 시간 별, 위치 별 알림을 받아볼 수 있어요."
+            $0.text = "설정한 알림을 받아볼 수 있어요."
             $0.textColor = .gray400
             $0.font = .custom(.bodyMDMedium)
         }

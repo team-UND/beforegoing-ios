@@ -10,7 +10,7 @@ import UIKit
 final class SettingNoticeView: BaseView {
     
     private let titleLabel = UILabel()
-    private(set) var basicPushNoticeView = SettingPushNoticeView(title: "푸시 알림 설정")
+    private(set) var basicPushNoticeView = SettingPushNoticeView(title: "푸시 알림")
     private let divider = UILabel()
     
     override func setStyle() {
