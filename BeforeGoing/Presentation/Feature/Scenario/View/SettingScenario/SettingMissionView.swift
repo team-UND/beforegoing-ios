@@ -109,9 +109,18 @@ extension SettingMissionView {
     }
     
     func updateText() {
-        guard let text = missionTextField.text else { return }
-        missionTextField.text = text
+        guard let text = missionTextField.text,
+              !text.isBlank else {
+            missionTextField.text = ""
+            letterCountLabel.text = "\(0)/\(maxLength)"
+            addMissionButton.setImage(.plusCircle.withTintColor(.gray400), for: .normal)
+            return
+        }
+        addMissionButton.setImage(.plusCircle.withTintColor(.blue500), for: .normal)
+        let completeText = text
             .trim(limit: maxLength)
             .removeLeadingSpaces()
+        missionTextField.text = completeText
+        letterCountLabel.text = "\(completeText.count)/\(maxLength)"
     }
 }
