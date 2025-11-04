@@ -52,7 +52,7 @@ extension ModifyNameViewController: Backable {
     }
 }
 
-extension ModifyNameViewController: NetworkRequestable {
+extension ModifyNameViewController: NetworkRequestable, NetworkRequestErrorHandler {
     
     @objc
     private func nameTextFieldDidChange() {
@@ -87,10 +87,7 @@ extension ModifyNameViewController: NetworkRequestable {
             case .success:
                 self.navigationController?.popViewController(animated: true)
             case .failure(let error):
-                if let error = error as? BeforeGoingError,
-                   error == .loginExpired {
-                    self.presentLoginExpired()
-                }
+                self.handleError(error)
                 BeforeGoingLogger.error(BeforeGoingError.updateNicknameFailed)
             }
         }

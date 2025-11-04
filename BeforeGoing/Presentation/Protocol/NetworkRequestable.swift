@@ -7,11 +7,21 @@
 
 protocol NetworkRequestable: AnyObject {
     func presentLoginExpired()
+    func presentTooManyRequest()
 }
 
 extension NetworkRequestable where Self: BaseViewController {
     func presentLoginExpired() {
-        let modalViewController = ModalViewController(modalView: ModalView(type: .expirationLogin))
-        self.present(modalViewController, animated: false)
+        presentModal(modalType: .expirationLogin)
+    }
+    
+    func presentTooManyRequest() {
+        presentModal(modalType: .tooManyRequest)
+    }
+    
+    private func presentModal(modalType: ModalType) {
+        let modalView = ModalView(type: modalType)
+        let modalViewController = ModalViewController(modalView: modalView)
+        self.present(modalViewController, animated: true)
     }
 }

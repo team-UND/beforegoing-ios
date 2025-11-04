@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class SetNoticeMethodViewController: BaseViewController, NetworkRequestable {
+final class SetNoticeMethodViewController: BaseViewController {
     
     private let rootView = SetNoticeMethodView()
     
@@ -82,7 +82,7 @@ extension SetNoticeMethodViewController {
     }
 }
 
-extension SetNoticeMethodViewController {
+extension SetNoticeMethodViewController: NetworkRequestable, NetworkRequestErrorHandler {
     
     @objc
     private func imageViewDidTap(_ sender: UITapGestureRecognizer) {
@@ -116,10 +116,7 @@ extension SetNoticeMethodViewController {
                 )
                 self.navigationController?.popToRootViewController(animated: false)
             } catch {
-                if let error = error as? BeforeGoingError,
-                   error == .loginExpired {
-                    self.presentLoginExpired()
-                }
+                self.handleError(error)
                 BeforeGoingLogger.error(error)
             }
         }
@@ -134,10 +131,7 @@ extension SetNoticeMethodViewController {
                 )
                 self.navigationController?.popToRootViewController(animated: false)
             } catch {
-                if let error = error as? BeforeGoingError,
-                   error == .loginExpired {
-                    self.presentLoginExpired()
-                }
+                self.handleError(error)
                 BeforeGoingLogger.error(error)
             }
         }

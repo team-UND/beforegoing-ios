@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class MyScenarioViewController: BaseViewController, NetworkRequestable {
+final class MyScenarioViewController: BaseViewController, NetworkRequestable, NetworkRequestErrorHandler {
     
     private let rootView = ScenarioListView()
     private let getSingleScenarioViewModel: GetSingleScenarioViewModel
@@ -52,9 +52,7 @@ final class MyScenarioViewController: BaseViewController, NetworkRequestable {
                         if error == .notFoundError {
                             rootView.replaceEmptyView()
                         }
-                        if error == .loginExpired {
-                            self.presentLoginExpired()
-                        }
+                        self.handleError(error)
                     }
                 }
             } catch {
@@ -114,10 +112,7 @@ extension MyScenarioViewController {
                 )
                 handleGetScenarioResult(result: result.getScenarioResult)
             } catch {
-                if let error = error as? BeforeGoingError,
-                   error == .loginExpired {
-                    self.presentLoginExpired()
-                }
+                self.handleError(error)
             }
         }
     }
@@ -231,10 +226,7 @@ extension MyScenarioViewController: UITableViewDataSource {
                     }
                     
                 } catch {
-                    if let error = error as? BeforeGoingError,
-                       error == .loginExpired {
-                        self.presentLoginExpired()
-                    }
+                    self.handleError(error)
                     BeforeGoingLogger.error(error)
                 }
                 completion(true)
@@ -332,10 +324,7 @@ extension MyScenarioViewController: UITableViewDropDelegate {
                 )
                 handleUpdateScenarioOrderResult(result: result.updateScenarioOrderResult)
             } catch {
-                if let error = error as? BeforeGoingError,
-                   error == .loginExpired {
-                    self.presentLoginExpired()
-                }
+                self.handleError(error)
             }
         }
     }

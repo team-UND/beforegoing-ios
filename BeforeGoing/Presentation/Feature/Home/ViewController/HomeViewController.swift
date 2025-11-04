@@ -124,11 +124,8 @@ final class HomeViewController: BaseViewController {
                 rootView.headerView.updateDateUI(date: result.date)
                 rootView.modalView.updatePlaceHolder(text: "\(monthAndDay)에만 할 일을 추가해주세요")
                 rootView.modalView.updateTaskField(isEnable: true)
-            } catch {
-                if let error = error as? BeforeGoingError,
-                   error == .loginExpired {
-                    self.presentLoginExpired()
-                }
+            } catch (let error) {
+                self.handleError(error)
                 BeforeGoingLogger.error(error)
             }
         }
@@ -280,9 +277,7 @@ extension HomeViewController: ToastPresentable {
                 rootView.modalView.listTableView.reloadData()
             case .failure(let error):
                 if let error = error as? BeforeGoingError {
-                    if error == .loginExpired {
-                        self.presentLoginExpired()
-                    }
+                    self.handleError(error)
                     if error == .missionLimitError {
                         self.presentToastMessage(type: .todayMissionLimit)
                     }
@@ -331,10 +326,7 @@ extension HomeViewController: ToastPresentable {
                 getScenariosViewModel.updatePointer(to: tag)
                 rootView.modalView.listTableView.reloadData()
             case .failure(let error):
-                if let error = error as? BeforeGoingError,
-                   error == .loginExpired {
-                    self.presentLoginExpired()
-                }
+                self.handleError(error)
                 BeforeGoingLogger.error(error)
             }
         }
@@ -392,8 +384,8 @@ extension HomeViewController: ToastPresentable {
     }
 }
 
-extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable {
-    
+extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable, NetworkRequestErrorHandler {
+
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         let status = manager.authorizationStatus
         
@@ -424,10 +416,7 @@ extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable {
                     self.rootView.headerView.updateWeatherUI(information: result.weatherResult)
                     manager.stopUpdatingLocation()
                 } catch (let error) {
-                    if let error = error as? BeforeGoingError,
-                       error == .loginExpired {
-                        self.presentLoginExpired()
-                    }
+                    self.handleError(error)
                     BeforeGoingLogger.error(error)
                     BeforeGoingLogger.error(BeforeGoingError.requestWeatherFailed)
                 }
@@ -504,11 +493,8 @@ extension HomeViewController: UITableViewDataSource {
                         )
                     )
                     tableView.reloadData()
-                } catch {
-                    if let error = error as? BeforeGoingError,
-                       error == .loginExpired {
-                        self.presentLoginExpired()
-                    }
+                } catch (let error) {
+                    self.handleError(error)
                 }
             }
         }
@@ -554,10 +540,7 @@ extension HomeViewController: UITableViewDataSource {
                 case .success:
                     tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
                 case .failure(let error):
-                    if let error = error as? BeforeGoingError,
-                       error == .loginExpired {
-                        self?.presentLoginExpired()
-                    }
+                    self?.handleError(error)
                     BeforeGoingLogger.error(error)
                 }
             }
