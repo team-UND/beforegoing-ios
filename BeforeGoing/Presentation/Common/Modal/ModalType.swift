@@ -7,7 +7,7 @@
 
 enum ModalType {
     
-    case expirationLogin, logout, withdraw
+    case expirationLogin, logout, withdraw, tooManyRequest
     
     var component: ModalComponent {
         switch self {
@@ -34,6 +34,14 @@ enum ModalType {
                 description: "지금까지의 기록이 모두 사라지며\n복구되지 않아요.\n정말 탈퇴하실 건가요?",
                 dismissTitle: "취소",
                 actionTitle: "탈퇴하기"
+            )
+        case .tooManyRequest:
+            return .init(
+                image: .withdrawWorry,
+                mainTitle: "응답 제한",
+                description: "너무 많은 수의 요청을 보냈어요",
+                dismissTitle: "취소",
+                actionTitle: "확인"
             )
         }
     }
