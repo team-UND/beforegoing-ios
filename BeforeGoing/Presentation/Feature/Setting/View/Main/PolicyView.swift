@@ -49,18 +49,22 @@ final class PolicyView: BaseView {
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.leading.equalToSuperview().inset(20.adjustedW)
+            $0.height.equalTo(29.adjustedH)
         }
         noticeView.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(12.adjustedH)
             $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(28.adjustedH)
         }
         termView.snp.makeConstraints {
             $0.top.equalTo(noticeView.snp.bottom).offset(16.adjustedH)
             $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(28.adjustedH)
         }
         privacyView.snp.makeConstraints {
             $0.top.equalTo(termView.snp.bottom).offset(16.adjustedH)
             $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(28.adjustedH)
         }
         versionTitleLabel.snp.makeConstraints {
             $0.top.equalTo(privacyView.snp.bottom).offset(16.adjustedH)

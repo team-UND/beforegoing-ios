@@ -44,6 +44,7 @@ final class SettingNoticeView: BaseView {
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview().inset(12.adjustedH)
             $0.leading.equalToSuperview().inset(20.adjustedW)
+            $0.height.equalTo(29.adjustedH)
         }
         basicPushNoticeView.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(12.adjustedH)
