@@ -10,6 +10,7 @@ import UIKit
 final class ModifyNameViewController: BaseViewController {
     
     private let rootView = ModifyNameView()
+    private var initialName: String?
     private let viewModel: ModifyNicknameViewModel
     
     init(viewModel: ModifyNicknameViewModel) {
@@ -74,6 +75,12 @@ extension ModifyNameViewController: NetworkRequestable {
               !nickname.isBlank else {
             return
         }
+        guard let initialName = initialName,
+              initialName != nickname else {
+            self.navigationController?.popViewController(animated: true)
+            return
+        }
+        
         Task {
             let result = try await viewModel.action(input: .confirmButtonDidTap(nickname: nickname))
             switch result.updateNicknameResult {
@@ -101,6 +108,7 @@ extension ModifyNameViewController: NetworkRequestable {
 extension ModifyNameViewController {
     
     func configure(_ name: String) {
+        self.initialName = name
         rootView.configureName(name)
     }
 }
