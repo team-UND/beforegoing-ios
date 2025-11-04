@@ -63,6 +63,11 @@ final class SettingViewController: BaseViewController, NetworkRequestable {
             action: #selector(pushNoticeButtonDidTap),
             for: .touchUpInside
         )
+        rootView.policyView.noticeView.moveButton.addTarget(
+            self,
+            action: #selector(noticeButtonDidTap),
+            for: .touchUpInside
+        )
         rootView.policyView.termView.moveButton.addTarget(
             self,
             action: #selector(termButtonDidTap),
@@ -137,6 +142,11 @@ extension SettingViewController {
                 }
             }
         }
+    }
+    
+    @objc
+    private func noticeButtonDidTap() {
+        ExternalLink.support.openURL(for: self)
     }
     
     @objc

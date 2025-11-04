@@ -10,6 +10,7 @@ import UIKit
 final class PolicyView: BaseView {
     
     private let titleLabel = UILabel()
+    private(set) var noticeView = SeeMoreView(title: "공지사항")
     private(set) var termView = SeeMoreView(title: "이용 약관")
     private(set) var privacyView = SeeMoreView(title: "개인정보 처리방침")
     private let versionTitleLabel = UILabel()
@@ -36,6 +37,7 @@ final class PolicyView: BaseView {
     override func setUI() {
         addSubviews(
             titleLabel,
+            noticeView,
             termView,
             privacyView,
             versionTitleLabel,
@@ -48,8 +50,12 @@ final class PolicyView: BaseView {
             $0.top.equalToSuperview()
             $0.leading.equalToSuperview().inset(20.adjustedW)
         }
-        termView.snp.makeConstraints {
+        noticeView.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(12.adjustedH)
+            $0.horizontalEdges.equalToSuperview()
+        }
+        termView.snp.makeConstraints {
+            $0.top.equalTo(noticeView.snp.bottom).offset(16.adjustedH)
             $0.horizontalEdges.equalToSuperview()
         }
         privacyView.snp.makeConstraints {
