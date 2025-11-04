@@ -113,8 +113,6 @@ extension SettingViewController: NetworkRequestable, NetworkRequestErrorHandler 
     
     @objc
     private func pushNoticeButtonDidTap() {
-        let isSwitchedOn = rootView.isSwitchedOn
-        
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             DispatchQueue.main.async { [weak self] in
                 self?.hasOpenedSettings = true
