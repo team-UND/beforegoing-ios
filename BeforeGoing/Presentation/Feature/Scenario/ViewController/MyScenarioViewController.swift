@@ -289,7 +289,7 @@ extension MyScenarioViewController: UITableViewDropDelegate {
             let sourceSection = sourceIndexPath.section
             
             moveScenario(originalAt: sourceSection, destinationAt: destinationSection)
-            updateScenarioOrder(section: destinationSection)
+            updateScenarioOrder(originalAt: sourceSection, destinationAt: destinationSection)
         }
         tableView.reloadData()
     }
@@ -312,10 +312,14 @@ extension MyScenarioViewController: UITableViewDropDelegate {
         )
     }
     
-    private func updateScenarioOrder(section: Int) {
-        let scenarioID = getScenariosViewModel.getScenarioID(at: section)
-        let prevOrder = getScenariosViewModel.getPreviousScenarioOrder(current: section)
-        let nextOrder = getScenariosViewModel.getNextScenarioOrder(current: section)
+    private func updateScenarioOrder(originalAt: Int, destinationAt: Int) {
+        guard originalAt != destinationAt else {
+            return
+        }
+    
+        let scenarioID = getScenariosViewModel.getScenarioID(at: destinationAt)
+        let prevOrder = getScenariosViewModel.getPreviousScenarioOrder(current: destinationAt)
+        let nextOrder = getScenariosViewModel.getNextScenarioOrder(current: destinationAt)
         
         Task {
             do {
