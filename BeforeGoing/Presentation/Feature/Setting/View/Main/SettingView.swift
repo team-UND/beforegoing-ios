@@ -68,7 +68,7 @@ extension SettingView {
         settingNoticeView.basicPushNoticeView.switchButton.isOn
     }
     
-    func toggleSwitch() {
-        settingNoticeView.basicPushNoticeView.switchButton.isSelected = true
+    func updateSwitch(isAgreed: Bool) {
+        settingNoticeView.basicPushNoticeView.switchButton.isSelected = isAgreed
     }
 }

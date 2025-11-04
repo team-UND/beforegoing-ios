@@ -113,16 +113,9 @@ extension SettingViewController {
         
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             DispatchQueue.main.async { [weak self] in
-                switch settings.authorizationStatus {
-                case .authorized, .provisional, .ephemeral:
-                    self?.performTask(isSwitchedOn: isSwitchedOn)
-                case .denied, .notDetermined:
-                    self?.hasOpenedSettings = true
-                    if let url = URL(string: UIApplication.openSettingsURLString) {
-                        UIApplication.shared.open(url)
-                    }
-                @unknown default:
-                    break
+                self?.hasOpenedSettings = true
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
                 }
             }
         }
@@ -134,10 +127,24 @@ extension SettingViewController {
         
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             DispatchQueue.main.async {
-                if settings.authorizationStatus == .authorized {
-                    self.rootView.toggleSwitch()
-                    self.performTask(isSwitchedOn: true)
+                let isAgreed: Bool
+
+                switch settings.authorizationStatus {
+                case .authorized, .provisional, .ephemeral:
+                    isAgreed = true
+                case .denied, .notDetermined:
+                    isAgreed = false
+                @unknown default:
+                    isAgreed = false
                 }
+                
+                let currentDate = DateUtil.getCurrentDate().toString()
+                let modalVC = ModalViewController(
+                    modalView: ModalView(type: .eventPushAgree(isAgreed: isAgreed, currentDate: currentDate))
+                )
+                
+                self.rootView.updateSwitch(isAgreed: isAgreed)
+                self.present(modalVC, animated: true)
             }
         }
     }
