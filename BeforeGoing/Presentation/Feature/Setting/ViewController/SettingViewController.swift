@@ -37,7 +37,7 @@ final class SettingViewController: BaseViewController, NetworkRequestable {
             }
             switch result.isEventPushAgreed {
             case .success(let eventPushAgreed):
-                rootView.settingNoticeView.basicPushNoticeView.updateButtonState(condition: eventPushAgreed)
+                rootView.settingNoticeView.eventPushNoticeView.updateButtonState(condition: eventPushAgreed)
             case .failure(let error):
                 if error == .loginExpired {
                     self.presentLoginExpired()
@@ -56,6 +56,11 @@ final class SettingViewController: BaseViewController, NetworkRequestable {
         rootView.supportView.seemoreView.moveButton.addTarget(
             self,
             action: #selector(supportButtonDidTap),
+            for: .touchUpInside
+        )
+        rootView.settingNoticeView.eventPushNoticeView.switchButton.addTarget(
+            self,
+            action: #selector(eventPushNoticeButtonDidTap),
             for: .touchUpInside
         )
         rootView.settingNoticeView.basicPushNoticeView.switchButton.addTarget(
@@ -94,6 +99,12 @@ extension SettingViewController {
     @objc
     private func supportButtonDidTap() {
         ExternalLink.support.openURL(for: self)
+    }
+    
+    @objc
+    private func eventPushNoticeButtonDidTap() {
+        let isSwitchedOn = rootView.settingNoticeView.eventPushNoticeView.switchButton.isOn
+        performTask(isSwitchedOn: isSwitchedOn)
     }
     
     @objc

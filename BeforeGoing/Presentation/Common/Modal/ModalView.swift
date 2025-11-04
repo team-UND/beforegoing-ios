@@ -9,6 +9,7 @@ import UIKit
 
 final class ModalView: BaseView {
     
+    private var modalType: ModalType?
     private let imageView = UIImageView()
     private let titleLabel = UILabel()
     private let descriptionLabel = UILabel()
@@ -46,7 +47,6 @@ final class ModalView: BaseView {
             $0.font = .custom(.headingH5)
         }
         descriptionLabel.do {
-            $0.textColor = .gray400
             $0.textAlignment = .center
             $0.numberOfLines = 0
             $0.font = .custom(.bodyMDMedium)
@@ -74,10 +74,10 @@ final class ModalView: BaseView {
             descriptionLabel,
             buttonStackView
         )
-        buttonStackView.addArrangedSubviews(
-            dismissButton,
-            actionButton
-        )
+        if let dismissTitle = modalType?.component.dismissTitle {
+            buttonStackView.addArrangedSubview(dismissButton)
+        }
+        buttonStackView.addArrangedSubview(actionButton)
     }
     
     override func setLayout() {

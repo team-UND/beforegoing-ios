@@ -7,7 +7,11 @@
 
 enum ModalType {
     
-    case expirationLogin, logout, withdraw, tooManyRequest
+    case expirationLogin
+    case logout
+    case withdraw
+    case tooManyRequest
+    case eventPushAgree(isAgreed: Bool, currentDate: String)
     
     var component: ModalComponent {
         switch self {
@@ -40,7 +44,16 @@ enum ModalType {
                 image: .withdrawWorry,
                 mainTitle: "응답 제한",
                 description: "너무 많은 수의 요청을 보냈어요",
-                dismissTitle: "취소",
+                dismissTitle: nil,
+                actionTitle: "확인"
+            )
+        case .eventPushAgree(let isAgreed, let currentDate):
+            let agreeStatus = isAgreed ? "수신 동의" : "수신 거부"
+            return .init(
+                image: nil,
+                mainTitle: nil,
+                description: "[나가기전에]에서 보내는 이벤트/마케팅 관련\n푸시알림 수신 여부가 ‘\(agreeStatus)’로\n변경되었습니다.\n\(currentDate)",
+                dismissTitle: nil,
                 actionTitle: "확인"
             )
         }
