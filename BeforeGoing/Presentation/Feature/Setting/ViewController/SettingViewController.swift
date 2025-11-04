@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class SettingViewController: BaseViewController, NetworkRequestable, NetworkRequestErrorHandler {
+final class SettingViewController: BaseViewController {
     
     private let rootView = SettingView()
     private let viewModel: SettingViewModel
@@ -84,7 +84,7 @@ final class SettingViewController: BaseViewController, NetworkRequestable, Netwo
     }
 }
 
-extension SettingViewController {
+extension SettingViewController: NetworkRequestable, NetworkRequestErrorHandler {
     
     @objc
     private func profileButtonDidTap() {

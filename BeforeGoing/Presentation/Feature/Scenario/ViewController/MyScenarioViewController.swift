@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class MyScenarioViewController: BaseViewController, NetworkRequestable, NetworkRequestErrorHandler {
+final class MyScenarioViewController: BaseViewController {
     
     private let rootView = ScenarioListView()
     private let getSingleScenarioViewModel: GetSingleScenarioViewModel
@@ -89,7 +89,7 @@ final class MyScenarioViewController: BaseViewController, NetworkRequestable, Ne
     }
 }
 
-extension MyScenarioViewController {
+extension MyScenarioViewController: NetworkRequestable, NetworkRequestErrorHandler {
     
     @objc
     private func addScenarioButtonDidTap() {
