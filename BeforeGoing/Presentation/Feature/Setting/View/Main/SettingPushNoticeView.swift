@@ -13,9 +13,10 @@ final class SettingPushNoticeView: BaseView {
     private let subtitleLabel = UILabel()
     private(set) var switchButton = UISwitch()
     
-    init(title: String) {
+    init(title: String, subtitle: String) {
         super.init(frame: .zero)
         titleLabel.text = title
+        subtitleLabel.text = subtitle
     }
     
     required init?(coder: NSCoder) {
@@ -28,7 +29,6 @@ final class SettingPushNoticeView: BaseView {
             $0.font = .custom(.bodyLGMedium)
         }
         subtitleLabel.do {
-            $0.text = "설정한 알림을 받아볼 수 있어요."
             $0.textColor = .gray400
             $0.font = .custom(.bodyMDMedium)
         }

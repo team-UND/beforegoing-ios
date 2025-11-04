@@ -52,12 +52,12 @@ final class SettingView: BaseView {
         settingNoticeView.snp.makeConstraints {
             $0.top.equalTo(supportView.snp.bottom).offset(8.adjustedH)
             $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(129.adjustedH)
+            $0.height.equalTo(191.adjustedH)
         }
         policyView.snp.makeConstraints {
             $0.top.equalTo(settingNoticeView.snp.bottom).offset(20.adjustedH)
             $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(140.adjustedH)
+            $0.height.equalTo(180.adjustedH)
         }
     }
 }
@@ -66,5 +66,9 @@ extension SettingView {
     
     var isSwitchedOn: Bool {
         settingNoticeView.basicPushNoticeView.switchButton.isOn
+    }
+    
+    func toggleSwitch() {
+        settingNoticeView.basicPushNoticeView.switchButton.isSelected = true
     }
 }
