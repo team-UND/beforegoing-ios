@@ -165,7 +165,7 @@ extension SettingViewController: NetworkRequestable, NetworkRequestErrorHandler 
     
     @objc
     private func noticeButtonDidTap() {
-        ExternalLink.support.openURL(for: self)
+        ExternalLink.notice.openURL(for: self)
     }
     
     @objc
