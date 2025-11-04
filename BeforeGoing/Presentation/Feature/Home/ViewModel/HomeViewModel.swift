@@ -13,6 +13,7 @@ protocol HomeOutput {}
 final class HomeViewModel: ViewModeling {
     
     private static let seperator = ", "
+    private let todayMissionLimit = 20
     
     private let getMemberNameUseCase: GetMemberNameType
     private let weatherUseCase: RequestWeatherType
@@ -130,6 +131,7 @@ final class HomeViewModel: ViewModeling {
                     }
                     addMissionContent($0.missionId, $0.content, .normal, .normal, $0.isChecked)
                 }
+                sortMissions()
                 return MissionsOutput(missionsResult: .success(result))
             } catch {
                 BeforeGoingLogger.error(error)
@@ -152,6 +154,10 @@ final class HomeViewModel: ViewModeling {
             return EmptyOutput()
             
         case .addTodayMissionButtonDidTap(let scenarioID, let date, let content):
+            if isLimitTodayMissions {
+                return TodayMissionOutput(todayMissionResult: .failure(BeforeGoingError.missionLimitError))
+            }
+            
             do {
                 let result = try await addTodayMissionUseCase.execute(
                     scenarioID: scenarioID,
@@ -168,6 +174,8 @@ final class HomeViewModel: ViewModeling {
                     ),
                     at: 0
                 )
+                sortMissions()
+                
                 return TodayMissionOutput(todayMissionResult: .success(result))
             } catch {
                 BeforeGoingLogger.error(error)
@@ -284,6 +292,10 @@ final class HomeViewModel: ViewModeling {
             mission.content == content
         })
     }
+    
+    private var isLimitTodayMissions: Bool {
+        missions.filter({ $0.initState == .today }).count >= todayMissionLimit
+    }
 }
 
 extension HomeViewModel {
@@ -321,5 +333,25 @@ extension HomeViewModel {
         missions[index].isChecked = true
         let removed = missions.remove(at: index)
         missions.append(removed)
+        
+        sortMissions()
+    }
+    
+    private func sortMissions() {
+        missions.sort { mission1, mission2 in
+            let isChecked1 = mission1.isChecked
+            let isChecked2 = mission2.isChecked
+            if isChecked1 != isChecked2 {
+                return !isChecked1
+            }
+            
+            let isBasicMission1 = mission1.initState == .normal
+            let isBasicMission2 = mission2.initState == .normal
+            if isBasicMission1 != isBasicMission2 {
+                return !isBasicMission1
+            }
+            
+            return mission1.missionID < mission2.missionID
+        }
     }
 }
