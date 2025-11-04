@@ -12,6 +12,8 @@ final class SettingViewController: BaseViewController, NetworkRequestable {
     private let rootView = SettingView()
     private let viewModel: SettingViewModel
     
+    private var hasOpenedSettings = false
+    
     init(viewModel: SettingViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -93,6 +95,38 @@ extension SettingViewController {
     private func pushNoticeButtonDidTap() {
         let isSwitchedOn = rootView.isSwitchedOn
         
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            DispatchQueue.main.async { [weak self] in
+                switch settings.authorizationStatus {
+                case .authorized, .provisional, .ephemeral:
+                    self?.performTask(isSwitchedOn: isSwitchedOn)
+                case .denied, .notDetermined:
+                    self?.hasOpenedSettings = true
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                @unknown default:
+                    break
+                }
+            }
+        }
+    }
+    
+    func pushNoticeDidBecomeActive() {
+        guard hasOpenedSettings else { return }
+        hasOpenedSettings = false
+        
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            DispatchQueue.main.async {
+                if settings.authorizationStatus == .authorized {
+                    self.rootView.toggleSwitch()
+                    self.performTask(isSwitchedOn: true)
+                }
+            }
+        }
+    }
+    
+    private func performTask(isSwitchedOn: Bool) {
         Task {
             do {
                 let _ = try await viewModel.action(input: .switchButtonDidTap(isSwitchedOn))
