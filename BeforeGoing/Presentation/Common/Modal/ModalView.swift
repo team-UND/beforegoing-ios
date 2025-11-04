@@ -17,14 +17,10 @@ final class ModalView: BaseView {
     private(set) var actionButton = UIButton()
     
     init(type: ModalType) {
+        self.modalType = type
         super.init(frame: .zero)
         
-        let component = type.component
-        imageView.image = component.image
-        titleLabel.text = component.mainTitle
-        descriptionLabel.text = component.description
-        dismissButton.setTitle(component.dismissTitle, for: .normal)
-        actionButton.setTitle(component.actionTitle, for: .normal)
+        setComponent(type.component)
     }
 
     required init?(coder: NSCoder) {
@@ -104,5 +100,25 @@ final class ModalView: BaseView {
             $0.bottom.equalToSuperview().inset(4.adjustedH)
             $0.height.equalTo(48.adjustedH)
         }
+    }
+    
+    private func setComponent(_ component: ModalComponent) {
+        if let image = component.image {
+            imageView.image = component.image
+        }
+        
+        if let mainTitle = component.mainTitle {
+            titleLabel.text = component.mainTitle
+            descriptionLabel.textColor = .gray400
+        } else {
+            descriptionLabel.textColor = .gray900
+        }
+        
+        if let dismissTitle = component.dismissTitle {
+            dismissButton.setTitle(component.dismissTitle, for: .normal)
+        }
+        
+        descriptionLabel.text = component.description
+        actionButton.setTitle(component.actionTitle, for: .normal)
     }
 }
