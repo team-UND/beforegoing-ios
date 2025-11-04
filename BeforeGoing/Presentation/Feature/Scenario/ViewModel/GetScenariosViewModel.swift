@@ -115,6 +115,10 @@ extension GetScenariosViewModel {
         self.pointer = pointer
     }
     
+    func findTagByTitle(_ title: String) -> Int {
+        scenarios?.firstIndex(where: { $0.scenarioName == title }) ?? 0
+    }
+    
     private func findScenarioByID(id: Int) -> ScenarioEntity? {
         scenarios?.filter { $0.scenarioId == id }.first
     }

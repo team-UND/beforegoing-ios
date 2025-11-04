@@ -25,6 +25,28 @@ final class BottomNavigationViewController: UITabBarController {
         self.selectedIndex = item.rawValue
     }
     
+    func handleScenarioTap(title: String) {
+        let homeIndex = BottomNavigationItem.home.rawValue
+        
+        guard let viewControllers = self.viewControllers,
+              homeIndex < viewControllers.count else {
+            return
+        }
+        
+        var homeVC = viewControllers[homeIndex]
+        
+        if let navController = homeVC as? UINavigationController,
+           let rootVC = navController.viewControllers.first {
+            homeVC = rootVC
+        }
+        
+        guard let finalHomeVC = homeVC as? HomeViewController else {
+            return
+        }
+        
+        finalHomeVC.handleScenarioTap(title: title)
+    }
+    
     private func setViewControllers() { 
         self.viewControllers = BottomNavigationItem.allCases.map {
              createViewController(
