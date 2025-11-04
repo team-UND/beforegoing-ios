@@ -26,4 +26,5 @@ enum BeforeGoingError: Error, Equatable {
     case unknownError
     case loginExpired
     case missionLimitError
+    case tooManyRequset
 }
