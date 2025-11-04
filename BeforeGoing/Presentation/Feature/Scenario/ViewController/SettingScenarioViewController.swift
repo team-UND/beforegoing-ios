@@ -213,6 +213,7 @@ extension SettingScenarioViewController: ToastPresentable {
     private func missionTextFieldDidTap() {
         rootView.settingMissionView.revealDeleteButton()
         guard let text = rootView.settingMissionView.missionTextField.text else { return }
+        
         rootView.settingMissionView.deleteMissionButton.isHidden = text.isBlank ? true : false
         rootView.settingMissionView.updateText()
     }
@@ -239,6 +240,7 @@ extension SettingScenarioViewController: ToastPresentable {
         }
         
         missions.insert((nil, missionContent), at: 0)
+        rootView.settingMissionView.updateMissionCount(missions.count)
         rootView.settingMissionView.missionTableView.insertSections(
             IndexSet(integer: 0),
             with: .automatic

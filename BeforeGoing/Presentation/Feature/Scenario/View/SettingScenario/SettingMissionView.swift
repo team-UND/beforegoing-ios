@@ -12,7 +12,7 @@ final class SettingMissionView: BaseView {
     private let maxLength = 20
     
     private let missionTitleLabel = UILabel()
-    private(set) var letterCountLabel = UILabel()
+    private(set) var missionCountLabel = UILabel()
     private(set) var missionTextField = TextField(type: .enableAddField)
     private(set) var addMissionButton = UIButton()
     private(set) var deleteMissionButton = UIButton()
@@ -24,10 +24,10 @@ final class SettingMissionView: BaseView {
             $0.textColor = .gray600
             $0.font = .custom(.bodyLGMedium)
         }
-        letterCountLabel.do {
+        missionCountLabel.do {
             $0.textColor = .gray400
             $0.font = .custom(.bodyMDMedium)
-            self.letterCountLabel.text = "0/\(maxLength)"
+            $0.text = "0/\(maxLength)"
         }
         missionTextField.do {
             $0.placeholder = "항목을 추가하세요"
@@ -47,7 +47,7 @@ final class SettingMissionView: BaseView {
     override func setUI() {
         addSubviews(
             missionTitleLabel,
-            letterCountLabel,
+            missionCountLabel,
             missionTextField,
             addMissionButton,
             deleteMissionButton,
@@ -60,7 +60,7 @@ final class SettingMissionView: BaseView {
             $0.top.equalToSuperview()
             $0.leading.equalToSuperview()
         }
-        letterCountLabel.snp.makeConstraints {
+        missionCountLabel.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.centerY.equalTo(missionTitleLabel.snp.centerY)
             $0.trailing.equalToSuperview()
@@ -112,7 +112,6 @@ extension SettingMissionView {
         guard let text = missionTextField.text,
               !text.isBlank else {
             missionTextField.text = ""
-            letterCountLabel.text = "\(0)/\(maxLength)"
             addMissionButton.setImage(.plusCircle.withTintColor(.gray400), for: .normal)
             return
         }
@@ -121,6 +120,9 @@ extension SettingMissionView {
             .trim(limit: maxLength)
             .removeLeadingSpaces()
         missionTextField.text = completeText
-        letterCountLabel.text = "\(completeText.count)/\(maxLength)"
+    }
+    
+    func updateMissionCount(_ count: Int) {
+        missionCountLabel.text = "\(count)/\(maxLength)"
     }
 }
