@@ -10,6 +10,8 @@ import UserNotifications
 final class NotificationManager {
     
     static let shared = NotificationManager()
+    private let terminateIdentifier = "terminate"
+    
     private init() {}
     
     func setPermission(completion: @escaping () -> Void) {
@@ -79,6 +81,22 @@ final class NotificationManager {
             .removeDeliveredNotifications(withIdentifiers: identifiers)
     }
     
+    func pushTerminateNotification() async {
+        let pendingRequests = await UNUserNotificationCenter.current().pendingNotificationRequests()
+        
+        if pendingRequests.count > 0 {
+            let request = createNotificationRequest(
+                identifier: terminateIdentifier,
+                notificationContent: createNotificationContent(
+                    title: "잠시만요!",
+                    body: "앱을 완전히 종료하면 설정한 알람이 울리지 않아요",
+                    identifier: terminateIdentifier
+                )
+            )
+            addRequest(request)
+        }
+    }
+    
     private func createNotificationContent(
         title: String,
         body: String,
@@ -127,6 +145,15 @@ final class NotificationManager {
         UNNotificationRequest(identifier: identifier,
                               content: notificationContent,
                               trigger: trigger)
+    }
+    
+    private func createNotificationRequest(
+        identifier: String,
+        notificationContent: UNMutableNotificationContent
+    ) -> UNNotificationRequest {
+        UNNotificationRequest(identifier: identifier,
+                              content: notificationContent,
+                              trigger: nil)
     }
     
     private func addRequest(_ request: UNNotificationRequest) {
