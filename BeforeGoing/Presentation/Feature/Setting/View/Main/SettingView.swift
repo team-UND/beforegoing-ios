@@ -80,6 +80,10 @@ extension SettingView {
         settingNoticeView.basicPushNoticeView.switchButton.isOn
     }
     
+    func configure(version: String) {
+        policyView.versionLabel.text = version
+    }
+    
     func updateSwitch(isAgreed: Bool) {
         settingNoticeView.basicPushNoticeView.switchButton.isSelected = isAgreed
     }

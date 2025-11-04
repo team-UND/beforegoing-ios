@@ -14,7 +14,7 @@ final class PolicyView: BaseView {
     private(set) var termView = SeeMoreView(title: "이용 약관")
     private(set) var privacyView = SeeMoreView(title: "개인정보 처리방침")
     private let versionTitleLabel = UILabel()
-    private let versionLabel = UILabel()
+    private(set) var versionLabel = UILabel()
     
     override func setStyle() {
         titleLabel.do {
@@ -28,7 +28,6 @@ final class PolicyView: BaseView {
             $0.font = .custom(.bodyLGMedium)
         }
         versionLabel.do {
-            $0.text = "v.1.5.11"
             $0.textColor = .gray900
             $0.font = .custom(.bodyMDMedium)
         }

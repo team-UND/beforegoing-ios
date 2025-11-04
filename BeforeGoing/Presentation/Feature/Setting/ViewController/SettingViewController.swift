@@ -17,6 +17,12 @@ final class SettingViewController: BaseViewController {
     init(viewModel: SettingViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
+        
+        
+        guard let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
+            return
+        }
+        rootView.configure(version: version)
     }
 
     required init?(coder: NSCoder) {
