@@ -36,7 +36,8 @@ final class NotificationManager {
         let notificationContent = createNotificationContent(
             title: title,
             body: body,
-            identifier: identifier
+            identifier: identifier,
+            sound: UNNotificationSound.default
         )
         
         for day in daysOfWeek {
@@ -107,6 +108,24 @@ final class NotificationManager {
             content.title = title
             content.body = body
             content.userInfo["identifier"] = identifier
+            return content
+        }()
+        
+        return notificationContent
+    }
+    
+    private func createNotificationContent(
+        title: String,
+        body: String,
+        identifier: String,
+        sound: UNNotificationSound
+    ) -> UNMutableNotificationContent {
+        let notificationContent: UNMutableNotificationContent = {
+            let content = UNMutableNotificationContent()
+            content.title = title
+            content.body = body
+            content.userInfo["identifier"] = identifier
+            content.sound = sound
             return content
         }()
         
