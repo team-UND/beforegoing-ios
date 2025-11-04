@@ -11,6 +11,7 @@ final class SettingScenarioViewController: BaseViewController {
     
     private let rootView = SettingScenarioView()
     
+    private let missionLimit = 20
     private var missions: [(missionID: Int?, content: String)] = []
     private var scenarioID: Int?
     private var enterType: SettingScenarioEnterType?
@@ -173,7 +174,7 @@ extension SettingScenarioViewController {
     }
 }
 
-extension SettingScenarioViewController {
+extension SettingScenarioViewController: ToastPresentable {
     
     @objc
     private func scenarioNameTextFieldDidTap() {
@@ -223,9 +224,21 @@ extension SettingScenarioViewController {
     
     @objc
     private func addMissionButtonDidTap() {
-        guard let mission = rootView.settingMissionView.getUserMission(),
-              !mission.isBlank else { return }
-        missions.insert((nil, mission), at: 0)
+        guard let missionContent = rootView.settingMissionView.getUserMission(),
+              !missionContent.isBlank else { return }
+        
+        if missions.count >= missionLimit {
+            self.presentToastMessage(type: .missionLimit)
+            return
+        }
+        if missions.contains(where: { _, content in
+            content == missionContent
+        }) {
+            self.presentToastMessage(type: .duplicateMission)
+            return
+        }
+        
+        missions.insert((nil, missionContent), at: 0)
         rootView.settingMissionView.missionTableView.insertSections(
             IndexSet(integer: 0),
             with: .automatic

@@ -187,7 +187,7 @@ final class HomeViewController: BaseViewController {
     }
 }
 
-extension HomeViewController {
+extension HomeViewController: ToastPresentable {
     
     @objc
     private func viewCalendarButtonDidTap() {
@@ -279,9 +279,13 @@ extension HomeViewController {
             case .success:
                 rootView.modalView.listTableView.reloadData()
             case .failure(let error):
-                if let error = error as? BeforeGoingError,
-                   error == .loginExpired {
-                    self.presentLoginExpired()
+                if let error = error as? BeforeGoingError {
+                    if error == .loginExpired {
+                        self.presentLoginExpired()
+                    }
+                    if error == .missionLimitError {
+                        self.presentToastMessage(type: .todayMissionLimit)
+                    }
                 }
                 BeforeGoingLogger.error(error)
             }
