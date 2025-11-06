@@ -10,7 +10,14 @@ import UIKit
 final class SettingNoticeView: BaseView {
     
     private let titleLabel = UILabel()
-    private(set) var basicPushNoticeView = SettingPushNoticeView(title: "푸시 알림 설정")
+    private(set) var basicPushNoticeView = SettingPushNoticeView(
+        title: "푸시 알림 / 알람 설정",
+        subtitle: "설정한 알림을 받아볼 수 있어요."
+    )
+    private(set) var eventPushNoticeView = SettingPushNoticeView(
+        title: "이벤트 / 마케팅 앱 푸시 수신동의",
+        subtitle: "이벤트, 혜택 등 유용한 정보를 받아볼 수 있어요."
+    )
     private let divider = UILabel()
     
     override func setStyle() {
@@ -28,6 +35,7 @@ final class SettingNoticeView: BaseView {
         addSubviews(
             titleLabel,
             basicPushNoticeView,
+            eventPushNoticeView,
             divider
         )
     }
@@ -36,14 +44,20 @@ final class SettingNoticeView: BaseView {
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview().inset(12.adjustedH)
             $0.leading.equalToSuperview().inset(20.adjustedW)
+            $0.height.equalTo(29.adjustedH)
         }
         basicPushNoticeView.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(12.adjustedH)
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(46.adjustedH)
         }
+        eventPushNoticeView.snp.makeConstraints {
+            $0.top.equalTo(basicPushNoticeView.snp.bottom).offset(16.adjustedH)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(46.adjustedH)
+        }
         divider.snp.makeConstraints {
-            $0.top.equalTo(basicPushNoticeView.snp.bottom).offset(20.adjustedH)
+            $0.top.equalTo(eventPushNoticeView.snp.bottom).offset(20.adjustedH)
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(6.adjustedH)
             $0.bottom.equalToSuperview()

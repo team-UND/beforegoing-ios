@@ -77,7 +77,7 @@ extension NicknameViewController {
                   let text = nicknameView.nicknameTextField.text else {
                 return
             }
-            text.isEmpty ? nicknameView.hideDeleteButton() : nicknameView.revealDeleteButton()
+            text.isBlank ? nicknameView.hideDeleteButton() : nicknameView.revealDeleteButton()
             
             let trimmedText = trimText(text)
             if trimmedText.isValidNickname {

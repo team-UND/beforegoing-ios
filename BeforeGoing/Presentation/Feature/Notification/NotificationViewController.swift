@@ -19,7 +19,10 @@ final class NotificationViewController: BaseViewController {
         content: UNNotificationContent,
         identifier: String
     ) {
-        self.rootView = NotificationView(notificationViewType: notificationViewType)
+        self.rootView = NotificationView(
+            notificationViewType: notificationViewType,
+            title: content.title
+        )
         self.content = content
         self.identifier = identifier
         super.init(nibName: nil, bundle: nil)
@@ -71,6 +74,8 @@ extension NotificationViewController {
     }
     
     private func replaceToHome() {
-        ViewControllerUtil.replaceRootViewController(to: BottomNavigationViewController())
+        let bottomNavigationVC = BottomNavigationViewController()
+        ViewControllerUtil.replaceRootViewController(to: bottomNavigationVC)
+        bottomNavigationVC.handleScenarioTap(title: content.title)
     }
 }

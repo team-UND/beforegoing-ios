@@ -45,5 +45,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     ) -> UIInterfaceOrientationMask {
         return .portrait
     }
+    
+    func applicationWillTerminate(_ application: UIApplication) {
+        Task {
+            await NotificationManager.shared.pushTerminateNotification()
+        }
+    }
 }
 

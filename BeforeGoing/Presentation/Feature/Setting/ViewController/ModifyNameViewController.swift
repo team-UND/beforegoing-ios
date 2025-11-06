@@ -10,6 +10,7 @@ import UIKit
 final class ModifyNameViewController: BaseViewController {
     
     private let rootView = ModifyNameView()
+    private var initialName: String?
     private let viewModel: ModifyNicknameViewModel
     
     init(viewModel: ModifyNicknameViewModel) {
@@ -51,7 +52,7 @@ extension ModifyNameViewController: Backable {
     }
 }
 
-extension ModifyNameViewController: NetworkRequestable {
+extension ModifyNameViewController: NetworkRequestable, NetworkRequestErrorHandler {
     
     @objc
     private func nameTextFieldDidChange() {
@@ -60,7 +61,7 @@ extension ModifyNameViewController: NetworkRequestable {
                   let text = rootView.nameTextField.text else {
                 return
             }
-            rootView.updateDeleteButtonState(condition: text.isEmpty)
+            rootView.updateDeleteButtonState(condition: text.isBlank)
             
             let trimmedText = trimText(text)
             rootView.updateNameCount(trimmedText.count)
@@ -71,19 +72,22 @@ extension ModifyNameViewController: NetworkRequestable {
     @objc
     private func confirmButtonDidTap() {
         guard let nickname = rootView.nameTextField.text,
-              !nickname.isEmpty else {
+              !nickname.isBlank else {
             return
         }
+        guard let initialName = initialName,
+              initialName != nickname else {
+            self.navigationController?.popViewController(animated: true)
+            return
+        }
+        
         Task {
             let result = try await viewModel.action(input: .confirmButtonDidTap(nickname: nickname))
             switch result.updateNicknameResult {
             case .success:
                 self.navigationController?.popViewController(animated: true)
             case .failure(let error):
-                if let error = error as? BeforeGoingError,
-                   error == .loginExpired {
-                    self.presentLoginExpired()
-                }
+                self.handleError(error)
                 BeforeGoingLogger.error(BeforeGoingError.updateNicknameFailed)
             }
         }
@@ -101,6 +105,7 @@ extension ModifyNameViewController: NetworkRequestable {
 extension ModifyNameViewController {
     
     func configure(_ name: String) {
+        self.initialName = name
         rootView.configureName(name)
     }
 }

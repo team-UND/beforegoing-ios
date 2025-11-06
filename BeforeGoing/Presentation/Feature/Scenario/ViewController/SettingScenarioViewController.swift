@@ -11,6 +11,7 @@ final class SettingScenarioViewController: BaseViewController {
     
     private let rootView = SettingScenarioView()
     
+    private let missionLimit = 20
     private var missions: [(missionID: Int?, content: String)] = []
     private var scenarioID: Int?
     private var enterType: SettingScenarioEnterType?
@@ -173,7 +174,7 @@ extension SettingScenarioViewController {
     }
 }
 
-extension SettingScenarioViewController {
+extension SettingScenarioViewController: ToastPresentable {
     
     @objc
     private func scenarioNameTextFieldDidTap() {
@@ -191,7 +192,7 @@ extension SettingScenarioViewController {
         DispatchQueue.main.async { [weak self] in
             guard self != nil else { return }
             
-            text.isEmpty ? view.hideDeleteButton() : view.revealDeleteButton()
+            text.isBlank ? view.hideDeleteButton() : view.revealDeleteButton()
             let trimmedText = view.trimText(text)
             view.updateTextCount(trimmedText.count)
         }
@@ -212,7 +213,9 @@ extension SettingScenarioViewController {
     private func missionTextFieldDidTap() {
         rootView.settingMissionView.revealDeleteButton()
         guard let text = rootView.settingMissionView.missionTextField.text else { return }
-        rootView.settingMissionView.deleteMissionButton.isHidden = text.isEmpty ? true : false
+        
+        rootView.settingMissionView.deleteMissionButton.isHidden = text.isBlank ? true : false
+        rootView.settingMissionView.updateText()
     }
     
     @objc
@@ -222,14 +225,28 @@ extension SettingScenarioViewController {
     
     @objc
     private func addMissionButtonDidTap() {
-        guard let mission = rootView.settingMissionView.getUserMission(),
-                !mission.isEmpty else { return }
-        missions.insert((nil, mission), at: 0)
+        guard let missionContent = rootView.settingMissionView.getUserMission(),
+              !missionContent.isBlank else { return }
+        
+        if missions.count >= missionLimit {
+            self.presentToastMessage(type: .missionLimit)
+            return
+        }
+        if missions.contains(where: { _, content in
+            content == missionContent
+        }) {
+            self.presentToastMessage(type: .duplicateMission)
+            return
+        }
+        
+        missions.insert((nil, missionContent), at: 0)
+        rootView.settingMissionView.updateMissionCount(missions.count)
         rootView.settingMissionView.missionTableView.insertSections(
             IndexSet(integer: 0),
             with: .automatic
         )
         checkNextButtonState()
+        rootView.settingMissionView.deleteAllText()
         self.view.endEditing(false)
     }
     
@@ -251,12 +268,15 @@ extension SettingScenarioViewController {
     private func checkNextButtonState() {
         guard let scenario = rootView.inputScenarioView.textField.text,
               let memo = rootView.inputMemoView.textField.text else { return }
-        let isEnabled = !scenario.isEmpty && !memo.isEmpty && missions.count >= 1
+        let isEnabled = !scenario.isBlank && !memo.isBlank && missions.count >= 1
         
         rootView.updateUI(state: isEnabled ? .enableLongButton : .disableLongButton)
     }
     
     private func addScenario(scenarioName: String, memo: String) {
+        let scenarioName = scenarioName.removeTrailingSpaces()
+        let memo = memo.removeTrailingSpaces()
+
         Task {
             do {
                 let _ = try await addScenarioViewModel.action(
@@ -276,6 +296,9 @@ extension SettingScenarioViewController {
     private func updateScenario(scenarioName: String, memo: String) {
         guard let scenarioID = scenarioID else { return }
 
+        let scenarioName = scenarioName.removeTrailingSpaces()
+        let memo = memo.removeTrailingSpaces()
+        
         Task {
             do {
                 let _ = try await updateScenarioViewModel.action(

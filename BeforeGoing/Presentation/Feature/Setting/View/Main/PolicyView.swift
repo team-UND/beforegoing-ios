@@ -10,10 +10,11 @@ import UIKit
 final class PolicyView: BaseView {
     
     private let titleLabel = UILabel()
+    private(set) var noticeView = SeeMoreView(title: "공지사항")
     private(set) var termView = SeeMoreView(title: "이용 약관")
     private(set) var privacyView = SeeMoreView(title: "개인정보 처리방침")
     private let versionTitleLabel = UILabel()
-    private let versionLabel = UILabel()
+    private(set) var versionLabel = UILabel()
     
     override func setStyle() {
         titleLabel.do {
@@ -27,7 +28,6 @@ final class PolicyView: BaseView {
             $0.font = .custom(.bodyLGMedium)
         }
         versionLabel.do {
-            $0.text = "v.1.5.11"
             $0.textColor = .gray900
             $0.font = .custom(.bodyMDMedium)
         }
@@ -36,6 +36,7 @@ final class PolicyView: BaseView {
     override func setUI() {
         addSubviews(
             titleLabel,
+            noticeView,
             termView,
             privacyView,
             versionTitleLabel,
@@ -47,14 +48,22 @@ final class PolicyView: BaseView {
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.leading.equalToSuperview().inset(20.adjustedW)
+            $0.height.equalTo(29.adjustedH)
         }
-        termView.snp.makeConstraints {
+        noticeView.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(12.adjustedH)
             $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(28.adjustedH)
+        }
+        termView.snp.makeConstraints {
+            $0.top.equalTo(noticeView.snp.bottom).offset(16.adjustedH)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(28.adjustedH)
         }
         privacyView.snp.makeConstraints {
             $0.top.equalTo(termView.snp.bottom).offset(16.adjustedH)
             $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(28.adjustedH)
         }
         versionTitleLabel.snp.makeConstraints {
             $0.top.equalTo(privacyView.snp.bottom).offset(16.adjustedH)

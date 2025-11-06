@@ -9,6 +9,8 @@ import UIKit
 
 final class SettingView: BaseView {
     
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
     private let titleLabel = UILabel()
     private(set) var accountView = AccountView()
     private(set) var supportView = SupportView()
@@ -26,6 +28,10 @@ final class SettingView: BaseView {
     override func setUI() {
         addSubviews(
             titleLabel,
+            scrollView
+        )
+        scrollView.addSubview(contentView)
+        contentView.addSubviews(
             accountView,
             supportView,
             settingNoticeView,
@@ -39,25 +45,31 @@ final class SettingView: BaseView {
             $0.leading.equalToSuperview().inset(20.adjustedW)
             $0.height.equalTo(48.adjustedH)
         }
+        scrollView.snp.makeConstraints {
+            $0.top.equalTo(titleLabel.snp.bottom)
+            $0.horizontalEdges.equalTo(safeAreaLayoutGuide.snp.horizontalEdges)
+            $0.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
+        }
+        contentView.snp.makeConstraints {
+            $0.edges.equalTo(scrollView.contentLayoutGuide)
+            $0.width.equalTo(scrollView.frameLayoutGuide)
+        }
         accountView.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(16.adjustedH)
+            $0.top.equalToSuperview().offset(16.adjustedH)
             $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(77.adjustedH)
         }
         supportView.snp.makeConstraints {
             $0.top.equalTo(accountView.snp.bottom).offset(20.adjustedH)
             $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(77.adjustedH)
         }
         settingNoticeView.snp.makeConstraints {
             $0.top.equalTo(supportView.snp.bottom).offset(8.adjustedH)
             $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(129.adjustedH)
         }
         policyView.snp.makeConstraints {
             $0.top.equalTo(settingNoticeView.snp.bottom).offset(20.adjustedH)
             $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(140.adjustedH)
+            $0.bottom.equalToSuperview().inset(20.adjustedH)
         }
     }
 }
@@ -66,5 +78,13 @@ extension SettingView {
     
     var isSwitchedOn: Bool {
         settingNoticeView.basicPushNoticeView.switchButton.isOn
+    }
+    
+    func configure(version: String) {
+        policyView.versionLabel.text = version
+    }
+    
+    func updateSwitch(isAgreed: Bool) {
+        settingNoticeView.basicPushNoticeView.switchButton.isSelected = isAgreed
     }
 }

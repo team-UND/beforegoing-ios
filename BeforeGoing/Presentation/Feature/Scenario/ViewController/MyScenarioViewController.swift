@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class MyScenarioViewController: BaseViewController, NetworkRequestable {
+final class MyScenarioViewController: BaseViewController {
     
     private let rootView = ScenarioListView()
     private let getSingleScenarioViewModel: GetSingleScenarioViewModel
@@ -52,9 +52,7 @@ final class MyScenarioViewController: BaseViewController, NetworkRequestable {
                         if error == .notFoundError {
                             rootView.replaceEmptyView()
                         }
-                        if error == .loginExpired {
-                            self.presentLoginExpired()
-                        }
+                        self.handleError(error)
                     }
                 }
             } catch {
@@ -91,7 +89,7 @@ final class MyScenarioViewController: BaseViewController, NetworkRequestable {
     }
 }
 
-extension MyScenarioViewController {
+extension MyScenarioViewController: NetworkRequestable, NetworkRequestErrorHandler {
     
     @objc
     private func addScenarioButtonDidTap() {
@@ -114,10 +112,7 @@ extension MyScenarioViewController {
                 )
                 handleGetScenarioResult(result: result.getScenarioResult)
             } catch {
-                if let error = error as? BeforeGoingError,
-                   error == .loginExpired {
-                    self.presentLoginExpired()
-                }
+                self.handleError(error)
             }
         }
     }
@@ -231,10 +226,7 @@ extension MyScenarioViewController: UITableViewDataSource {
                     }
                     
                 } catch {
-                    if let error = error as? BeforeGoingError,
-                       error == .loginExpired {
-                        self.presentLoginExpired()
-                    }
+                    self.handleError(error)
                     BeforeGoingLogger.error(error)
                 }
                 completion(true)
@@ -289,7 +281,7 @@ extension MyScenarioViewController: UITableViewDropDelegate {
             let sourceSection = sourceIndexPath.section
             
             moveScenario(originalAt: sourceSection, destinationAt: destinationSection)
-            updateScenarioOrder(section: destinationSection)
+            updateScenarioOrder(originalAt: sourceSection, destinationAt: destinationSection)
         }
         tableView.reloadData()
     }
@@ -312,10 +304,14 @@ extension MyScenarioViewController: UITableViewDropDelegate {
         )
     }
     
-    private func updateScenarioOrder(section: Int) {
-        let scenarioID = getScenariosViewModel.getScenarioID(at: section)
-        let prevOrder = getScenariosViewModel.getPreviousScenarioOrder(current: section)
-        let nextOrder = getScenariosViewModel.getNextScenarioOrder(current: section)
+    private func updateScenarioOrder(originalAt: Int, destinationAt: Int) {
+        guard originalAt != destinationAt else {
+            return
+        }
+    
+        let scenarioID = getScenariosViewModel.getScenarioID(at: destinationAt)
+        let prevOrder = getScenariosViewModel.getPreviousScenarioOrder(current: destinationAt)
+        let nextOrder = getScenariosViewModel.getNextScenarioOrder(current: destinationAt)
         
         Task {
             do {
@@ -328,10 +324,7 @@ extension MyScenarioViewController: UITableViewDropDelegate {
                 )
                 handleUpdateScenarioOrderResult(result: result.updateScenarioOrderResult)
             } catch {
-                if let error = error as? BeforeGoingError,
-                   error == .loginExpired {
-                    self.presentLoginExpired()
-                }
+                self.handleError(error)
             }
         }
     }

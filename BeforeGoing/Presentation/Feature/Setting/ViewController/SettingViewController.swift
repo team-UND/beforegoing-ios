@@ -7,14 +7,22 @@
 
 import UIKit
 
-final class SettingViewController: BaseViewController, NetworkRequestable {
+final class SettingViewController: BaseViewController {
     
     private let rootView = SettingView()
     private let viewModel: SettingViewModel
     
+    private var hasOpenedSettings = false
+    
     init(viewModel: SettingViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
+        
+        
+        guard let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
+            return
+        }
+        rootView.configure(version: version)
     }
 
     required init?(coder: NSCoder) {
@@ -35,11 +43,9 @@ final class SettingViewController: BaseViewController, NetworkRequestable {
             }
             switch result.isEventPushAgreed {
             case .success(let eventPushAgreed):
-                rootView.settingNoticeView.basicPushNoticeView.updateButtonState(condition: eventPushAgreed)
+                rootView.settingNoticeView.eventPushNoticeView.updateButtonState(condition: eventPushAgreed)
             case .failure(let error):
-                if error == .loginExpired {
-                    self.presentLoginExpired()
-                }
+                self.handleError(error)
                 BeforeGoingLogger.error(error)
             }
         }
@@ -56,9 +62,19 @@ final class SettingViewController: BaseViewController, NetworkRequestable {
             action: #selector(supportButtonDidTap),
             for: .touchUpInside
         )
+        rootView.settingNoticeView.eventPushNoticeView.switchButton.addTarget(
+            self,
+            action: #selector(eventPushNoticeButtonDidTap),
+            for: .touchUpInside
+        )
         rootView.settingNoticeView.basicPushNoticeView.switchButton.addTarget(
             self,
             action: #selector(pushNoticeButtonDidTap),
+            for: .touchUpInside
+        )
+        rootView.policyView.noticeView.moveButton.addTarget(
+            self,
+            action: #selector(noticeButtonDidTap),
             for: .touchUpInside
         )
         rootView.policyView.termView.moveButton.addTarget(
@@ -74,7 +90,7 @@ final class SettingViewController: BaseViewController, NetworkRequestable {
     }
 }
 
-extension SettingViewController {
+extension SettingViewController: NetworkRequestable, NetworkRequestErrorHandler {
     
     @objc
     private func profileButtonDidTap() {
@@ -90,19 +106,64 @@ extension SettingViewController {
     }
     
     @objc
+    private func eventPushNoticeButtonDidTap() {
+        let isSwitchedOn = rootView.settingNoticeView.eventPushNoticeView.switchButton.isOn
+        performTask(isSwitchedOn: isSwitchedOn)
+    }
+    
+    @objc
     private func pushNoticeButtonDidTap() {
-        let isSwitchedOn = rootView.isSwitchedOn
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            DispatchQueue.main.async { [weak self] in
+                self?.hasOpenedSettings = true
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            }
+        }
+    }
+    
+    func pushNoticeDidBecomeActive() {
+        guard hasOpenedSettings else { return }
+        hasOpenedSettings = false
         
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            DispatchQueue.main.async {
+                let isAgreed: Bool
+
+                switch settings.authorizationStatus {
+                case .authorized, .provisional, .ephemeral:
+                    isAgreed = true
+                case .denied, .notDetermined:
+                    isAgreed = false
+                @unknown default:
+                    isAgreed = false
+                }
+                
+                let currentDate = DateUtil.getCurrentDate().toString()
+                let modalVC = ModalViewController(
+                    modalView: ModalView(type: .eventPushAgree(isAgreed: isAgreed, currentDate: currentDate))
+                )
+                
+                self.rootView.updateSwitch(isAgreed: isAgreed)
+                self.present(modalVC, animated: true)
+            }
+        }
+    }
+    
+    private func performTask(isSwitchedOn: Bool) {
         Task {
             do {
                 let _ = try await viewModel.action(input: .switchButtonDidTap(isSwitchedOn))
             } catch {
-                if let error = error as? BeforeGoingError,
-                   error == .loginExpired {
-                    self.presentLoginExpired()
-                }
+                self.handleError(error)
             }
         }
+    }
+    
+    @objc
+    private func noticeButtonDidTap() {
+        ExternalLink.notice.openURL(for: self)
     }
     
     @objc

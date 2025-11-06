@@ -14,12 +14,14 @@ final class NotificationView: BaseView {
     
     private let backgroundImageView = UIImageView()
     private let mainTitleLabel = UILabel()
-    private let subTitleLabel = UILabel()
+    private let subtitleLabel = UILabel()
     
-    init(notificationViewType: NotificationViewType) {
+    init(notificationViewType: NotificationViewType, title: String) {
         self.notificationViewType = notificationViewType
         self.backgroundImageView.image = notificationViewType.backgroundImage
         super.init(frame: .zero)
+        
+        subtitleLabel.text = title
     }
     
     @MainActor required init?(coder: NSCoder) {
@@ -33,8 +35,7 @@ final class NotificationView: BaseView {
             $0.textAlignment = .center
             $0.font = .custom(.headingH2)
         }
-        subTitleLabel.do {
-            $0.text = "출근 전"
+        subtitleLabel.do {
             $0.textColor = .gray900
             $0.textAlignment = .center
             $0.font = .custom(.headingH1)
@@ -45,7 +46,7 @@ final class NotificationView: BaseView {
         addSubviews(
             backgroundImageView,
             mainTitleLabel,
-            subTitleLabel
+            subtitleLabel
         )
         
         notificationViewType.actions.forEach { addSubview(createActionView(action: $0)) }
@@ -60,7 +61,7 @@ final class NotificationView: BaseView {
             $0.horizontalEdges.equalToSuperview().inset(92.adjustedW)
             $0.height.equalTo(36.adjustedH)
         }
-        subTitleLabel.snp.makeConstraints {
+        subtitleLabel.snp.makeConstraints {
             $0.top.equalTo(mainTitleLabel.snp.bottom).offset(4.adjustedH)
             $0.horizontalEdges.equalToSuperview().inset(92.adjustedW)
             $0.height.equalTo(47.adjustedH)

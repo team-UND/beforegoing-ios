@@ -25,4 +25,6 @@ enum BeforeGoingError: Error, Equatable {
     case weatherServiceError
     case unknownError
     case loginExpired
+    case missionLimitError
+    case tooManyRequset
 }

@@ -27,8 +27,9 @@ final class LoginView: BaseView {
             $0.image = .bgSplash
         }
         appIconImageView.do {
-            $0.play()
             $0.loopMode = .loop
+            $0.backgroundBehavior = .pauseAndRestore
+            $0.play()
         }
         subtitleLabel.do {
             $0.text = ApproachLiteral.subtitle.rawValue
