@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class NoticeViewController: BaseViewController, NetworkRequestable {
+final class NoticeViewController: BaseViewController {
     
     private let rootView = NoticeView()
     
@@ -103,7 +103,7 @@ extension NoticeViewController: Backable {
     }
 }
 
-extension NoticeViewController {
+extension NoticeViewController: NetworkRequestable, NetworkRequestErrorHandler {
     
     @objc
     private func alarmViewDidTap(_ gesture: UITapGestureRecognizer) {
@@ -163,19 +163,13 @@ extension NoticeViewController {
                     do {
                         let _ = try await addScenarioViewModel.action(input: .saveButtonInSetNoticeDidTap)
                     } catch {
-                        if let error = error as? BeforeGoingError,
-                           error == .loginExpired {
-                            self.presentLoginExpired()
-                        }
+                        self.handleError(error)
                     }
                 } else {
                     do {
                         let _ = try await updateScenarioViewModel.action(input: .saveButtonInSetNoticeDidTap)
                     } catch {
-                        if let error = error as? BeforeGoingError,
-                           error == .loginExpired {
-                            self.presentLoginExpired()
-                        }
+                        self.handleError(error)
                     }
                 }
                 self.navigationController?.popToRootViewController(animated: false)
@@ -218,10 +212,7 @@ extension NoticeViewController {
                     notificationMethod: notificationMethod
                 )
             } catch {
-                if let error = error as? BeforeGoingError,
-                   error == .loginExpired {
-                    self.presentLoginExpired()
-                }
+                self.handleError(error)
             }
         }
     }
@@ -245,10 +236,7 @@ extension NoticeViewController {
                     notificationMethod: notificationMethod
                 )
             } catch {
-                if let error = error as? BeforeGoingError,
-                   error == .loginExpired {
-                    self.presentLoginExpired()
-                }
+                self.handleError(error)
             }
         }
     }

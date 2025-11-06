@@ -36,10 +36,12 @@ final class SupportView: BaseView {
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.leading.equalToSuperview().inset(20.adjustedW)
+            $0.height.equalTo(29.adjustedH)
         }
         seemoreView.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(12.adjustedH)
             $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(28.adjustedH)
         }
         divider.snp.makeConstraints {
             $0.top.equalTo(seemoreView.snp.bottom).offset(20.adjustedH)

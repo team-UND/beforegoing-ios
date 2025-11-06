@@ -75,6 +75,9 @@ final class NetworkService: APIManaging {
                 if statuscode == 404 {
                     return .notFoundError
                 }
+                if statuscode == 429 {
+                    return .tooManyRequset
+                }
                 if statuscode == 503 {
                     return .weatherServiceError
                 }

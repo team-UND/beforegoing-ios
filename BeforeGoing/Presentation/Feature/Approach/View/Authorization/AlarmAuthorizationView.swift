@@ -33,7 +33,10 @@ final class AlarmAuthorizationView: BaseView {
             $0.textAlignment = .left
             $0.font = .custom(.bodyMDMedium)
         }
-        notificationsImageView.image = .notifications
+        notificationsImageView.do {
+            $0.image = .noticeAuthorization
+            $0.contentMode = .scaleAspectFill
+        }
         agreeButton.do {
             $0.setTitle("알람을 받을래!", for: .normal)
             $0.setTitleColor(.gray900, for: .normal)
@@ -80,9 +83,9 @@ final class AlarmAuthorizationView: BaseView {
             $0.height.equalTo(17.adjustedH)
         }
         notificationsImageView.snp.makeConstraints {
-            $0.top.equalTo(subLabel.snp.bottom).offset(244.adjustedH)
+            $0.top.equalTo(subLabel.snp.bottom).offset(201.adjustedH)
             $0.horizontalEdges.equalToSuperview().inset(20.adjustedW)
-            $0.height.equalTo(133.4.adjustedH)
+            $0.height.equalTo(163.8.adjustedH)
         }
         agreeButton.snp.makeConstraints {
             $0.bottom.equalToSuperview().inset(94.adjustedH)

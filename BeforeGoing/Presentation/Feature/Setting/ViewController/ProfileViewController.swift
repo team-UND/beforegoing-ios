@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class ProfileViewController: BaseViewController, NetworkRequestable {
+final class ProfileViewController: BaseViewController {
     
     private let rootView = ProfileView()
     private let viewModel: ProfileViewModel
@@ -80,7 +80,7 @@ extension ProfileViewController: Backable {
     }
 }
 
-extension ProfileViewController {
+extension ProfileViewController: NetworkRequestable, NetworkRequestErrorHandler {
     
     @objc
     private func modifyNameButtonDidTap() {
@@ -108,7 +108,7 @@ extension ProfileViewController {
         var action: () -> Void
         
         switch modalType {
-        case .expirationLogin:
+        case .expirationLogin, .eventPushAgree, .tooManyRequest:
             action = {}
         case .logout:
             action = defineLogout()
@@ -140,10 +140,7 @@ extension ProfileViewController {
                         return
                     }
                 } catch {
-                    if let error = error as? BeforeGoingError,
-                       error == .loginExpired {
-                        self.presentLoginExpired()
-                    }
+                    self.handleError(error)
                     BeforeGoingLogger.error(BeforeGoingError.logoutFailed)
                 }
             }
@@ -168,10 +165,7 @@ extension ProfileViewController {
                         ViewControllerUtil.replaceRootViewController(to: navigationController)
                     }
                 } catch {
-                    if let error = error as? BeforeGoingError,
-                       error == .loginExpired {
-                        self.presentLoginExpired()
-                    }
+                    self.handleError(error)
                 }
             }
         }

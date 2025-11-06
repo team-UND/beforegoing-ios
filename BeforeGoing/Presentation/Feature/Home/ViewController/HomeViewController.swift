@@ -17,6 +17,7 @@ final class HomeViewController: BaseViewController {
     private let locationManager = CLLocationManager()
     
     private var homeDate: String?
+    private var memberName: String?
     
     init(
         homeViewModel: HomeViewModel,
@@ -48,20 +49,18 @@ final class HomeViewController: BaseViewController {
         Task {
             do {
                 guard let result = try await homeViewModel.action(
-                    input: .requestDate
-                ) as? HomeViewModel.DateOutput else {
+                    input: .requestName
+                ) as? HomeViewModel.MemberNameOutput else {
                     return
                 }
-                self.homeDate = result.date
-                rootView.headerView.updateDateUI(date: result.date)
+                
+                self.memberName = result.memberName
             } catch {
-                if let error = error as? BeforeGoingError,
-                   error == .loginExpired {
-                    self.presentLoginExpired()
-                }
                 BeforeGoingLogger.error(error)
             }
         }
+        
+        requestDate()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -108,6 +107,27 @@ final class HomeViewController: BaseViewController {
             $0.dataSource = self
             $0.register(ListItemCell.self, forCellReuseIdentifier: ListItemCell.identifier)
             $0.reloadData()
+        }
+    }
+    
+    private func requestDate() {
+        Task {
+            do {
+                guard let result = try await homeViewModel.action(
+                    input: .requestDate
+                ) as? HomeViewModel.DateOutput,
+                      let monthAndDay = DateUtil.toMonthAndDay(date: result.date)
+                else {
+                    return
+                }
+                self.homeDate = result.date
+                rootView.headerView.updateDateUI(date: result.date)
+                rootView.modalView.updatePlaceHolder(text: "\(monthAndDay)에만 할 일을 추가해주세요")
+                rootView.modalView.updateTaskField(isEnable: true)
+            } catch (let error) {
+                self.handleError(error)
+                BeforeGoingLogger.error(error)
+            }
         }
     }
     
@@ -164,7 +184,7 @@ final class HomeViewController: BaseViewController {
     }
 }
 
-extension HomeViewController {
+extension HomeViewController: ToastPresentable {
     
     @objc
     private func viewCalendarButtonDidTap() {
@@ -172,8 +192,23 @@ extension HomeViewController {
         calendar.modalPresentationStyle = .overFullScreen
         calendar.onDayDidTap = { [weak self] date in
             let dateString = DateUtil.toString(date: date)
-            self?.homeDate = dateString
-            self?.rootView.headerView.updateDateUI(date: dateString)
+            let currentDate = DateUtil.getCurrentDate()
+            
+            guard let self = self,
+                  let monthAndDay = DateUtil.toMonthAndDay(date: dateString) else {
+                return
+            }
+            
+            self.homeDate = dateString
+            updateHeaderDate(date: dateString)
+            
+            if date != currentDate {
+                updateWeatherByDate(condition: date > currentDate, monthAndDay: monthAndDay)
+                updatePlaceHolderByDate(condition: date > currentDate, monthAndDay: monthAndDay)
+                return
+            }
+            locationManager.requestLocation()
+            updatePlaceHolderByDate(condition: date == currentDate, monthAndDay: monthAndDay)
         }
         calendar.onDismiss = { [weak self] in
             guard let homeDate = self?.homeDate,
@@ -194,7 +229,7 @@ extension HomeViewController {
     @objc
     private func taskTextFieldEditingChanged() {
         if let text = rootView.modalView.taskTextField.text,
-           !text.isEmpty {
+           !text.isBlank {
             rootView.modalView.do {
                 $0.enableAddTaskButton()
                 $0.revealDeleteTaskButton()
@@ -219,7 +254,7 @@ extension HomeViewController {
     @objc
     private func addTaskButtonDidTap() {
         guard let content = rootView.modalView.taskTextField.text,
-              !content.isEmpty,
+              !content.isBlank,
               let homeDate = DateUtil.convertDateFormat(dateString: homeDate) else {
             return
         }
@@ -241,9 +276,11 @@ extension HomeViewController {
             case .success:
                 rootView.modalView.listTableView.reloadData()
             case .failure(let error):
-                if let error = error as? BeforeGoingError,
-                   error == .loginExpired {
-                    self.presentLoginExpired()
+                if let error = error as? BeforeGoingError {
+                    self.handleError(error)
+                    if error == .missionLimitError {
+                        self.presentToastMessage(type: .todayMissionLimit)
+                    }
                 }
                 BeforeGoingLogger.error(error)
             }
@@ -258,7 +295,18 @@ extension HomeViewController {
             return
         }
         
-        let tag = view.tag
+        fetchScenario(tag: view.tag, homeDate: homeDate)
+    }
+    
+    @objc
+    func handleScenarioTap(title: String) {
+        let currentDate = DateUtil.getCurrentDate().toString()
+        
+        let tag = getScenariosViewModel.findTagByTitle(title)
+        rootView.modalView.headerView.updateTappedLabel(tag: tag)
+    }
+    
+    private func fetchScenario(tag: Int, homeDate: String) {
         let scenarioID = getScenariosViewModel.getScenarioID(at: tag)
         
         rootView.modalView.headerView.updateTappedLabel(tag: tag)
@@ -276,10 +324,7 @@ extension HomeViewController {
                 getScenariosViewModel.updatePointer(to: tag)
                 rootView.modalView.listTableView.reloadData()
             case .failure(let error):
-                if let error = error as? BeforeGoingError,
-                   error == .loginExpired {
-                    self.presentLoginExpired()
-                }
+                self.handleError(error)
                 BeforeGoingLogger.error(error)
             }
         }
@@ -296,10 +341,49 @@ extension HomeViewController {
         }
         bottomViewController.selectTab(item: .scenario)
     }
+    
+    private func updateHeaderDate(date: String) {
+        self.rootView.headerView.updateDateUI(date: date)
+    }
+    
+    private func updateWeatherByDate(condition: Bool, monthAndDay: String) {
+        guard let memberName = memberName else { return }
+        
+        let scenarioIntroduce = "\(memberName)님의 \(monthAndDay) 시나리오예요!"
+        let pastDateIntroduce = "해당 날짜의 기상 정보는 확인하기 어려워요:("
+        let futureDateIntroduce = "지난 날짜의 기상 정보는 제공하지 않아요:("
+        let customColor = UIColor.blue700.cgColor
+        
+        if condition {
+            self.rootView.headerView.updateWeatherUI(
+                information: "\(pastDateIntroduce)\n\(scenarioIntroduce)"
+                    .customText(rangedText: memberName, color: customColor)
+            )
+            return
+        }
+        self.rootView.headerView.updateWeatherUI(
+            information: "\(futureDateIntroduce)\n\(scenarioIntroduce)"
+                .customText(rangedText: memberName, color: customColor)
+        )
+    }
+    
+    private func updatePlaceHolderByDate(condition: Bool, monthAndDay: String) {
+        if condition {
+            self.rootView.modalView.do {
+                $0.updatePlaceHolder(text: "\(monthAndDay)에만 할 일을 추가해주세요")
+                $0.updateTaskField(isEnable: true)
+            }
+            return
+        }
+        self.rootView.modalView.do {
+            $0.updatePlaceHolder(text: "지난 날짜의 리스트는 추가할 수 없어요")
+            $0.updateTaskField(isEnable: false)
+        }
+    }
 }
 
-extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable {
-    
+extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable, NetworkRequestErrorHandler {
+
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         let status = manager.authorizationStatus
         
@@ -327,13 +411,10 @@ extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable {
                     ) as? HomeViewModel.WeatherOutput else {
                         return
                     }
-                    self.rootView.headerView.updateWeatherUI(weather: result.weatherResult)
+                    self.rootView.headerView.updateWeatherUI(information: result.weatherResult)
                     manager.stopUpdatingLocation()
                 } catch (let error) {
-                    if let error = error as? BeforeGoingError,
-                       error == .loginExpired {
-                        self.presentLoginExpired()
-                    }
+                    self.handleError(error)
                     BeforeGoingLogger.error(error)
                     BeforeGoingLogger.error(BeforeGoingError.requestWeatherFailed)
                 }
@@ -410,11 +491,8 @@ extension HomeViewController: UITableViewDataSource {
                         )
                     )
                     tableView.reloadData()
-                } catch {
-                    if let error = error as? BeforeGoingError,
-                       error == .loginExpired {
-                        self.presentLoginExpired()
-                    }
+                } catch (let error) {
+                    self.handleError(error)
                 }
             }
         }
@@ -460,10 +538,7 @@ extension HomeViewController: UITableViewDataSource {
                 case .success:
                     tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
                 case .failure(let error):
-                    if let error = error as? BeforeGoingError,
-                       error == .loginExpired {
-                        self?.presentLoginExpired()
-                    }
+                    self?.handleError(error)
                     BeforeGoingLogger.error(error)
                 }
             }
