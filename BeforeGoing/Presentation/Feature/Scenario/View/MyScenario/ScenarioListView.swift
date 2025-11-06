@@ -49,7 +49,7 @@ final class ScenarioListView: BaseView {
         }
         addScenarioButton.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(16.adjustedH)
-            $0.centerX.equalToSuperview()
+            $0.horizontalEdges.equalToSuperview().inset(20.adjustedW)
         }
         scenarioListTableView.snp.makeConstraints {
             $0.top.equalTo(addScenarioButton.snp.bottom).offset(12.adjustedH)
