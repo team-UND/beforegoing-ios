@@ -7,6 +7,7 @@
 
 import CoreLocation
 import Foundation
+import UIKit
 
 protocol HomeOutput {}
 
@@ -234,7 +235,10 @@ final class HomeViewModel: ViewModeling {
     ) -> NSMutableAttributedString {
         
         let weatherInformation = makeString(result.mapInformation())
-        let supplies = makeString(result.mapSupplies())
+        let supplies = makeString(
+            result.mapSupplies(),
+            color: UIColor.blue700.cgColor
+        )
         
         let weatherResult = NSMutableAttributedString()
         
@@ -254,7 +258,8 @@ final class HomeViewModel: ViewModeling {
     }
     
     private func makeString<T: RawRepresentable>(
-        _ array: [T?]
+        _ array: [T?],
+        color: CGColor = UIColor.danger600.cgColor
     ) -> NSMutableAttributedString where T.RawValue == String {
         
         let resultAttributedString = NSMutableAttributedString()
@@ -264,7 +269,7 @@ final class HomeViewModel: ViewModeling {
             let fullText = element
             let firstSpaceIndex = fullText.firstIndex(of: " ") ?? fullText.endIndex
             let firstWord = String(fullText[..<firstSpaceIndex])
-            let attributedText = fullText.customText(rangedText: firstWord)
+            let attributedText = fullText.customText(rangedText: firstWord, color: color)
             
             resultAttributedString.append(attributedText)
             
