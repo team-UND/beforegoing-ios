@@ -300,12 +300,10 @@ extension HomeViewController: ToastPresentable {
     
     @objc
     func handleScenarioTap(title: String) {
-        guard let homeDate = DateUtil.convertDateFormat(dateString: homeDate) else {
-            return
-        }
+        let currentDate = DateUtil.getCurrentDate().toString()
         
         let tag = getScenariosViewModel.findTagByTitle(title)
-        fetchScenario(tag: tag, homeDate: homeDate)
+        rootView.modalView.headerView.updateTappedLabel(tag: tag)
     }
     
     private func fetchScenario(tag: Int, homeDate: String) {
