@@ -114,9 +114,7 @@ extension AgreeItemCell {
                 $0.textColor = .gray400
             }
         }
-        if component.canMoveToSetting {
-            goToSettingButton.isHidden = false
-        }
+        goToSettingButton.isHidden = !component.canMoveToExternal
         
         switch component.text {
         case .termsOfServiceAgreed:
