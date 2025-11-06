@@ -38,6 +38,8 @@ final class UserScenarioModalView: BaseView {
     override func setStyle() {
         self.do {
             $0.backgroundColor = .white
+            $0.layer.cornerRadius = 20
+            $0.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         }
         taskTextField.do {
             $0.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 20.adjustedW, height: 0))
