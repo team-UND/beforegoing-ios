@@ -10,5 +10,5 @@ struct AgreeComponent {
     var checkBox: CheckBox = CheckBox()
     let text: AgreeItemLiteral
     let isNecessary: Bool
-    let canMoveToSetting: Bool
+    let canMoveToExternal: Bool
 }

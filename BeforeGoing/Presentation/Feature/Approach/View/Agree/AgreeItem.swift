@@ -18,25 +18,25 @@ enum AgreeItem: CaseIterable {
             return AgreeComponent(
                 text: AgreeItemLiteral.termsOfServiceAgreed,
                 isNecessary: true,
-                canMoveToSetting: true
+                canMoveToExternal: true
             )
         case .isPrivacyPolicyAgreed:
             return AgreeComponent(
                 text: AgreeItemLiteral.privacyPolicyAgreed,
                 isNecessary: true,
-                canMoveToSetting: true
+                canMoveToExternal: true
             )
         case .isOverFourteen:
             return AgreeComponent(
                 text: AgreeItemLiteral.overFourteen,
                 isNecessary: true,
-                canMoveToSetting: false
+                canMoveToExternal: false
             )
         case .isPushAgreed:
             return AgreeComponent(
                 text: AgreeItemLiteral.pushAgreed,
                 isNecessary: false,
-                canMoveToSetting: false
+                canMoveToExternal: false
             )
         }
     }
