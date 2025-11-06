@@ -33,6 +33,9 @@ final class OnboardingView: BaseView {
         }
         return swipeAction
     }()
+    private let transition = CATransition()
+    private let timingFunction = CAMediaTimingFunction(name: .easeOut)
+    private let contentTransitionKey = "contentTransition"
     private(set) var bottomButton = CustomButton(state: .enableLongButton, title: "시작하기")
     
     private var step: OnboardingStep
@@ -91,27 +94,36 @@ final class OnboardingView: BaseView {
 
 extension OnboardingView {
     
-    func updateUI() -> Bool {
+    func moveFront() -> Bool {
         guard let step = OnboardingStep(rawValue: step.rawValue + 1) else { return false }
         
         self.step = step
-        if step == .end {
-            bottomButton.isHidden = false
-        }
-        requestUpdate()
+        bottomButton.isHidden = (step == .end) ? false : true
+        requestUpdate(direction: .fromRight)
         return true
     }
     
     private func moveBack() {
-        guard step != .end else { return }
         guard let step = OnboardingStep(rawValue: step.rawValue - 1) else { return }
         
         self.step = step
-        requestUpdate()
+        bottomButton.isHidden = (step == .end) ? false : true
+        requestUpdate(direction: .fromLeft)
     }
     
-    private func requestUpdate() {
+    private func requestUpdate(direction: CATransitionSubtype? = nil) {
         progressView.updateUI(step: step)
+        
+        if let direction = direction {
+            transition.do {
+                $0.duration = 0.3
+                $0.type = .push
+                $0.subtype = direction
+                $0.timingFunction = timingFunction
+            }
+            contentView.layer.add(transition, forKey: contentTransitionKey)
+        }
+        
         contentView.updateUI(step: step)
     }
 }
@@ -122,7 +134,7 @@ extension OnboardingView {
     private func handleMovingPage(_ gesture: UISwipeGestureRecognizer) {
         switch gesture.direction {
         case .left:
-            let _ = updateUI()
+            let _ = moveFront()
         case .right:
             moveBack()
         default:

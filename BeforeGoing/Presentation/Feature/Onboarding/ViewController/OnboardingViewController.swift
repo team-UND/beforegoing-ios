@@ -32,7 +32,7 @@ extension OnboardingViewController {
     
     @objc
     private func bottomButtonDidTap() {
-        let updateResult = rootView.updateUI()
+        let updateResult = rootView.moveFront()
         if !updateResult {
             let viewController = ViewControllerFactory.shared.makeAlarmAuthorizationViewController()
             viewController.navigationItem.hidesBackButton = true
