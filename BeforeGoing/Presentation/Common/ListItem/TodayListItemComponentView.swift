@@ -1,5 +1,5 @@
 //
-//  TodayListItemComponent.swift
+//  TodayListItemComponentView.swift
 //  BeforeGoing
 //
 //  Created by APPLE on 8/23/25.
@@ -23,7 +23,7 @@ class TodayListItemComponentView: BaseView {
         todayBackgroundView.do {
             $0.layer.borderColor = UIColor.blue200.cgColor
             $0.layer.borderWidth = 1
-            $0.layer.cornerRadius = 15
+            $0.layer.cornerRadius = 12.5
             $0.clipsToBounds = true
         }
         todayLabel.do {
@@ -43,7 +43,7 @@ class TodayListItemComponentView: BaseView {
         }
         expressTodayView.do {
             $0.backgroundColor = .blue50
-            $0.layer.cornerRadius = 14
+            $0.layer.cornerRadius = 25
             $0.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
             $0.layer.borderWidth = 1.4
             $0.layer.borderColor = UIColor.blue50.cgColor
@@ -52,11 +52,11 @@ class TodayListItemComponentView: BaseView {
     }
     
     override func setUI() {
-        todayBackgroundView.addSubview(todayLabel)
         addSubviews(
             todayBackgroundView,
             expressTodayView
         )
+        todayBackgroundView.addSubview(todayLabel)
     }
     
     override func setLayout() {
