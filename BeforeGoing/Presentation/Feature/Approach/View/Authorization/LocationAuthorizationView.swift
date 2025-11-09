@@ -17,7 +17,9 @@ final class LocationAuthorizationView: BaseView {
     private(set) var disagreeButton = UIButton()
     
     override func setStyle() {
-        backgroundImageView.image = .bgSplash
+        backgroundImageView.do {
+            $0.image = .bgAuthorization
+        }
         mainLabel.do {
             $0.text = "현재 위치의 날씨 소식과\n날씨별 추천 준비물을 알려드려요"
             $0.textColor = .gray900
