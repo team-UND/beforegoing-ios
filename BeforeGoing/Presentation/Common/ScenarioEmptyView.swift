@@ -14,7 +14,10 @@ final class ScenarioEmptyView: BaseView {
     private let worryImageView = UIImageView()
     private let titleLabel = UILabel()
     private let subtitleLabel = UILabel()
-    private(set) var moveButton = CustomButton(state: .enableShortButton, title: "시나리오 추가하러 가기")
+    private(set) var moveButton = CustomButton(
+        state: .addScenarioButton,
+        title: "+ 시나리오 추가"
+    )
     
     init(type: ScenarioEmptyViewType) {
         self.type = type
@@ -31,31 +34,29 @@ final class ScenarioEmptyView: BaseView {
     override func setStyle() {
         worryImageView.do {
             $0.image = .starWorry
+            $0.contentMode = .scaleAspectFill
         }
         titleLabel.do {
             $0.textColor = .gray900
             $0.textAlignment = .center
             $0.font = .custom(.headingH4)
         }
-        if type.subtitle != nil {
-            subtitleLabel.do {
-                $0.textColor = .gray400
-                $0.textAlignment = .center
-                $0.font = .custom(.bodyMDMedium)
-            }
+        subtitleLabel.do {
+            $0.textColor = .gray400
+            $0.textAlignment = .center
+            $0.font = .custom(.bodyMDMedium)
         }
     }
     
     override func setUI() {
         addSubviews(
             worryImageView,
-            titleLabel
+            titleLabel,
+            subtitleLabel
         )
-        if type.subtitle == nil {
+        if type.isHome {
             addSubview(moveButton)
-            return
         }
-        addSubview(subtitleLabel)
     }
     
     override func setLayout() {
@@ -69,19 +70,19 @@ final class ScenarioEmptyView: BaseView {
             $0.centerX.equalToSuperview()
             $0.height.equalTo(26.adjustedH)
         }
-        if type.subtitle == nil {
-            moveButton.snp.makeConstraints {
-                $0.top.equalTo(titleLabel.snp.bottom).offset(10.adjustedH)
-                $0.centerX.equalToSuperview()
-                $0.width.equalTo(200)
-                $0.height.equalTo(35.adjustedH)
-            }
-            return
-        }
         subtitleLabel.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(6.adjustedH)
             $0.centerX.equalToSuperview()
             $0.height.equalTo(17.adjustedH)
+        }
+        if type.isHome {
+            moveButton.snp.makeConstraints {
+                $0.top.equalTo(subtitleLabel.snp.bottom).offset(26.adjustedH)
+                $0.centerX.equalToSuperview()
+                $0.width.equalTo(139.adjustedW)
+                $0.height.equalTo(48.adjustedH)
+                $0.bottom.equalToSuperview()
+            }
         }
     }
 }
