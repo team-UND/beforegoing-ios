@@ -33,6 +33,9 @@ final class NoticeMethodView: BaseView {
     }
     
     override func setStyle() {
+        imageView.do {
+            $0.contentMode = .scaleAspectFill
+        }
         methodNameLabel.do {
             $0.textColor = .black
             $0.textAlignment = .center
