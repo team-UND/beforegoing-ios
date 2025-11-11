@@ -69,6 +69,7 @@ final class HomeViewController: BaseViewController {
     }
     
     override func setAction() {
+        setGesture()
         rootView.headerView.viewCalendarButton.addTarget(
             self,
             action: #selector(viewCalendarButtonDidTap),
@@ -158,6 +159,14 @@ final class HomeViewController: BaseViewController {
                 BeforeGoingLogger.error(error)
             }
         }
+    }
+    
+    private func setGesture() {
+        let tapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(viewCalendarButtonDidTap)
+        )
+        rootView.headerView.dateStackView.addGestureRecognizer(tapGesture)
     }
     
     private func setGesture(scenarios: [ScenarioEntity]) {
