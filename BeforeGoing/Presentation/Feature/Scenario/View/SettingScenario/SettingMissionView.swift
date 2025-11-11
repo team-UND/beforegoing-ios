@@ -9,7 +9,8 @@ import UIKit
 
 final class SettingMissionView: BaseView {
     
-    private let maxLength = 20
+    private let maxMissionCount = 20
+    private let maxMissionNameLength = 14
     
     private let missionTitleLabel = UILabel()
     private(set) var missionCountLabel = UILabel()
@@ -27,7 +28,7 @@ final class SettingMissionView: BaseView {
         missionCountLabel.do {
             $0.textColor = .gray400
             $0.font = .custom(.bodyMDMedium)
-            $0.text = "0/\(maxLength)"
+            $0.text = "0/\(maxMissionCount)"
         }
         missionTextField.do {
             $0.placeholder = "항목을 추가하세요"
@@ -108,6 +109,16 @@ extension SettingMissionView {
         return text.removeTrailingSpaces()
     }
     
+    func trimText(_ text: String) -> String {
+        let trimmedText = text
+            .trim(limit: maxMissionNameLength)
+            .removeLeadingSpaces()
+        if text != trimmedText {
+            self.missionTextField.text = trimmedText
+        }
+        return trimmedText
+    }
+    
     func updateText() {
         guard let text = missionTextField.text,
               !text.isBlank else {
@@ -117,12 +128,12 @@ extension SettingMissionView {
         }
         addMissionButton.setImage(.plusCircle.withTintColor(.blue500), for: .normal)
         let completeText = text
-            .trim(limit: maxLength)
+            .trim(limit: maxMissionNameLength)
             .removeLeadingSpaces()
         missionTextField.text = completeText
     }
     
     func updateMissionCount(_ count: Int) {
-        missionCountLabel.text = "\(count)/\(maxLength)"
+        missionCountLabel.text = "\(count)/\(maxMissionCount)"
     }
 }

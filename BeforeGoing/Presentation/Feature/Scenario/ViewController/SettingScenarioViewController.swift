@@ -214,8 +214,12 @@ extension SettingScenarioViewController: ToastPresentable {
         rootView.settingMissionView.revealDeleteButton()
         guard let text = rootView.settingMissionView.missionTextField.text else { return }
         
-        rootView.settingMissionView.deleteMissionButton.isHidden = text.isBlank ? true : false
-        rootView.settingMissionView.updateText()
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            
+            self.rootView.settingMissionView.deleteMissionButton.isHidden = text.isBlank ? true : false
+            rootView.settingMissionView.updateText()
+        }
     }
     
     @objc

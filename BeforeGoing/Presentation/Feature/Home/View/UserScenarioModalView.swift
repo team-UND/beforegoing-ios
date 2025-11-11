@@ -11,6 +11,8 @@ import SnapKit
 
 final class UserScenarioModalView: BaseView {
     
+    private let maxTaskNameLength = 14
+    
     private(set) var headerView = UserScenarioModalHeaderView()
     private(set) var emptyView = ScenarioEmptyView(type: .home)
     private(set) var taskTextField = TextField(type: .enableAddField)
@@ -120,6 +122,18 @@ extension UserScenarioModalView {
 }
 
 extension UserScenarioModalView {
+    
+    func updateText(text: String) {
+        guard let text = taskTextField.text,
+              !text.isBlank else {
+            taskTextField.text = ""
+            return
+        }
+        let completeText = text
+            .trim(limit: maxTaskNameLength)
+            .removeLeadingSpaces()
+        taskTextField.text = completeText
+    }
     
     func updatePlaceHolder(text: String) {
         taskTextField.placeholder = text

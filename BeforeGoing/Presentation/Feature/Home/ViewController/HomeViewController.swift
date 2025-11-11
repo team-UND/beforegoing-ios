@@ -244,17 +244,22 @@ extension HomeViewController: ToastPresentable {
     
     @objc
     private func taskTextFieldEditingChanged() {
-        if let text = rootView.modalView.taskTextField.text,
-           !text.isBlank {
+        guard let text = rootView.modalView.taskTextField.text,
+              !text.isEmpty else {
             rootView.modalView.do {
-                $0.enableAddTaskButton()
-                $0.revealDeleteTaskButton()
+                $0.disableAddTaskButton()
+                $0.hideDeleteTaskButton()
             }
             return
         }
-        rootView.modalView.do {
-            $0.disableAddTaskButton()
-            $0.hideDeleteTaskButton()
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            rootView.modalView.do {
+                $0.updateText(text: text)
+                $0.enableAddTaskButton()
+                $0.revealDeleteTaskButton()
+            }
         }
     }
     
