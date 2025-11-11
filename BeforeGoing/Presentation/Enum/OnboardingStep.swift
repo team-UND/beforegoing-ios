@@ -40,7 +40,7 @@ enum OnboardingStep: Int, CaseIterable {
         switch self {
         case .first: "이제부터 나가기전에에 대해 알려드릴게요"
         case .second: "시간별/위치별로\n시나리오 템플릿이 제공돼요"
-        case .third: "홈에서 완료한 미션을 체크하고,\n오늘만 할일을 따로 추가, 관리 할 수 있어요"
+        case .third: "홈에서 완료한 미션을 체크하고,\n오늘만 할일을 따로 추가, 관리할 수 있어요"
         case .fourth: "날씨 확인을 미처 못하셨나요?\n걱정하지 마세요! 워리가 알려드릴게요"
         case .fifth: "미션을 잊지 않도록\n알림을 보내드려요!"
         case .end: "나만의 시나리오를 만들고\n워리와 함께 걱정을 가볍게 털어내봐요!"
