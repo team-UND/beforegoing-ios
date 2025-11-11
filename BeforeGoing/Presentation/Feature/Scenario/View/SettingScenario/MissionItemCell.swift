@@ -16,6 +16,7 @@ final class MissionItemCell: UITableViewCell {
         
         setStyle()
         setUI()
+        setLayout()
     }
     
     required init?(coder: NSCoder) {
@@ -28,6 +29,12 @@ final class MissionItemCell: UITableViewCell {
     
     private func setUI() {
         addSubview(missionItemView)
+    }
+    
+    private func setLayout() {
+        missionItemView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
     }
 }
 
