@@ -54,6 +54,9 @@ extension ListItemCell {
             action: #selector(checkBoxDidTap),
             for: .touchUpInside
         )
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(checkBoxDidTap))
+        listItem.checkBoxView.addGestureRecognizer(tapGesture)
     }
     
     private func bindItemTitle(_ listItem: ListItemProtocol, title: String) {

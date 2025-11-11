@@ -7,8 +7,9 @@
 
 import UIKit
 
-final class TodayListItem: TodayListItemComponentView, ListItemProtocol {
+final class TodayListItem: TodayListItemComponentView {
     
+    private(set) var checkBoxView = UIView()
     private(set) var checkBox = CheckBox(currentState: .unchecked)
     private let contentLabel = UILabel()
     
@@ -21,6 +22,11 @@ final class TodayListItem: TodayListItemComponentView, ListItemProtocol {
             $0.layer.borderWidth = 1.4
             $0.layer.borderColor = UIColor.blue50.cgColor
         }
+        checkBoxView.do {
+            $0.backgroundColor = .white
+            $0.layer.cornerRadius = 14
+            $0.layer.maskedCorners = [.layerMinXMinYCorner, .layerMinXMaxYCorner]
+        }
         contentLabel.do {
             $0.textColor = .gray900
             $0.font = .custom(.bodyLGMedium)
@@ -31,14 +37,20 @@ final class TodayListItem: TodayListItemComponentView, ListItemProtocol {
         super.setUI()
         
         addSubviews(
-            checkBox,
+            checkBoxView,
             contentLabel
         )
+        checkBoxView.addSubview(checkBox)
     }
     
     override func setLayout() {
         super.setLayout()
 
+        checkBoxView.snp.makeConstraints {
+            $0.leading.equalToSuperview()
+            $0.verticalEdges.equalToSuperview()
+            $0.width.equalTo(40.adjustedW)
+        }
         checkBox.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(16.adjustedW)
             $0.centerY.equalToSuperview()
@@ -56,7 +68,7 @@ final class TodayListItem: TodayListItemComponentView, ListItemProtocol {
     }
 }
 
-extension TodayListItem {
+extension TodayListItem: ListItemProtocol {
     
     func updateText(_ text: String) {
         contentLabel.text = text
