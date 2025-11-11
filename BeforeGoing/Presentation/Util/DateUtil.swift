@@ -57,6 +57,10 @@ struct DateUtil {
         return homeDateformatter.string(from: date)
     }
     
+    static func toDate(dateString: String) -> Date? {
+        return homeDateformatter.date(from: dateString)
+    }
+    
     static func convertDateFormat(dateString: String?) -> String? {
         guard let dateString = dateString,
               let date = homeDateformatter.date(from: dateString) else {

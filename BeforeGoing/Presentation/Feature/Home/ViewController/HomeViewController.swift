@@ -199,6 +199,14 @@ extension HomeViewController: ToastPresentable {
     private func viewCalendarButtonDidTap() {
         let calendar = CalendarViewController()
         calendar.modalPresentationStyle = .overFullScreen
+        
+        if let homeDateString = self.homeDate,
+           let date = DateUtil.toDate(dateString: homeDateString) {
+            calendar.initialSelectedDate = date
+        } else {
+            calendar.initialSelectedDate = DateUtil.getCurrentDate()
+        }
+        
         calendar.onDayDidTap = { [weak self] date in
             let dateString = DateUtil.toString(date: date)
             let currentDate = DateUtil.getCurrentDate()
