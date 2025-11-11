@@ -122,7 +122,7 @@ final class HomeViewController: BaseViewController {
                 }
                 self.homeDate = result.date
                 rootView.headerView.updateDateUI(date: result.date)
-                rootView.modalView.updatePlaceHolder(text: "\(monthAndDay)에만 할 일을 추가해주세요")
+                rootView.modalView.updatePlaceHolder(text: "\(monthAndDay)의 미션을 추가해요")
                 rootView.modalView.updateTaskField(isEnable: true)
             } catch (let error) {
                 self.handleError(error)
@@ -381,10 +381,14 @@ extension HomeViewController: ToastPresentable {
         )
     }
     
-    private func updatePlaceHolderByDate(condition: Bool, monthAndDay: String) {
-        if condition {
+    private func updatePlaceHolderByDate(
+        date: Date,
+        currentDate: Date,
+        monthAndDay: String
+    ) {
+        if date >= currentDate {
             self.rootView.modalView.do {
-                $0.updatePlaceHolder(text: "\(monthAndDay)에만 할 일을 추가해주세요")
+                $0.updatePlaceHolder(text: "\(monthAndDay)의 미션을 추가해요")
                 $0.updateTaskField(isEnable: true)
             }
             return
