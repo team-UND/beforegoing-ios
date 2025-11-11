@@ -350,8 +350,8 @@ extension HomeViewController: ToastPresentable {
         guard let memberName = memberName else { return }
         
         let scenarioIntroduce = "\(memberName)님의 \(monthAndDay) 시나리오예요!"
-        let pastDateIntroduce = "해당 날짜의 기상 정보는 확인하기 어려워요:("
-        let futureDateIntroduce = "지난 날짜의 기상 정보는 제공하지 않아요:("
+        let pastDateIntroduce = "해당 날짜의 기상 정보는 확인하기 어려워요"
+        let futureDateIntroduce = "지난 날짜의 기상 정보는 제공하지 않아요"
         let customColor = UIColor.blue700.cgColor
         
         if condition {
