@@ -24,7 +24,7 @@ final class SettingViewController: BaseViewController {
         }
         rootView.configure(version: version)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -52,16 +52,20 @@ final class SettingViewController: BaseViewController {
     }
     
     override func setAction() {
+        rootView.accountView.seemoreView.addGestureRecognizer(createTapGesture(action: #selector(profileButtonDidTap)))
         rootView.accountView.seemoreView.moveButton.addTarget(
             self,
             action: #selector(profileButtonDidTap),
             for: .touchUpInside
         )
+        
+        rootView.supportView.seemoreView.addGestureRecognizer(createTapGesture(action: #selector(supportButtonDidTap)))
         rootView.supportView.seemoreView.moveButton.addTarget(
             self,
             action: #selector(supportButtonDidTap),
             for: .touchUpInside
         )
+        
         rootView.settingNoticeView.eventPushNoticeView.switchButton.addTarget(
             self,
             action: #selector(eventPushNoticeButtonDidTap),
@@ -72,21 +76,33 @@ final class SettingViewController: BaseViewController {
             action: #selector(pushNoticeButtonDidTap),
             for: .touchUpInside
         )
+        
+        rootView.policyView.noticeView.addGestureRecognizer(createTapGesture(action: #selector(noticeButtonDidTap)))
         rootView.policyView.noticeView.moveButton.addTarget(
             self,
             action: #selector(noticeButtonDidTap),
             for: .touchUpInside
         )
+        rootView.policyView.termView.addGestureRecognizer(createTapGesture(action: #selector(termButtonDidTap)))
         rootView.policyView.termView.moveButton.addTarget(
             self,
             action: #selector(termButtonDidTap),
             for: .touchUpInside
         )
+        rootView.policyView.privacyView.addGestureRecognizer(createTapGesture(action: #selector(privacyButtonDidTap)))
         rootView.policyView.privacyView.moveButton.addTarget(
             self,
             action: #selector(privacyButtonDidTap),
             for: .touchUpInside
         )
+    }
+    
+    private func createTapGesture(action: Selector) -> UITapGestureRecognizer {
+        let tapGesture = UITapGestureRecognizer(
+            target: self,
+            action: action
+        )
+        return tapGesture
     }
 }
 
@@ -130,7 +146,7 @@ extension SettingViewController: NetworkRequestable, NetworkRequestErrorHandler 
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             DispatchQueue.main.async {
                 let isAgreed: Bool
-
+                
                 switch settings.authorizationStatus {
                 case .authorized, .provisional, .ephemeral:
                     isAgreed = true
