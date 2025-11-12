@@ -93,7 +93,7 @@ extension MyScenarioViewController: NetworkRequestable, NetworkRequestErrorHandl
     
     @objc
     private func addScenarioButtonDidTap() {
-        let viewController = ManageScenarioViewController()
+        let viewController = ViewControllerFactory.shared.makeManageScenarioViewController()
         viewController.do {
             $0.navigationItem.hidesBackButton = true
             $0.hidesBottomBarWhenPushed = true

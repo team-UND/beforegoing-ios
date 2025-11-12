@@ -10,10 +10,19 @@ import UIKit
 final class ManageScenarioViewController: BaseViewController {
     
     private let rootView = ManageScenarioView()
+    private let viewModel: ManageScenarioViewModel
     
-    private var templates: [ScenarioType] = [.mine, .outing, .goWork, .leaveWork, .exercise, .miracle]
     private var didCellTap: Bool = false
     private var selectedIndex: Int?
+    
+    init(viewModel: ManageScenarioViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         view = rootView
@@ -51,10 +60,12 @@ extension ManageScenarioViewController {
     
     @objc
     func selectButtonDidTap() {
-        guard let selectedIndex = selectedIndex else { return }
+        guard let selectedIndex = selectedIndex,
+              let scenarioType = viewModel.findScenarioType(index: selectedIndex) else {
+            return
+        }
         
         let viewController = ViewControllerFactory.shared.makeSettingScenarioViewController()
-        let scenarioType = templates[selectedIndex]
         
         viewController.navigationItem.hidesBackButton = true
         viewController.configure(scenarioType: scenarioType, enterType: .addScenario)
@@ -77,7 +88,7 @@ extension ManageScenarioViewController: UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return section == templates.count - 1 ? 0 : 12
+        return section == viewModel.templateCount - 1 ? 0 : 12
     }
 
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -103,7 +114,7 @@ extension ManageScenarioViewController: UITableViewDelegate {
 extension ManageScenarioViewController: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return templates.count
+        return viewModel.templateCount
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -118,7 +129,11 @@ extension ManageScenarioViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        cell.bind(type: templates[indexPath.section])
+        guard let scenarioType = viewModel.findScenarioType(index: indexPath.section) else {
+            return UITableViewCell()
+        }
+        
+        cell.bind(type: scenarioType)
         return cell
     }
     
@@ -140,7 +155,7 @@ extension ManageScenarioViewController: UITableViewDataSource {
             style: .normal,
             title: nil
         ) { [weak self] (_, view, completion) in
-            self?.templates.remove(at: indexPath.section)
+            let _ = self?.viewModel.removeScenarioType(at: indexPath.section)
             tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
             completion(true)
         }
@@ -188,11 +203,11 @@ extension ManageScenarioViewController: UITableViewDropDelegate {
         let destinationSection = destinationIndexPath.section
         
         for item in coordinator.items {
-            guard let sourceIndexPath = item.sourceIndexPath else { continue }
-            let sourceSection = sourceIndexPath.section
-            
-            let movedSection = templates.remove(at: sourceSection)
-            templates.insert(movedSection, at: destinationSection)
+            guard let sourceIndexPath = item.sourceIndexPath,
+                  let movedSection = viewModel.removeScenarioType(at: sourceIndexPath.section) else {
+                return
+            }
+            viewModel.addScenarioType(movedSection, at: destinationSection)
         }
         tableView.reloadData()
     }

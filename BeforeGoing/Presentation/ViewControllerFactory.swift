@@ -62,6 +62,12 @@ final class ViewControllerFactory {
         )
     }
     
+    func makeManageScenarioViewController() -> ManageScenarioViewController {
+        let manageScenarioViewModel = resolveViewModel(ManageScenarioViewModel.self)
+        
+        return ManageScenarioViewController(viewModel: manageScenarioViewModel)
+    }
+    
     func makeSettingViewController() -> SettingViewController {
         let viewModel = resolveViewModel(SettingViewModel.self)
         return .init(viewModel: viewModel)

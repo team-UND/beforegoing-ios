@@ -12,7 +12,7 @@ final class SettingScenarioViewController: BaseViewController {
     private let rootView = SettingScenarioView()
     
     private let missionLimit = 20
-    private var missions: [(missionID: Int?, content: String)] = []
+    //private var missions: [(missionID: Int?, content: String)] = []
     private var scenarioID: Int?
     private var enterType: SettingScenarioEnterType?
     private var isNotificationActive: Bool?
@@ -123,6 +123,8 @@ extension SettingScenarioViewController {
         enterType: SettingScenarioEnterType
     ) {
         self.enterType = enterType
+        addScenarioViewModel.setMissions(missions: scenarioType.basicMissions)
+        rootView.settingMissionView.updateMissionCount(addScenarioViewModel.missionsCount)
         
         switch scenarioType {
         case .mine:
@@ -138,6 +140,8 @@ extension SettingScenarioViewController {
                 $0.updateTextCount(scenario.count)
             }
         }
+        
+        checkNextButtonState()
     }
     
     func configure(
@@ -160,7 +164,8 @@ extension SettingScenarioViewController {
         self.notificationMethod = notificationMethod
         self.enterType = enterType
 
-        missions.forEach { self.missions.append(($0.missionID, $0.content)) }
+        addScenarioViewModel.setMissions(missions: missions)
+        
         rootView.inputScenarioView.do {
             $0.textField.text = scenarioName
             $0.updateTextCount(scenarioName.count)
@@ -232,19 +237,17 @@ extension SettingScenarioViewController: ToastPresentable {
         guard let missionContent = rootView.settingMissionView.getUserMission(),
               !missionContent.isBlank else { return }
         
-        if missions.count >= missionLimit {
+        if addScenarioViewModel.missionsCount >= missionLimit {
             self.presentToastMessage(type: .missionLimit)
             return
         }
-        if missions.contains(where: { _, content in
-            content == missionContent
-        }) {
+        if addScenarioViewModel.contains(missionContent: missionContent) {
             self.presentToastMessage(type: .duplicateMission)
             return
         }
         
-        missions.insert((nil, missionContent), at: 0)
-        rootView.settingMissionView.updateMissionCount(missions.count)
+        addScenarioViewModel.addMission(missionContent: missionContent)
+        rootView.settingMissionView.updateMissionCount(addScenarioViewModel.missionsCount)
         rootView.settingMissionView.missionTableView.insertSections(
             IndexSet(integer: 0),
             with: .automatic
@@ -272,8 +275,8 @@ extension SettingScenarioViewController: ToastPresentable {
     private func checkNextButtonState() {
         guard let scenario = rootView.inputScenarioView.textField.text,
               let memo = rootView.inputMemoView.textField.text else { return }
-        let isEnabled = !scenario.isBlank && !memo.isBlank && missions.count >= 1
         
+        let isEnabled = !scenario.isBlank && addScenarioViewModel.isExistMission
         rootView.updateUI(state: isEnabled ? .enableLongButton : .disableLongButton)
     }
     
@@ -287,7 +290,7 @@ extension SettingScenarioViewController: ToastPresentable {
                     input: .nextButtonInSetScenarioDidTap(
                         scenarioName: scenarioName,
                         memo: memo,
-                        basicMissions: missions.map { $0.content }
+                        basicMissions: addScenarioViewModel.missionsContent
                     )
                 )
                 moveNotice(enterType: .addScenario)
@@ -310,7 +313,7 @@ extension SettingScenarioViewController: ToastPresentable {
                         scenarioID: scenarioID,
                         scenarioName: scenarioName,
                         memo: memo,
-                        basicMissions: missions
+                        basicMissions: addScenarioViewModel.getMissions()
                     )
                 )
                 moveNotice(enterType: .updateScenario)
@@ -338,7 +341,7 @@ extension SettingScenarioViewController: ToastPresentable {
 extension SettingScenarioViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return section == missions.count - 1 ? 0 : 12
+        return section == addScenarioViewModel.missionsCount - 1 ? 0 : 12
     }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -349,7 +352,7 @@ extension SettingScenarioViewController: UITableViewDelegate {
 extension SettingScenarioViewController: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return missions.count
+        return addScenarioViewModel.missionsCount
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -363,7 +366,12 @@ extension SettingScenarioViewController: UITableViewDataSource {
         ) as? MissionItemCell else {
             return UITableViewCell()
         }
-        cell.bind(mission: missions[indexPath.section].content)
+        
+        guard let missionContent = addScenarioViewModel.findMissionContent(at: indexPath.section) else {
+            return UITableViewCell()
+        }
+        
+        cell.bind(mission: missionContent)
         return cell
     }
     
@@ -385,7 +393,7 @@ extension SettingScenarioViewController: UITableViewDataSource {
             style: .normal,
             title: nil
         ) { [weak self] (_, view, completion) in
-            self?.missions.remove(at: indexPath.section)
+            let _ = self?.addScenarioViewModel.removeMission(at: indexPath.section)
             tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
             self?.checkNextButtonState()
             completion(true)
@@ -433,8 +441,8 @@ extension SettingScenarioViewController: UITableViewDropDelegate {
             guard let sourceIndexPath = item.sourceIndexPath else { continue }
             let sourceSection = sourceIndexPath.section
             
-            let movedSection = missions.remove(at: sourceSection)
-            missions.insert(movedSection, at: destinationSection)
+            let movedSection = addScenarioViewModel.removeMission(at: sourceSection)
+            addScenarioViewModel.addMission(movedSection, at: destinationSection)
         }
         tableView.reloadData()
     }

@@ -9,6 +9,7 @@ protocol ScenarioOutput {}
 
 final class AddScenarioViewModel: ViewModeling {
     
+    private var missions: [(missionID: Int?, content: String)] = []
     private var scenarioName: String?
     private var memo: String?
     private var basicMissions: [String]?
@@ -60,6 +61,7 @@ final class AddScenarioViewModel: ViewModeling {
                   let basicMissions = basicMissions else {
                 return EmptyOutput()
             }
+            
             do {
                 let result = try await useCase.execute(
                     scenarioName: scenarioName,
@@ -122,5 +124,61 @@ final class AddScenarioViewModel: ViewModeling {
                 return EmptyOutput()
             }
         }
+    }
+}
+
+extension AddScenarioViewModel {
+    
+    var missionsCount: Int {
+        missions.count
+    }
+    
+    var missionsContent: [String] {
+        missions.map { $0.content }
+    }
+    
+    var isExistMission: Bool {
+        !missions.isEmpty
+    }
+    
+    func setMissions(missions: [String]) {
+        self.missions = missions.map { (nil, $0) }
+    }
+    
+    func setMissions(missions: [(missionID: Int, content: String)]) {
+        self.missions = missions.map { ($0.missionID, $0.content) }
+    }
+    
+    func getMissions() -> [(missionID: Int?, content: String)] {
+        missions
+    }
+    
+    func addMission(missionContent: String) {
+        missions.insert((nil, missionContent), at: 0)
+    }
+    
+    func addMission(_ mission: (Int?, String), at index: Int) {
+        missions.insert(mission, at: index)
+    }
+    
+//    func addMissions(missions: [(missionID: Int, content: String)]) {
+//        missions.forEach { self.missions.append(($0.missionID, $0.content)) }
+//    }
+    
+    func contains(missionContent: String) -> Bool {
+        missions.contains(where: { _, content in
+            content == missionContent
+        })
+    }
+    
+    func findMissionContent(at index: Int) -> String? {
+        guard index >= 0 && index < missions.count else {
+            return nil
+        }
+        return missions[index].content
+    }
+    
+    func removeMission(at index: Int) -> (Int?, String) {
+        missions.remove(at: index)
     }
 }

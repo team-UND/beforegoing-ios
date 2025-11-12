@@ -154,5 +154,6 @@ struct PresentationDependencyAssembler: DependencyAssembler {
         DIContainer.shared.register(UpdateScenarioViewModel(useCase: updateScenarioUseCase))
         DIContainer.shared.register(UpdateScenarioOrderViewModel(useCase: updateScenarioOrderUseCase))
         DIContainer.shared.register(GetSingleScenarioViewModel(useCase: fetchSingleScenarioUsecase))
+        DIContainer.shared.register(ManageScenarioViewModel())
     }
 }
