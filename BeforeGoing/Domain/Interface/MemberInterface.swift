@@ -10,4 +10,5 @@ protocol MemberInterface {
     func updateNickname(nickname: String) async throws
     func withdrawMember() async throws
     func getMemberName() -> String?
+    func completeOnboarding() -> Bool
 }

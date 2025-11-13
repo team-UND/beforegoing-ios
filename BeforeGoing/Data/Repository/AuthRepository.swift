@@ -56,12 +56,13 @@ struct AuthRepository: AuthInterface {
             responseType: LoginResponseDTO.self
         )
         saveKeyChain(response: response)
+        saveProvider(provider)
         
-        return isMemberNameSet
+        return isCompletedOnboarding
     }
     
     func autoLogin() async throws -> Bool {
-        guard isTokenExists, isMemberNameSet else { return false }
+        guard isTokenExists, isCompletedOnboarding else { return false }
         
         guard let accessTokenExpirationDate = keyChainService.load(key: .accessTokenExpirationDate),
               let refreshTokenExpirationDate = keyChainService.load(key: .refreshTokenExpirationDate) else {
@@ -83,6 +84,7 @@ struct AuthRepository: AuthInterface {
             return
         }
         try await networkService.request(endPoint: AuthAPI.logout(accessToken: accessToken))
+        
         deleteUserInformation()
     }
     
@@ -107,6 +109,10 @@ struct AuthRepository: AuthInterface {
         }
     }
     
+    private func saveProvider(_ provider: Provider) {
+        let _ = userDefaultsService.save(provider.rawValue, key: .provider)
+    }
+    
     private var isTokenExists: Bool {
         if let accessToken = keyChainService.load(key: .accessToken),
            let refreshToken = keyChainService.load(key: .refreshToken),
@@ -117,15 +123,18 @@ struct AuthRepository: AuthInterface {
         return false
     }
     
-    private var isMemberNameSet: Bool {
-        let memberName: String? = userDefaultsService.load(key: .memberName)
-        return memberName != nil
+    private var isCompletedOnboarding: Bool {
+        guard let isCompleted: Bool = userDefaultsService.load(key: .isCompletedOnboarding) else {
+            return false
+        }
+        return isCompleted
     }
     
     private func deleteUserInformation() {
         for key in KeyChainKey.allCases {
             keyChainService.delete(key: key)
         }
-        let _ = userDefaultsService.delete(key: .memberName)
+        let _ = userDefaultsService.delete(key: .provider)
+//        let _ = userDefaultsService.delete(key: (provider == Provider.apple.rawValue) ? .appleMemberName : .kakaoMemberName)
     }
 }

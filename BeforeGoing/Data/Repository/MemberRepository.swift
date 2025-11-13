@@ -25,15 +25,26 @@ struct MemberRepository: MemberInterface {
     }
     
     func getMemberName() -> String? {
-        guard let name: String? = userDefaultsService.load(key: .memberName) else {
+        guard let provider: String = userDefaultsService.load(key: .provider) else {
             return nil
         }
-        return name
+        
+        switch provider {
+        case Provider.kakao.rawValue:
+            return userDefaultsService.load(key: .kakaoMemberName)
+        case Provider.apple.rawValue:
+            return userDefaultsService.load(key: .appleMemberName)
+        default:
+            return nil
+        }
     }
     
     func updateNickname(nickname: String) async throws {
         guard let accessToken = keyChainService.load(key: .accessToken) else {
             BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
+            return
+        }
+        guard let provider: String = userDefaultsService.load(key: .provider) else {
             return
         }
         
@@ -42,22 +53,35 @@ struct MemberRepository: MemberInterface {
             endPoint: MemberAPI.updateNickname(accessToken: accessToken, dto: requestDTO),
             responseType: MemberResponseDTO.self
         )
-        let _ = userDefaultsService.save(responseDTO.nickname, key: .memberName)
+        
+        if provider == Provider.apple.rawValue {
+            let _ = userDefaultsService.save(responseDTO.nickname, key: .appleMemberName)
+        }
+        if provider == Provider.kakao.rawValue {
+            let _ = userDefaultsService.save(responseDTO.nickname, key: .kakaoMemberName)
+        }
     }
     
     func withdrawMember() async throws {
-        guard let accessToken = keyChainService.load(key: .accessToken) else {
+        guard let accessToken = keyChainService.load(key: .accessToken),
+        let provider: String = userDefaultsService.load(key: .provider) else {
             BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
             return
         }
         
         try await networkService.request(endPoint: MemberAPI.withdraw(accessToken: accessToken))
-        removeMemberInfo()
+        
+        removeMemberInfo(provider: provider)
     }
     
-    private func removeMemberInfo() {
+    func completeOnboarding() -> Bool {
+        let isSaved = userDefaultsService.save(true, key: .isCompletedOnboarding)
+        return isSaved
+    }
+    
+    private func removeMemberInfo(provider: String) {
         removeKeyChainInfo()
-        removeUserDefaultsInfo()
+        removeUserDefaultsInfo(provider: provider)
     }
     
     private func removeKeyChainInfo() {
@@ -66,9 +90,17 @@ struct MemberRepository: MemberInterface {
         }
     }
     
-    private func removeUserDefaultsInfo() {
-        for key in UserDefaultsKey.allCases {
-            let _ = userDefaultsService.delete(key: key)
-        }
+    private func removeUserDefaultsInfo(provider: String) {
+        let excludedKey: UserDefaultsKey? = {
+            switch provider {
+            case Provider.kakao.rawValue: return .appleMemberName
+            case Provider.apple.rawValue: return .kakaoMemberName
+            default: return nil
+            }
+        }()
+
+        UserDefaultsKey.allCases
+            .filter { $0 != excludedKey }
+            .forEach { let _ = userDefaultsService.delete(key: $0) }
     }
 }

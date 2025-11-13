@@ -109,6 +109,9 @@ final class DomainDependencyAssembler: DependencyAssembler {
         DIContainer.shared.register(type: MemberWithdrawType.self) { _ in
             return MemberWithdrawUseCase(repository: memberRepository)
         }
+        DIContainer.shared.register(type: SaveOnboardingCompletedType.self) { _ in
+            return SaveOnboardingCompletedUseCase(repository: memberRepository)
+        }
         
         DIContainer.shared.register(type: RequestWeatherType.self) { _ in
             return RequestWeatherUseCase(repository: weatherRepository)

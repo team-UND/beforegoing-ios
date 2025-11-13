@@ -31,7 +31,8 @@ final class ViewControllerFactory {
     }
     
     func makeOnboardingViewController() -> OnboardingViewController {
-        return OnboardingViewController()
+        let viewModel = resolveViewModel(OnboardingViewModel.self)
+        return OnboardingViewController(viewModel: viewModel)
     }
     
     func makeModifyNicknameViewController() -> ModifyNameViewController {

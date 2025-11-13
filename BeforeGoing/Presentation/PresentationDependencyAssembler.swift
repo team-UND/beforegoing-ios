@@ -116,6 +116,11 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
+        guard let saveOnboardingCompletedUseCase = DIContainer.shared.resolve(type: SaveOnboardingCompletedType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
         DIContainer.shared.register(AgreeItemViewModel(useCase: agreeTermsUseCase))
         DIContainer.shared.register(
             LoginViewModel(
@@ -155,5 +160,6 @@ struct PresentationDependencyAssembler: DependencyAssembler {
         DIContainer.shared.register(UpdateScenarioOrderViewModel(useCase: updateScenarioOrderUseCase))
         DIContainer.shared.register(GetSingleScenarioViewModel(useCase: fetchSingleScenarioUsecase))
         DIContainer.shared.register(ManageScenarioViewModel())
+        DIContainer.shared.register(OnboardingViewModel(useCase: saveOnboardingCompletedUseCase))
     }
 }

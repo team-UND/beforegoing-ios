@@ -136,7 +136,8 @@ extension ProfileViewController: NetworkRequestable, NetworkRequestErrorHandler 
                     }
                     if result.isSucceedLogout {
                         let loginViewController = ViewControllerFactory.shared.makeLoginViewController()
-                        ViewControllerUtil.replaceRootViewController(to: loginViewController)
+                        let navigationController = UINavigationController(rootViewController: loginViewController)
+                        ViewControllerUtil.replaceRootViewController(to: navigationController)
                         return
                     }
                 } catch {
