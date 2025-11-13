@@ -33,8 +33,8 @@ struct AuthRepository: AuthInterface {
         self.tokenValidator = tokenValidator
     }
     
-    func requestNonce(provider: String) async throws -> NonceEntity {
-        let nonceRequestDTO = nonceRequestMapper.map(provider)
+    func requestNonce(provider: Provider) async throws -> NonceEntity {
+        let nonceRequestDTO = nonceRequestMapper.map(provider.rawValue)
         let response = try await networkService.request(
             endPoint: AuthAPI.nonce(dto: nonceRequestDTO),
             responseType: NonceResponseDTO.self
@@ -42,15 +42,15 @@ struct AuthRepository: AuthInterface {
         return response.toEntity()
     }
     
-    func requestLogin(provider: String) async throws -> Bool {
+    func requestLogin(provider: Provider) async throws -> Bool {
         let nonceEntity = try await requestNonce(provider: provider)
         let idToken = try await requestIDToken(nonce: nonceEntity.nonce)
         
         return try await requestLogin(provider: provider, idToken: idToken)
     }
     
-    func requestLogin(provider: String, idToken: String) async throws -> Bool {
-        let requestDTO = loginRequestMapper.map((provider, idToken))
+    func requestLogin(provider: Provider, idToken: String) async throws -> Bool {
+        let requestDTO = loginRequestMapper.map((provider.rawValue, idToken))
         let response = try await networkService.request(
             endPoint: AuthAPI.login(dto: requestDTO),
             responseType: LoginResponseDTO.self
@@ -126,5 +126,6 @@ struct AuthRepository: AuthInterface {
         for key in KeyChainKey.allCases {
             keyChainService.delete(key: key)
         }
+        let _ = userDefaultsService.delete(key: .memberName)
     }
 }
