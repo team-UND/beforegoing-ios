@@ -7,6 +7,8 @@ protocol APIManaging {
         endPoint: EndPoint,
         responseType: T.Type
     ) async throws -> T
+    func request(endPoint: any EndPoint) async throws
+    func requestKakaoIDToken(nonce: String?) async throws -> String
 }
 
 final class NetworkService: APIManaging {
