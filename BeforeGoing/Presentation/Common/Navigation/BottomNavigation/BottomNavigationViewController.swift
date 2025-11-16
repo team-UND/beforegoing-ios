@@ -17,6 +17,10 @@ final class BottomNavigationViewController: UITabBarController {
         setAppearance()
     }
     
+    override func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
+        HapticManager.shared.impact()
+    }
+    
     func selectTab(item: BottomNavigationItem) {
         guard item.rawValue >= 0, item.rawValue < (self.viewControllers?.count ?? 0) else {
             return

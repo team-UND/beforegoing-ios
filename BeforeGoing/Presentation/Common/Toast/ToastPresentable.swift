@@ -19,7 +19,7 @@ extension ToastPresentable where Self: BaseViewController {
         setUI(toastMessageView)
         setLayout(toastMessageView)
         
-        HapticManager.shared.impact()
+        HapticManager.shared.notice(feedbackType: .error)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             self.removeUI(toastMessageView)

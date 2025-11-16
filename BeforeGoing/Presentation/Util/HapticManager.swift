@@ -12,10 +12,20 @@ final class HapticManager {
     static let shared = HapticManager()
     private init() {}
     
+    private let notificationFeedbackGenerator = UINotificationFeedbackGenerator()
+    private let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: .light)
+    
+    func notice(feedbackType: UINotificationFeedbackGenerator.FeedbackType) {
+        notificationFeedbackGenerator.do {
+            $0.prepare()
+            $0.notificationOccurred(feedbackType)
+        }
+    }
+    
     func impact() {
-        let type = UINotificationFeedbackGenerator.FeedbackType.error
-        let generator = UINotificationFeedbackGenerator()
-        generator.prepare()
-        generator.notificationOccurred(type)
+        impactFeedbackGenerator.do {
+            $0.prepare()
+            $0.impactOccurred()
+        }
     }
 }
