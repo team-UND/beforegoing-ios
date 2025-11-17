@@ -41,6 +41,7 @@ final class SettingViewController: BaseViewController {
             ) as? SettingViewModel.EventPushAgreedOutput else {
                 return
             }
+            
             switch result.isEventPushAgreed {
             case .success(let eventPushAgreed):
                 rootView.settingNoticeView.eventPushNoticeView.updateButtonState(condition: eventPushAgreed)
@@ -49,6 +50,21 @@ final class SettingViewController: BaseViewController {
                 BeforeGoingLogger.error(error)
             }
         }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(pushNoticeDidBecomeActive(_:)),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
     }
     
     override func setAction() {
@@ -74,7 +90,7 @@ final class SettingViewController: BaseViewController {
         rootView.settingNoticeView.basicPushNoticeView.switchButton.addTarget(
             self,
             action: #selector(pushNoticeButtonDidTap),
-            for: .touchUpInside
+            for: .valueChanged
         )
         
         rootView.policyView.noticeView.addGestureRecognizer(createTapGesture(action: #selector(noticeButtonDidTap)))
@@ -129,17 +145,14 @@ extension SettingViewController: NetworkRequestable, NetworkRequestErrorHandler 
     
     @objc
     private func pushNoticeButtonDidTap() {
-        UNUserNotificationCenter.current().getNotificationSettings { settings in
-            DispatchQueue.main.async { [weak self] in
-                self?.hasOpenedSettings = true
-                if let url = URL(string: UIApplication.openSettingsURLString) {
-                    UIApplication.shared.open(url)
-                }
-            }
+        hasOpenedSettings = true
+        if let url = URL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(url)
         }
     }
     
-    func pushNoticeDidBecomeActive() {
+    @objc
+    func pushNoticeDidBecomeActive(_ notification: Notification) {
         guard hasOpenedSettings else { return }
         hasOpenedSettings = false
         
@@ -148,29 +161,36 @@ extension SettingViewController: NetworkRequestable, NetworkRequestErrorHandler 
                 let isAgreed: Bool
                 
                 switch settings.authorizationStatus {
-                case .authorized, .provisional, .ephemeral:
+                case .authorized:
+                    isAgreed = (settings.alertSetting == .enabled)
+                case .provisional, .ephemeral:
                     isAgreed = true
-                case .denied, .notDetermined:
-                    isAgreed = false
-                @unknown default:
+                default:
                     isAgreed = false
                 }
                 
-                let currentDate = DateUtil.getCurrentDate().toString()
-                let modalVC = ModalViewController(
-                    modalView: ModalView(type: .eventPushAgree(isAgreed: isAgreed, currentDate: currentDate))
-                )
-                
                 self.rootView.updateSwitch(isAgreed: isAgreed)
-                self.present(modalVC, animated: true)
             }
         }
     }
     
     private func performTask(isSwitchedOn: Bool) {
+        let isReception = isSwitchedOn ? "수신 동의" : "수신 거부"
+        let currentDate = DateUtil.getCurrentDate(format: "yyyy년 MM월 dd일")
+        
         Task {
             do {
                 let _ = try await viewModel.action(input: .switchButtonDidTap(isSwitchedOn))
+                let alert = UIAlertController(
+                    title: "",
+                    message: "[나가기전에]에서 보내는 이벤트/마케팅 관련\n푸시알림 수신 여부가\n '\(isReception)'로 변경되었습니다.\n\(currentDate)",
+                    preferredStyle: .alert
+                )
+                let success = UIAlertAction(title: "확인", style: .default) { action in
+                    
+                }
+                alert.addAction(success)
+                present(alert, animated: true, completion: nil)
             } catch {
                 self.handleError(error)
             }
