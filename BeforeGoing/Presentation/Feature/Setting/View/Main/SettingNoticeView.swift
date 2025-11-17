@@ -12,7 +12,7 @@ final class SettingNoticeView: BaseView {
     private let titleLabel = UILabel()
     private(set) var locationAuthorizationView = SettingPushNoticeView(
         title: "위치 접근 허용 동의",
-        subtitle: "현재 위치의 기상정보와 추천 준비물을 확인할 수 있어요."
+        subtitle: "현 위치의 날씨와 준비물을 확인할 수 있어요."
     )
     private(set) var basicPushNoticeView = SettingPushNoticeView(
         title: "푸시 알림 / 알람 설정",
