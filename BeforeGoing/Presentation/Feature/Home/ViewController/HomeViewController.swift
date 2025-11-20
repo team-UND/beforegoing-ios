@@ -531,7 +531,7 @@ extension HomeViewController: UITableViewDataSource {
                         )
                     )
                     tableView.reloadData()
-                    HapticManager.shared.notice(feedbackType: .success)
+                    HapticManager.shared.impact()
                 } catch (let error) {
                     self.handleError(error)
                 }
