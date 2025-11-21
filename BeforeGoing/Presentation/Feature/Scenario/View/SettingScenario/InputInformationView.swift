@@ -98,9 +98,8 @@ extension InputInformationView {
     }
     
     func deleteAllText() {
-        guard let text = textField.text else { return }
         textField.text = ""
-        updateTextCount(text.count)
+        updateTextCount(0)
         hideDeleteButton()
     }
     
