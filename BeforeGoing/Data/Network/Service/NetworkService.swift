@@ -76,17 +76,19 @@ final class NetworkService: APIManaging {
         switch afError {
         case .responseValidationFailed(let reason):
             if case .unacceptableStatusCode(let statuscode) = reason {
-                if statuscode == 304 {
+                switch statuscode {
+                case 304:
                     return .notModifiedError
-                }
-                if statuscode == 400 {
+                case 400:
                     return .badRequestError
-                }
-                if statuscode == 404 {
+                case 404:
                     return .notFoundError
-                }
-                if statuscode == 429 {
+                case 429:
                     return .tooManyRequset
+                case (500...599):
+                    return .serviceUnavailable
+                default:
+                    return .unknownError
                 }
             }
             return .unknownError
