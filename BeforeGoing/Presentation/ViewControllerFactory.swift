@@ -26,8 +26,12 @@ final class ViewControllerFactory {
     }
     
     func makeNicknameViewController() -> NicknameViewController {
-        let viewModel = resolveViewModel(NicknameViewModel.self)
-        return .init(viewModel: viewModel)
+        let nicknameViewModel = resolveViewModel(NicknameViewModel.self)
+        let agreeItemViewModel = resolveViewModel(AgreeItemViewModel.self)
+        return .init(
+            nicknameViewModel: nicknameViewModel,
+            agreeItemViewModel: agreeItemViewModel
+        )
     }
     
     func makeOnboardingViewController() -> OnboardingViewController {

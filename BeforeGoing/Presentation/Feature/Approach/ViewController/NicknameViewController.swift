@@ -11,10 +11,16 @@ final class NicknameViewController: BaseViewController {
     
     private let nicknameView = NicknameView()
     private static let maxNumberOfCharacters = 8
-    private let viewModel: NicknameViewModel
     
-    init(viewModel: NicknameViewModel) {
-        self.viewModel = viewModel
+    private let nicknameViewModel: NicknameViewModel
+    private let agreeItemViewModel: AgreeItemViewModel
+    
+    init(
+        nicknameViewModel: NicknameViewModel,
+        agreeItemViewModel: AgreeItemViewModel
+    ) {
+        self.nicknameViewModel = nicknameViewModel
+        self.agreeItemViewModel = agreeItemViewModel
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -102,11 +108,12 @@ extension NicknameViewController {
         }
         
         Task {
-            let result = try await viewModel.action(input: .startButtonDidTap(nickname: nickname))
+            let result = try await nicknameViewModel.action(input: .startButtonDidTap(nickname: nickname))
             
             switch result {
             case .updateNicknameResult(let isNicknameUpdated):
                 if isNicknameUpdated {
+                    let _ = try await agreeItemViewModel.action(input: .initTerms)
                     let viewController = ViewControllerFactory.shared.makeOnboardingViewController()
                     viewController.navigationItem.hidesBackButton = true
                     self.navigationController?.pushViewController(viewController, animated: false)
