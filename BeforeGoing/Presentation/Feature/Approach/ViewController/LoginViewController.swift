@@ -69,7 +69,7 @@ final class LoginViewController: BaseViewController {
     }
 }
 
-extension LoginViewController {
+extension LoginViewController: NetworkRequestable, NetworkRequestErrorHandler {
     
     @objc
     func kakaoLoginButtonDidTap() {
@@ -81,8 +81,9 @@ extension LoginViewController {
                     return
                 }
                 output.isRegisteredMember ? moveHome() : moveTerms()
-            } catch(let error) {
-                BeforeGoingLogger.error(error)
+            } catch (let error) {
+                self.handleError(error)
+                BeforeGoingLogger.error(BeforeGoingError.loginFailed)
             }
         }
     }
@@ -96,7 +97,7 @@ extension LoginViewController {
                     isMemberRegistered ? self?.moveHome() : self?.moveTerms()
                 }
             } catch (let error) {
-                BeforeGoingLogger.error(error)
+                self.handleError(error)
                 BeforeGoingLogger.error(BeforeGoingError.loginFailed)
             }
         }

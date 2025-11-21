@@ -55,22 +55,16 @@ final class LoginViewModel: NSObject, ViewModeling {
             let provider = ASAuthorizationAppleIDProvider()
             let request = provider.createRequest()
             
-            Task {
-                do {
-                    let nonce = try await loginUseCase.requestNonce(provider: .apple)
-                    request.nonce = nonce
-                    
-                    let controller = ASAuthorizationController(authorizationRequests: [request])
-                    controller.do {
-                        $0.delegate = self
-                        $0.presentationContextProvider = self
-                        $0.performRequests()
-                    }
-                } catch (let error) {
-                    BeforeGoingLogger.error(error)
-                    BeforeGoingLogger.error(BeforeGoingError.loginFailed)
-                }
+            let nonce = try await loginUseCase.requestNonce(provider: .apple)
+            request.nonce = nonce
+            
+            let controller = ASAuthorizationController(authorizationRequests: [request])
+            controller.do {
+                $0.delegate = self
+                $0.presentationContextProvider = self
+                $0.performRequests()
             }
+            
             return EmptyOutput()
         }
     }

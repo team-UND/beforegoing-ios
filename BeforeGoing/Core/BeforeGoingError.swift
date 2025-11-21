@@ -1,6 +1,7 @@
 enum BeforeGoingError: Error, Equatable {
     case urlNotFound
     case decodingError
+    case serviceUnavailable
     case loginFailed
     case idTokenMissing
     case invalidToken

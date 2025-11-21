@@ -12,6 +12,7 @@ enum ModalType {
     case withdraw
     case tooManyRequest
     case eventPushAgree(isAgreed: Bool, currentDate: String)
+    case serviceUnavailable
     
     var component: ModalComponent {
         switch self {
@@ -53,6 +54,14 @@ enum ModalType {
                 image: nil,
                 mainTitle: nil,
                 description: "[나가기전에]에서 보내는 이벤트/마케팅 관련\n푸시알림 수신 여부가 ‘\(agreeStatus)’로\n변경되었습니다.\n\(currentDate)",
+                dismissTitle: nil,
+                actionTitle: "확인"
+            )
+        case .serviceUnavailable:
+            return .init(
+                image: .withdrawWorry,
+                mainTitle: "지금은 서비스가 원활하지 않아요",
+                description: "잠시 후 다시 시도해주세요!",
                 dismissTitle: nil,
                 actionTitle: "확인"
             )

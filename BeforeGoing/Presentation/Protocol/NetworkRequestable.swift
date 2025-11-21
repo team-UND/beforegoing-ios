@@ -19,9 +19,16 @@ extension NetworkRequestable where Self: BaseViewController {
         presentModal(modalType: .tooManyRequest)
     }
     
+    func presentServiceUnavailable() {
+        presentModal(modalType: .serviceUnavailable)
+    }
+    
     private func presentModal(modalType: ModalType) {
         let modalView = ModalView(type: modalType)
-        let modalViewController = ModalViewController(modalView: modalView)
+        let modalViewController = ModalViewController(
+            modalView: modalView,
+            action: { self.dismiss(animated: true) }
+        )
         self.present(modalViewController, animated: true)
     }
 }

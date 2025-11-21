@@ -1,3 +1,5 @@
+import Foundation
+
 import Alamofire
 import KakaoSDKAuth
 import KakaoSDKUser
@@ -65,6 +67,12 @@ final class NetworkService: APIManaging {
     }
     
     private func handleError(afError: AFError) -> BeforeGoingError {
+        if let urlError = afError.underlyingError as? URLError {
+            if case .cannotFindHost = urlError.code {
+                return .serviceUnavailable
+            }
+        }
+        
         switch afError {
         case .responseValidationFailed(let reason):
             if case .unacceptableStatusCode(let statuscode) = reason {
@@ -79,9 +87,6 @@ final class NetworkService: APIManaging {
                 }
                 if statuscode == 429 {
                     return .tooManyRequset
-                }
-                if statuscode == 503 {
-                    return .weatherServiceError
                 }
             }
             return .unknownError
