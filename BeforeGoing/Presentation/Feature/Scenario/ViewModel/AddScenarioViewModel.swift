@@ -161,10 +161,6 @@ extension AddScenarioViewModel {
         missions.insert(mission, at: index)
     }
     
-//    func addMissions(missions: [(missionID: Int, content: String)]) {
-//        missions.forEach { self.missions.append(($0.missionID, $0.content)) }
-//    }
-    
     func contains(missionContent: String) -> Bool {
         missions.contains(where: { _, content in
             content == missionContent
