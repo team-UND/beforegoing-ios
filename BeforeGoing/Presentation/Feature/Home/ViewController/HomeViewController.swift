@@ -247,7 +247,7 @@ extension HomeViewController: ToastPresentable {
     
     @objc
     private func addScenarioButtonDidTap() {
-        moveMySceario()
+        let _ = moveScenarioTab()
     }
     
     @objc
@@ -361,14 +361,13 @@ extension HomeViewController: ToastPresentable {
     
     @objc
     private func moveButtonDidTap() {
-        moveMySceario()
-    }
-    
-    private func moveMySceario() {
-        guard let bottomViewController = self.tabBarController as? BottomNavigationViewController else {
+        guard let bottomViewController = moveScenarioTab(),
+              let navigationController = bottomViewController.selectedViewController as? UINavigationController else {
             return
         }
-        bottomViewController.selectTab(item: .scenario)
+        
+        pushMyScenario(navigationController: navigationController)
+        pushManageScenario(navigationController: navigationController)
     }
     
     private func updateHeaderDate(date: String) {
@@ -419,6 +418,31 @@ extension HomeViewController: ToastPresentable {
             $0.updatePlaceHolder(text: "지난 날짜의 리스트는 추가할 수 없어요")
             $0.updateTaskField(isEnable: false)
         }
+    }
+    
+    private func moveScenarioTab() -> BottomNavigationViewController? {
+        guard let bottomViewController = self.tabBarController as? BottomNavigationViewController else {
+            return nil
+        }
+        bottomViewController.selectTab(item: .scenario)
+        return bottomViewController
+    }
+    
+    private func pushMyScenario(navigationController: UINavigationController) {
+        let hasMyScenarioVC = navigationController.viewControllers.contains { $0 is MyScenarioViewController }
+        if !hasMyScenarioVC {
+            let myScenarioVC = ViewControllerFactory.shared.makeMyScenarioViewController()
+            navigationController.pushViewController(myScenarioVC, animated: false)
+        }
+    }
+    
+    private func pushManageScenario(navigationController: UINavigationController) {
+        let manageScenarioVC = ViewControllerFactory.shared.makeManageScenarioViewController()
+        manageScenarioVC.do {
+            $0.navigationItem.hidesBackButton = true
+            $0.hidesBottomBarWhenPushed = true
+        }
+        navigationController.pushViewController(manageScenarioVC, animated: true)
     }
 }
 

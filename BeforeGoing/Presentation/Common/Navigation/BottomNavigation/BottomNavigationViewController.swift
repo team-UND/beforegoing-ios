@@ -76,10 +76,12 @@ final class BottomNavigationViewController: UITabBarController {
             $0.title = title
             $0.image = image.withRenderingMode(.alwaysTemplate)
         }
+        
+        let navigationVC = UINavigationController(rootViewController: rootViewController)
         if let viewController = rootViewController as? HomeViewController {
-            return viewController
+            viewController.navigationController?.setNavigationBarHidden(true, animated: false)
         }
-        return UINavigationController(rootViewController: rootViewController)
+        return navigationVC
     }
     
     private func createTabBarAppearance() -> UITabBarAppearance {
