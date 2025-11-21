@@ -8,6 +8,7 @@
 protocol NetworkRequestable: AnyObject {
     func presentLoginExpired()
     func presentTooManyRequest()
+    func presentServiceUnavailable()
 }
 
 extension NetworkRequestable where Self: BaseViewController {
