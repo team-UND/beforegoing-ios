@@ -290,6 +290,11 @@ extension HomeViewController: ToastPresentable {
         
         clearTaskTextField()
         
+        if homeViewModel.isExistMission(content: content) {
+            self.presentToastMessage(type: .duplicateMission)
+            return
+        }
+        
         Task {
             guard let result = try await homeViewModel.action(
                 input: .addTodayMissionButtonDidTap(

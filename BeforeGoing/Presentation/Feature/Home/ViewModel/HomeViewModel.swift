@@ -200,6 +200,12 @@ final class HomeViewModel: ViewModeling {
         }
     }
     
+    func isExistMission(content: String) -> Bool {
+        missions.contains(where: { mission in
+            mission.content == content
+        })
+    }
+    
     private func getAdministrativeArea(
         latitude: CLLocationDegrees,
         longitude: CLLocationDegrees
@@ -290,12 +296,6 @@ final class HomeViewModel: ViewModeling {
         if !isExistMission(content: content) {
             self.missions.append((missionID, content, beforeState, state, isChecked))
         }
-    }
-    
-    private func isExistMission(content: String) -> Bool {
-        missions.contains(where: { mission in
-            mission.content == content
-        })
     }
     
     private var isLimitTodayMissions: Bool {
