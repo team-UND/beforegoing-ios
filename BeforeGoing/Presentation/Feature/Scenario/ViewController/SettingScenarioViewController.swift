@@ -382,9 +382,7 @@ extension SettingScenarioViewController: UITableViewDataSource {
         let deleteAction = createDeleteAction(tableView: tableView, indexPath: indexPath)
         let largeConfig = createLargeConfig()
         setDeleteActionStyle(deleteAction: deleteAction, largeConfig: largeConfig)
-        
         let config = createSwipeAction(deleteAction: deleteAction)
-        
         return config
     }
     
@@ -393,9 +391,12 @@ extension SettingScenarioViewController: UITableViewDataSource {
             style: .normal,
             title: nil
         ) { [weak self] (_, view, completion) in
-            let _ = self?.addScenarioViewModel.removeMission(at: indexPath.section)
+            guard let self = self else { return }
+            
+            let _ = self.addScenarioViewModel.removeMission(at: indexPath.section)
             tableView.deleteSections(IndexSet(integer: indexPath.section), with: .automatic)
-            self?.checkNextButtonState()
+            self.checkNextButtonState()
+            self.rootView.settingMissionView.updateMissionCount(self.addScenarioViewModel.missionsCount)
             completion(true)
         }
     }
