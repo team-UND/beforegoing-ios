@@ -10,6 +10,12 @@ class BaseViewController: UIViewController {
         setDelegate()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        enableSwipeBackGesture()
+    }
+    
     // 내비게이션바 등 추가적인 UI 작업
     func setView() {}
     
@@ -18,4 +24,16 @@ class BaseViewController: UIViewController {
     
     // Delegate, DataSource 등 설정
     func setDelegate() {}
+    
+    private func enableSwipeBackGesture() {
+        guard let navigationController = navigationController,
+              navigationController.viewControllers.count > 1 else {
+            return
+        }
+        
+        navigationController.interactivePopGestureRecognizer?.do {
+            $0.isEnabled = true
+            $0.delegate = nil
+        }
+    }
 }
