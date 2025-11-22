@@ -12,7 +12,6 @@ final class SettingScenarioViewController: BaseViewController {
     private let rootView = SettingScenarioView()
     
     private let missionLimit = 20
-    //private var missions: [(missionID: Int?, content: String)] = []
     private var scenarioID: Int?
     private var enterType: SettingScenarioEnterType?
     private var isNotificationActive: Bool?
@@ -238,10 +237,12 @@ extension SettingScenarioViewController: ToastPresentable {
               !missionContent.isBlank else { return }
         
         if addScenarioViewModel.missionsCount >= missionLimit {
+            self.view.endEditing(true)
             self.presentToastMessage(type: .missionLimit)
             return
         }
         if addScenarioViewModel.contains(missionContent: missionContent) {
+            self.view.endEditing(true)
             self.presentToastMessage(type: .duplicateMission)
             return
         }
