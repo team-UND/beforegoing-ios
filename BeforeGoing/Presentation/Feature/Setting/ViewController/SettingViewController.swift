@@ -5,15 +5,14 @@
 //  Created by APPLE on 7/24/25.
 //
 
+import CoreLocation
 import UIKit
 
 final class SettingViewController: BaseViewController {
     
     private let rootView = SettingView()
     private let viewModel: SettingViewModel
-    
-    private var hasOpenedSettings = false
-    
+        
     init(viewModel: SettingViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -35,6 +34,7 @@ final class SettingViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         Task {
             guard let result = try await viewModel.action(
                 input: .viewWillAppear
@@ -44,22 +44,33 @@ final class SettingViewController: BaseViewController {
             
             switch result.isEventPushAgreed {
             case .success(let eventPushAgreed):
-                rootView.settingNoticeView.eventPushNoticeView.updateButtonState(condition: eventPushAgreed)
+                rootView.settingNoticeView.eventPushNoticeView.updateSwitch(isAgreed: eventPushAgreed)
             case .failure(let error):
                 self.handleError(error)
                 BeforeGoingLogger.error(error)
             }
         }
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(checkPushNoticeAuthorization),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(checkLocationAuthorization),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(pushNoticeDidBecomeActive(_:)),
-            name: UIApplication.didBecomeActiveNotification,
-            object: nil
-        )
+        
+        checkPushNoticeAuthorization()
+        checkLocationAuthorization()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -82,15 +93,20 @@ final class SettingViewController: BaseViewController {
             for: .touchUpInside
         )
         
+        rootView.settingNoticeView.locationAuthorizationView.switchButton.addTarget(
+            self,
+            action: #selector(authorizationSwitchChanged(_:)),
+            for: .valueChanged
+        )
+        rootView.settingNoticeView.basicPushNoticeView.switchButton.addTarget(
+            self,
+            action: #selector(authorizationSwitchChanged(_:)),
+            for: .valueChanged
+        )
         rootView.settingNoticeView.eventPushNoticeView.switchButton.addTarget(
             self,
             action: #selector(eventPushNoticeButtonDidTap),
             for: .touchUpInside
-        )
-        rootView.settingNoticeView.basicPushNoticeView.switchButton.addTarget(
-            self,
-            action: #selector(pushNoticeButtonDidTap),
-            for: .valueChanged
         )
         
         rootView.policyView.noticeView.addGestureRecognizer(createTapGesture(action: #selector(noticeButtonDidTap)))
@@ -144,34 +160,46 @@ extension SettingViewController: NetworkRequestable, NetworkRequestErrorHandler 
     }
     
     @objc
-    private func pushNoticeButtonDidTap() {
-        hasOpenedSettings = true
+    private func authorizationSwitchChanged(_ sender: UISwitch) {
+        let isAgreed = sender.isOn
+        sender.setOn(isAgreed, animated: true)
+        
         if let url = URL(string: UIApplication.openSettingsURLString) {
             UIApplication.shared.open(url)
         }
     }
     
     @objc
-    func pushNoticeDidBecomeActive(_ notification: Notification) {
-        guard hasOpenedSettings else { return }
-        hasOpenedSettings = false
-        
+    func checkPushNoticeAuthorization() {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             DispatchQueue.main.async {
-                let isAgreed: Bool
+                var isAgreed = false
                 
                 switch settings.authorizationStatus {
-                case .authorized:
+                case .authorized, .provisional, .ephemeral:
                     isAgreed = (settings.alertSetting == .enabled)
-                case .provisional, .ephemeral:
-                    isAgreed = true
                 default:
-                    isAgreed = false
+                    break
                 }
                 
-                self.rootView.updateSwitch(isAgreed: isAgreed)
+                self.rootView.settingNoticeView.basicPushNoticeView.updateSwitch(isAgreed: isAgreed)
             }
         }
+    }
+    
+    @objc
+    func checkLocationAuthorization() {
+        let locationManager = CLLocationManager()
+        var isAgreed = false
+        
+        switch locationManager.authorizationStatus {
+        case .authorizedAlways, .authorizedWhenInUse:
+            isAgreed = true
+        default:
+            break
+        }
+        
+        rootView.settingNoticeView.locationAuthorizationView.updateSwitch(isAgreed: isAgreed)
     }
     
     private func alertEventPushChange(isSwitchedOn: Bool) {

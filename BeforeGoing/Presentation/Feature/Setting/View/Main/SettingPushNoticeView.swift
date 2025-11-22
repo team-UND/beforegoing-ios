@@ -75,7 +75,7 @@ final class SettingPushNoticeView: BaseView {
 
 extension SettingPushNoticeView {
     
-    func updateButtonState(condition: Bool) {
-        switchButton.isOn = condition
+    func updateSwitch(isAgreed: Bool) {
+        switchButton.isOn = isAgreed
     }
 }

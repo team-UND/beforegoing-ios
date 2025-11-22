@@ -50,10 +50,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidBecomeActive(_ scene: UIScene) {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
-        if let root = (window?.rootViewController as? UINavigationController)?
-            .viewControllers.first(where: { $0 is SettingViewController }) as? SettingViewController {
-            root.pushNoticeDidBecomeActive()
-        }
+        NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
     }
     
     func sceneWillResignActive(_ scene: UIScene) {
@@ -81,7 +78,7 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification
     ) async -> UNNotificationPresentationOptions {
-        HapticManager.shared.impact()
+        HapticManager.shared.notice(feedbackType: .warning)
         return [.banner, .sound, .badge]
     }
     
@@ -93,7 +90,7 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
         let notificationRequest = response.notification.request
         navigateToScreen(for: notificationRequest)
         
-        HapticManager.shared.impact()
+        HapticManager.shared.notice(feedbackType: .warning)
         
         completionHandler()
     }
