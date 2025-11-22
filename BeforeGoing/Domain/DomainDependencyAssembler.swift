@@ -86,6 +86,9 @@ final class DomainDependencyAssembler: DependencyAssembler {
         DIContainer.shared.register(type: LoginType.self) { _ in
             LoginUseCase(repository: authrepository)
         }
+        DIContainer.shared.register(type: GetLastLoginType.self) { _ in
+            GetLastLoginUseCase(repository: authrepository)
+        }
         DIContainer.shared.register(type: LogoutType.self) { _ in
             return LogoutUseCase(repository: authrepository)
         }

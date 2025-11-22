@@ -11,5 +11,6 @@ protocol AuthInterface {
     func requestLogin(provider: Provider) async throws -> Bool
     func requestLogin(provider: Provider, idToken: String) async throws -> Bool
     func autoLogin() async throws -> Bool
+    func getLastLogin() -> Provider?
     func logout() async throws
 }

@@ -26,6 +26,11 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
+        guard let getLastLoginUseCase = DIContainer.shared.resolve(type: GetLastLoginType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
         guard let logoutUseCase = DIContainer.shared.resolve(type: LogoutType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
@@ -125,7 +130,8 @@ struct PresentationDependencyAssembler: DependencyAssembler {
         DIContainer.shared.register(
             LoginViewModel(
                 autoLoginUseCase: autoLoginUseCase,
-                loginUseCase: loginUseCase
+                loginUseCase: loginUseCase,
+                getLastLoginUseCase: getLastLoginUseCase
             )
         )
         DIContainer.shared.register(

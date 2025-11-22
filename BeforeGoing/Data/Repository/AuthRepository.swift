@@ -5,6 +5,8 @@
 //  Created by APPLE on 7/22/25.
 //
 
+import Foundation
+
 struct AuthRepository: AuthInterface {
     
     private let networkService: NetworkService
@@ -78,6 +80,13 @@ struct AuthRepository: AuthInterface {
         return true
     }
     
+    func getLastLogin() -> Provider? {
+        guard let lastLogin: LastLogin = userDefaultsService.load(key: .lastProvider) else {
+            return nil
+        }
+        return Provider(rawValue: lastLogin.provider)
+    }
+    
     func logout() async throws {
         guard let accessToken = keyChainService.load(key: .accessToken) else {
             BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
@@ -110,7 +119,10 @@ struct AuthRepository: AuthInterface {
     }
     
     private func saveProvider(_ provider: Provider) {
+        let lastLogin = LastLogin(provider: provider.rawValue, timestamp: Date())
+        
         let _ = userDefaultsService.save(provider.rawValue, key: .provider)
+        let _ = userDefaultsService.save(lastLogin, key: .lastProvider)
     }
     
     private var isTokenExists: Bool {
@@ -135,6 +147,5 @@ struct AuthRepository: AuthInterface {
             keyChainService.delete(key: key)
         }
         let _ = userDefaultsService.delete(key: .provider)
-//        let _ = userDefaultsService.delete(key: (provider == Provider.apple.rawValue) ? .appleMemberName : .kakaoMemberName)
     }
 }

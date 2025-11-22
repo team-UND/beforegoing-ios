@@ -41,6 +41,18 @@ final class LoginViewController: BaseViewController {
         }
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        Task {
+            guard let output = try await viewModel.action(input: .viewWillAppear) as? LoginViewModel.LastLoginOutput else {
+                return
+            }
+            
+            rootView.updateLastLoginBadgeConstraint(provider: output.lastLoginProvider)
+        }
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         setAnimation()
@@ -62,6 +74,7 @@ final class LoginViewController: BaseViewController {
                     
                     $0.kakaoLoginButton.alpha = 1
                     $0.appleLoginButton.alpha = 1
+                    $0.lastLoginBadgeView.alpha = 1
                     $0.layoutIfNeeded()
                 }
             }

@@ -13,17 +13,22 @@ final class LoginViewModel: NSObject, ViewModeling {
     
     private let autoLoginUseCase: AutoLoginType
     private let loginUseCase: LoginType
+    private let getLastLoginUseCase: GetLastLoginType
+    
     var onAppleLoginPerformed: ((Bool) -> Void)?
     
     init(
         autoLoginUseCase: AutoLoginType,
-        loginUseCase: LoginType
+        loginUseCase: LoginType,
+        getLastLoginUseCase: GetLastLoginType
     ) {
         self.autoLoginUseCase = autoLoginUseCase
         self.loginUseCase = loginUseCase
+        self.getLastLoginUseCase = getLastLoginUseCase
     }
     
     enum Input {
+        case viewWillAppear
         case viewDidLoad
         case kakaoLoginDidTap
         case appleLoginDidTap
@@ -39,10 +44,18 @@ final class LoginViewModel: NSObject, ViewModeling {
         let isRegisteredMember: Bool
     }
     
+    struct LastLoginOutput: LoginOutput {
+        let lastLoginProvider: Provider?
+    }
+    
     struct EmptyOutput: LoginOutput {}
     
     func action(input: Input) async throws -> Output {
         switch input {
+        case .viewWillAppear:
+            let provider = getLastLoginUseCase.execute()
+            return LastLoginOutput(lastLoginProvider: provider)
+            
         case .viewDidLoad:
             let isSucceedAutoLogin = try await autoLoginUseCase.execute()
             return AutoLoginOutput(isSucceed: isSucceedAutoLogin)
