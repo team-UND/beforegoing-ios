@@ -140,7 +140,7 @@ extension SettingViewController: NetworkRequestable, NetworkRequestErrorHandler 
     @objc
     private func eventPushNoticeButtonDidTap() {
         let isSwitchedOn = rootView.settingNoticeView.eventPushNoticeView.switchButton.isOn
-        performTask(isSwitchedOn: isSwitchedOn)
+        alertEventPushChange(isSwitchedOn: isSwitchedOn)
     }
     
     @objc
@@ -174,7 +174,7 @@ extension SettingViewController: NetworkRequestable, NetworkRequestErrorHandler 
         }
     }
     
-    private func performTask(isSwitchedOn: Bool) {
+    private func alertEventPushChange(isSwitchedOn: Bool) {
         let isReception = isSwitchedOn ? "수신 동의" : "수신 거부"
         let currentDate = DateUtil.getCurrentDate(format: "yyyy년 MM월 dd일")
         
