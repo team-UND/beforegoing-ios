@@ -12,7 +12,7 @@ final class SettingViewController: BaseViewController {
     
     private let rootView = SettingView()
     private let viewModel: SettingViewModel
-        
+    
     init(viewModel: SettingViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -72,7 +72,7 @@ final class SettingViewController: BaseViewController {
         checkPushNoticeAuthorization()
         checkLocationAuthorization()
     }
-
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
