@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UserNotifications
 
 final class AlarmAuthorizationViewController: BaseViewController {
     
@@ -33,8 +34,11 @@ extension AlarmAuthorizationViewController {
     
     @objc
     private func agreeButtonDidTap() {
-        NotificationManager.shared.setPermission { [weak self] in
-            self?.moveLocationAuthorization()
+        let authOptions: UNAuthorizationOptions = [.alert, .sound, .badge]
+        UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { _, _ in
+            DispatchQueue.main.async { [weak self] in
+                self?.moveLocationAuthorization()
+            }
         }
     }
     
