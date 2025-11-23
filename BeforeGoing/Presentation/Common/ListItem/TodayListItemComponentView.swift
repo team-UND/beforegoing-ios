@@ -43,7 +43,7 @@ class TodayListItemComponentView: BaseView {
         }
         expressTodayView.do {
             $0.backgroundColor = .blue50
-            $0.layer.cornerRadius = 25
+            $0.layer.cornerRadius = 5
             $0.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
             $0.layer.borderWidth = 1.4
             $0.layer.borderColor = UIColor.blue50.cgColor
