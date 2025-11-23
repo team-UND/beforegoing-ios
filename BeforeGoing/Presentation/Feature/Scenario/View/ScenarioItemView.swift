@@ -99,7 +99,7 @@ final class ScenarioItemView: BaseView {
             $0.trailing.equalToSuperview()
             $0.centerY.equalToSuperview()
             $0.width.equalTo(12.adjustedW)
-            $0.height.equalTo(76.adjustedH)
+            $0.height.equalTo(height.adjustedH)
         }
     }
 }
