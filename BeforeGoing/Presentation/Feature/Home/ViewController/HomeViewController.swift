@@ -187,7 +187,6 @@ final class HomeViewController: BaseViewController {
     private func setLocationManager() {
         locationManager.do {
             $0.delegate = self
-            $0.requestWhenInUseAuthorization()
             checkStatus()
         }
     }
@@ -497,8 +496,12 @@ extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable, Net
     
     private func checkStatus() {
         let status = locationManager.authorizationStatus
-        if status == .authorizedAlways || status == .authorizedWhenInUse {
+        switch status {
+        case .authorizedAlways, .authorizedWhenInUse:
             locationManager.requestLocation()
+        default:
+            print("위치 권한이 허용되지 않음")
+            break
         }
     }
 }

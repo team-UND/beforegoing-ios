@@ -33,13 +33,24 @@ final class LocationAuthorizationViewController: BaseViewController {
 
 extension LocationAuthorizationViewController: CLLocationManagerDelegate {
     
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        moveHome()
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
+        BeforeGoingLogger.error(error)
+        moveHome()
+    }
+}
+
+extension LocationAuthorizationViewController {
+    
     @objc
     private func agreeButtonDidTap() {
         locationManager.do {
             $0.delegate = self
             $0.requestAlwaysAuthorization()
         }
-        checkStatus(locationManager.authorizationStatus)
     }
     
     @objc
@@ -50,28 +61,5 @@ extension LocationAuthorizationViewController: CLLocationManagerDelegate {
     private func moveHome() {
         let viewController = BottomNavigationViewController()
         ViewControllerUtil.replaceRootViewController(to: viewController)
-    }
-    
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        checkStatus(manager.authorizationStatus)
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
-        BeforeGoingLogger.error(error)
-        moveHome()
-    }
-    
-    private func checkStatus(_ status: CLAuthorizationStatus) {
-        switch status {
-        case .authorizedAlways, .authorizedWhenInUse:
-            locationManager.requestAlwaysAuthorization()
-            moveHome()
-        case .restricted, .denied:
-            moveHome()
-        case .notDetermined:
-            break
-        @unknown default:
-            break
-        }
     }
 }
