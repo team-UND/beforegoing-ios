@@ -83,19 +83,15 @@ final class NotificationManager {
     }
     
     func pushTerminateNotification() async {
-        let pendingRequests = await UNUserNotificationCenter.current().pendingNotificationRequests()
-        
-        if pendingRequests.count > 0 {
-            let request = createNotificationRequest(
-                identifier: terminateIdentifier,
-                notificationContent: createNotificationContent(
-                    title: "잠시만요!",
-                    body: "앱을 완전히 종료하면 설정한 알람이 울리지 않아요",
-                    identifier: terminateIdentifier
-                )
+        let request = createNotificationRequest(
+            identifier: terminateIdentifier,
+            notificationContent: createNotificationContent(
+                title: "잠시만요!",
+                body: "앱을 완전히 종료하면 설정한 알람이 울리지 않아요",
+                identifier: terminateIdentifier
             )
-            addRequest(request)
-        }
+        )
+        addRequest(request)
     }
     
     private func createNotificationContent(
