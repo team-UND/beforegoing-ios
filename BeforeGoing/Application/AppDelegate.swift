@@ -47,9 +47,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func applicationWillTerminate(_ application: UIApplication) {
-        Task {
-            await NotificationManager.shared.pushTerminateNotification()
-        }
+        
     }
 }
 
