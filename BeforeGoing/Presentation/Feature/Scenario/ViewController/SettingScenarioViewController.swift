@@ -173,6 +173,7 @@ extension SettingScenarioViewController {
             $0.textField.text = memo
             $0.updateTextCount(memo.count)
         }
+        rootView.settingMissionView.updateMissionCount(addScenarioViewModel.missionsCount)
         rootView.settingMissionView.missionTableView.reloadData()
         checkNextButtonState()
     }
