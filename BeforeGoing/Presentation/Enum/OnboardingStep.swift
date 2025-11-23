@@ -47,14 +47,14 @@ enum OnboardingStep: Int, CaseIterable {
         }
     }
     
-    private var image: UIImage {
+    private var image: UIImage? {
         switch self {
-        case .first: return .worryOnboarding
+        case .first: return nil
         case .second: return .onboardingFirst
         case .third: return .onboardingSecond
         case .fourth: return .onboardingThird
         case .fifth: return .onboardingFourth
-        case .end: return .worryOnboarding
+        case .end: return nil
         }
     }
     
