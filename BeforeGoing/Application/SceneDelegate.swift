@@ -5,6 +5,7 @@
 //  Created by APPLE on 5/21/25.
 //
 
+import AVFAudio
 import UIKit
 import UserNotifications
 
@@ -67,13 +68,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
-        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
-            if !requests.isEmpty {
-                Task {
-                    await NotificationManager.shared.pushTerminateNotification()
-                }
-            }
-        }
     }
     
     
@@ -85,7 +79,11 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification
     ) async -> UNNotificationPresentationOptions {
-        HapticManager.shared.notice(feedbackType: .warning)
+        let identifier = notification.request.identifier
+        if NotificationIdentifier.isCallNotice(identifier: identifier) {
+            HapticManager.shared.notice(feedbackType: .warning)
+            AudioServicesPlaySystemSound(SystemSoundID(1315))
+        }
         return [.banner, .sound, .badge]
     }
     
@@ -95,9 +93,14 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
         let notificationRequest = response.notification.request
+        let identifier = notificationRequest.identifier
+        
         navigateToScreen(for: notificationRequest)
         
-        HapticManager.shared.notice(feedbackType: .warning)
+        if NotificationIdentifier.isCallNotice(identifier: identifier) {
+            HapticManager.shared.notice(feedbackType: .warning)
+            AudioServicesPlaySystemSound(SystemSoundID(1315))
+        }
         
         completionHandler()
     }
@@ -110,11 +113,8 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
         }
                 
         switch notificationIdentifier {
-        case .pushNotice:
-            guard let bottomVC = rootVC.tabBarController as? BottomNavigationViewController else {
-                return
-            }
-            bottomVC.selectTab(item: .home)
+        case .pushNotice, .terminate:
+            ViewControllerUtil.replaceRootViewController(to: BottomNavigationViewController())
             
         case .callNotice(let sequence):
             ViewControllerUtil.replaceRootViewController(
@@ -124,9 +124,6 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
                     identifier: notificationIdentifier.identifier
                 )
             )
-            
-        default:
-            break
         }        
     }
 }
