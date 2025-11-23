@@ -10,7 +10,6 @@ import UserNotifications
 final class NotificationManager {
     
     static let shared = NotificationManager()
-    private let terminateIdentifier = "terminate"
     
     private init() {}
     
@@ -83,6 +82,7 @@ final class NotificationManager {
     }
     
     func pushTerminateNotification() async {
+        let terminateIdentifier = NotificationIdentifier.terminate.identifier
         let request = createNotificationRequest(
             identifier: terminateIdentifier,
             notificationContent: createNotificationContent(
@@ -97,24 +97,8 @@ final class NotificationManager {
     private func createNotificationContent(
         title: String,
         body: String,
-        identifier: String
-    ) -> UNMutableNotificationContent {
-        let notificationContent: UNMutableNotificationContent = {
-            let content = UNMutableNotificationContent()
-            content.title = title
-            content.body = body
-            content.userInfo["identifier"] = identifier
-            return content
-        }()
-        
-        return notificationContent
-    }
-    
-    private func createNotificationContent(
-        title: String,
-        body: String,
         identifier: String,
-        sound: UNNotificationSound
+        sound: UNNotificationSound? = nil
     ) -> UNMutableNotificationContent {
         let notificationContent: UNMutableNotificationContent = {
             let content = UNMutableNotificationContent()
@@ -129,8 +113,16 @@ final class NotificationManager {
     }
     
     private func createTriggerComponents(date: Date, day: Int) -> DateComponents {
-        var dateComponents = Calendar.current.dateComponents([.hour, .minute, .second], from: date)
+        guard let seoulTZ = TimeZone(identifier: "Asia/Seoul") else {
+            return Calendar.current.dateComponents([.hour, .minute, .second], from: date)
+        }
+        var calendar = Calendar.current
+        calendar.timeZone = seoulTZ
+
+        var dateComponents = calendar.dateComponents([.hour, .minute, .second], from: date)
         dateComponents.weekday = convertWeekDay(from: day)
+        dateComponents.timeZone = seoulTZ
+        
         return dateComponents
     }
     

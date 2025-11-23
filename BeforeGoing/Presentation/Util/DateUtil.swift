@@ -12,34 +12,45 @@ struct DateUtil {
     private static let homeDateFormat = "yyyy년 MM월 dd일"
     private static let apiDateFormat = "yyyy-MM-dd"
     private static let monthAndDayDateFormat = "MM월 dd일"
-    private static let seoul = "Asia/Seoul"
-    private static let calendar = Calendar.current
+    private static let seoulTimeZoneIdentifier = "Asia/Seoul"
+
+    private static var seoulTimeZone: TimeZone? {
+        return TimeZone(identifier: seoulTimeZoneIdentifier)
+    }
+
+    private static var seoulCalendar: Calendar {
+        var cal = Calendar(identifier: .gregorian)
+        if let tz = seoulTimeZone {
+            cal.timeZone = tz
+        }
+        return cal
+    }
     
     private static let homeDateformatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = homeDateFormat
-        formatter.timeZone = TimeZone(identifier: seoul)
+        formatter.timeZone = seoulTimeZone
         return formatter
     }()
     
     private static let apiDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = apiDateFormat
-        formatter.timeZone = TimeZone(identifier: seoul)
+        formatter.timeZone = seoulTimeZone
         return formatter
     }()
     
     private static let monthAndDayDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = monthAndDayDateFormat
-        formatter.timeZone = TimeZone(identifier: seoul)
+        formatter.timeZone = seoulTimeZone
         return formatter
     }()
     
     static func getCurrentDate() -> Date {
         let now = Date()
-        let components = calendar.dateComponents([.year, .month, .day], from: now)
-        guard let date = calendar.date(from: components) else {
+        let components = seoulCalendar.dateComponents([.year, .month, .day], from: now)
+        guard let date = seoulCalendar.date(from: components) else {
             fatalError("Failed to create date from components. This should not happen.")
         }
         return date
@@ -85,15 +96,19 @@ struct DateUtil {
         minute: Int,
         on date: Date = Date()
     ) -> Date? {
-        var calendar = Calendar.current
-        calendar.timeZone = TimeZone.current
+        let current = seoulCalendar.dateComponents([.year, .month, .day], from: date)
 
         var dateComponents = DateComponents()
+        dateComponents.timeZone = seoulTimeZone
+        dateComponents.year = current.year
+        dateComponents.month = current.month
+        dateComponents.day = current.day
         dateComponents.hour = hour
         dateComponents.minute = minute
         dateComponents.second = 0
-
-        return calendar.date(from: dateComponents)
+        
+        let date = seoulCalendar.date(from: dateComponents)
+        return date
     }
     
     static func toMonthAndDay(date: String) -> String? {
@@ -111,7 +126,7 @@ struct DateUtil {
     }
     
     private static func getMonth(from date: Date, offset: Int) -> Date {
-        guard let date = calendar.date(byAdding: .month, value: offset, to: date) else {
+        guard let date = seoulCalendar.date(byAdding: .month, value: offset, to: date) else {
             fatalError("Failed to create date from components. This should not happen.")
         }
         return date
