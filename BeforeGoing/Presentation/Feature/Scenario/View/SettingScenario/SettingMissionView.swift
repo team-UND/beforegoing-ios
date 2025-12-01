@@ -42,7 +42,12 @@ final class SettingMissionView: BaseView {
             $0.setImage(.union, for: .normal)
             $0.isHidden = true
         }
-        missionTableView.separatorStyle = .none
+        missionTableView.do {
+            $0.separatorStyle = .none
+            $0.tableFooterView = UIView(
+                frame: CGRect(x: 0, y: 0, width: 0, height: 10)
+            )
+        }
     }
     
     override func setUI() {
@@ -84,7 +89,7 @@ final class SettingMissionView: BaseView {
             $0.top.equalTo(missionTextField.snp.bottom).offset(20.adjustedH)
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(236.adjustedH)
-            $0.bottom.equalToSuperview().inset(29.adjustedH)
+            $0.bottom.equalToSuperview()
         }
     }
 }

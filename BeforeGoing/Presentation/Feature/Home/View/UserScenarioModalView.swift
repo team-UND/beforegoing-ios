@@ -91,7 +91,7 @@ final class UserScenarioModalView: BaseView {
         listTableView.snp.makeConstraints {
             $0.top.equalTo(taskTextField.snp.bottom).offset(16.adjustedH)
             $0.leading.trailing.equalToSuperview().inset(20.adjustedW)
-            $0.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
+            $0.bottom.equalTo(safeAreaLayoutGuide.snp.bottom).inset(145.adjustedH)
         }
     }
     
