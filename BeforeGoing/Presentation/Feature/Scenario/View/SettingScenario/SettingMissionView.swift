@@ -28,7 +28,7 @@ final class SettingMissionView: BaseView {
         missionCountLabel.do {
             $0.textColor = .gray400
             $0.font = .custom(.bodyMDMedium)
-            $0.text = "0/\(maxMissionCount)"
+            $0.text = "0/\(maxMissionCount)개"
         }
         missionTextField.do {
             $0.placeholder = "항목을 추가하세요"
@@ -134,6 +134,6 @@ extension SettingMissionView {
     }
     
     func updateMissionCount(_ count: Int) {
-        missionCountLabel.text = "\(count)/\(maxMissionCount)"
+        missionCountLabel.text = "\(count)/\(maxMissionCount)개"
     }
 }
