@@ -31,7 +31,6 @@ final class CompletedListItem: TodayListItemComponentView {
             $0.checkBox.setImage(.completed, for: .normal)
             $0.checkBox.backgroundColor = .clear
             $0.checkBox.layer.borderWidth = 0
-            $0.checkBox.isEnabled = false
             $0.layer.cornerRadius = 14
             $0.backgroundColor = .gray200
         }

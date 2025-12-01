@@ -52,7 +52,7 @@ final class HomeViewModel: ViewModeling {
         case requestDate
         case requestWeather(latitude: CLLocationDegrees, longitude: CLLocationDegrees)
         case scenarioDidTap(scenarioID: Int, date: String)
-        case missionChecked(missionID: Int, date: String)
+        case missionChecked(missionID: Int, date: String, willBeChecked: Bool)
         case addTodayMissionButtonDidTap(scenarioID: Int, date: String, content: String)
         case deleteTodayMissionButtonDidTap(missionID: Int)
     }
@@ -139,15 +139,15 @@ final class HomeViewModel: ViewModeling {
                 return MissionsOutput(missionsResult: .failure(error))
             }
             
-        case .missionChecked(let missionID, let date):
+        case .missionChecked(let missionID, let date, let willBeChecked):
             do {
                 try await checkMissionUseCase.execute(
                     missionID: missionID,
                     date: date,
-                    isChecked: true
+                    isChecked: willBeChecked
                 )
                 if let index = missions.firstIndex(where: { $0.missionID == missionID }) {
-                    completeMission(at: index)
+                    willBeChecked ? completeMission(at: index) : cancelMission(at: index)
                 }
             } catch {
                 BeforeGoingLogger.error(error)
@@ -338,6 +338,15 @@ extension HomeViewModel {
         missions[index].isChecked = true
         let removed = missions.remove(at: index)
         missions.append(removed)
+        
+        sortMissions()
+    }
+    
+    private func cancelMission(at index: Int) {
+        missions[index].state = missions[index].initState
+        missions[index].isChecked = false
+        let removed = missions.remove(at: index)
+        missions.insert(removed, at: 0)
         
         sortMissions()
     }

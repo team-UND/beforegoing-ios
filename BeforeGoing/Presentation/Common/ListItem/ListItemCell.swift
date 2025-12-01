@@ -66,6 +66,10 @@ extension ListItemCell {
 
 extension ListItemCell {
     
+    var willBeChecked: Bool {
+        self.state != .completed
+    }
+    
     @objc
     func checkBoxDidTap(_ sender: UIButton) {
         onCellDidTap?()

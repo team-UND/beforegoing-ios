@@ -559,7 +559,8 @@ extension HomeViewController: UITableViewDataSource {
                     let _ = try await self.homeViewModel.action(
                         input: .missionChecked(
                             missionID: missionID,
-                            date: homeDate
+                            date: homeDate,
+                            willBeChecked: cell.willBeChecked
                         )
                     )
                     tableView.reloadData()
