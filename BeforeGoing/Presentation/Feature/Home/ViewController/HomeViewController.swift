@@ -62,6 +62,7 @@ final class HomeViewController: BaseViewController {
         }
         
         requestDate()
+        checkLoactionAuthorization()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -130,6 +131,20 @@ final class HomeViewController: BaseViewController {
                 self.handleError(error)
                 BeforeGoingLogger.error(error)
             }
+        }
+    }
+    
+    private func checkLoactionAuthorization() {
+        switch locationManager.authorizationStatus {
+        case .authorizedAlways, .authorizedWhenInUse:
+            locationManager.requestLocation()
+        case .restricted, .denied:
+            rootView.headerView.updateWeatherUI(information: "설정에서 위치 권한을 허용하시면,\n날씨와 추천 준비물을 알려드려요!")
+            break
+        case .notDetermined:
+            break
+        @unknown default:
+            break
         }
     }
     
@@ -203,7 +218,6 @@ final class HomeViewController: BaseViewController {
     private func setLocationManager() {
         locationManager.do {
             $0.delegate = self
-            checkStatus()
         }
     }
 }
@@ -468,19 +482,7 @@ extension HomeViewController {
 extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable, NetworkRequestErrorHandler {
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        let status = manager.authorizationStatus
-        
-        switch status {
-        case .authorizedAlways, .authorizedWhenInUse:
-            locationManager.requestLocation()
-        case .restricted, .denied:
-            rootView.headerView.updateWeatherUI(information: "설정에서 위치 권한을 허용하시면,\n날씨와 추천 준비물을 알려드려요!")
-            break
-        case .notDetermined:
-            break
-        @unknown default:
-            break
-        }
+        checkLoactionAuthorization()
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -508,17 +510,6 @@ extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable, Net
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
         BeforeGoingLogger.error(error)
-    }
-    
-    private func checkStatus() {
-        let status = locationManager.authorizationStatus
-        switch status {
-        case .authorizedAlways, .authorizedWhenInUse:
-            locationManager.requestLocation()
-        default:
-            print("위치 권한이 허용되지 않음")
-            break
-        }
     }
 }
 

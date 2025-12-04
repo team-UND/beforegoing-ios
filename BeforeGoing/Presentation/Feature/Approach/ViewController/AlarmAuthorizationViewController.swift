@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 import UserNotifications
 
 final class AlarmAuthorizationViewController: BaseViewController {
@@ -34,9 +35,15 @@ extension AlarmAuthorizationViewController {
     
     @objc
     private func agreeButtonDidTap() {
-        let authOptions: UNAuthorizationOptions = [.alert, .sound, .badge]
-        UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { _, _ in
-            DispatchQueue.main.async { [weak self] in
+        UNUserNotificationCenter.current().getNotificationSettings { [weak self] settings in
+            switch settings.authorizationStatus {
+            case .notDetermined:
+                self?.requestAuthorization()
+            case .denied:
+                self?.moveSetting()
+            case .authorized, .provisional, .ephemeral:
+                self?.moveLocationAuthorization()
+            @unknown default:
                 self?.moveLocationAuthorization()
             }
         }
@@ -51,5 +58,27 @@ extension AlarmAuthorizationViewController {
         let viewController = ViewControllerFactory.shared.makeLocationAuthorizationViewController()
         viewController.navigationItem.hidesBackButton = true
         self.navigationController?.pushViewController(viewController, animated: false)
+    }
+    
+    private func requestAuthorization() {
+        let authOptions: UNAuthorizationOptions = [.alert, .sound, .badge]
+        
+        UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { _, _ in
+            DispatchQueue.main.async { [weak self] in
+                self?.moveLocationAuthorization()
+            }
+        }
+    }
+    
+    private func moveSetting() {
+        DispatchQueue.main.async {
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(url) { [weak self] isOpened in
+                    if isOpened {
+                        self?.moveLocationAuthorization()
+                    }
+                }
+            }
+        }
     }
 }
