@@ -24,7 +24,7 @@ final class NotificationView: BaseView {
         subtitleLabel.text = title
     }
     
-    @MainActor required init?(coder: NSCoder) {
+    required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
@@ -49,7 +49,14 @@ final class NotificationView: BaseView {
             subtitleLabel
         )
         
-        notificationViewType.actions.forEach { addSubview(createActionView(action: $0)) }
+        notificationViewType.actions.forEach {
+            addSubview(
+                createActionView(
+                    action: $0,
+                    notificationViewType: notificationViewType
+                )
+            )
+        }
     }
     
     override func setLayout() {
@@ -63,7 +70,7 @@ final class NotificationView: BaseView {
         }
         subtitleLabel.snp.makeConstraints {
             $0.top.equalTo(mainTitleLabel.snp.bottom).offset(4.adjustedH)
-            $0.horizontalEdges.equalToSuperview().inset(92.adjustedW)
+            $0.centerX.equalToSuperview()
             $0.height.equalTo(47.adjustedH)
         }
         
@@ -96,24 +103,53 @@ final class NotificationView: BaseView {
         }
     }
     
-    private func createActionView(action: NotificationAction) -> UIView {
+    private func createActionView(
+        action: NotificationAction,
+        notificationViewType: NotificationViewType
+    ) -> UIView {
         let actionView = UIView()
+        
+        if notificationViewType == .last {
+            let closeButton = createCloseButton()
+            
+            actionButtons[closeButton] = action
+            actionView.addSubview(closeButton)
+            makeLayoutConstraints(actionView, closeButton)
+            
+            return actionView
+        }
+        
         let actionButton = createActionButton(image: action.image)
         let descriptionLabel = createDescriptionLabel(description: action.description)
         
         actionButtons[actionButton] = action
-        
         actionView.addSubviews(actionButton, descriptionLabel)
-        
         makeLayoutConstraints(actionView, actionButton, descriptionLabel)
         
         return actionView
     }
     
+    private func createCloseButton() -> UIButton {
+        var config = UIButton.Configuration.filled()
+        config.title = "알람 끄기"
+        config.image = .close.resize(newWidth: 22.15.adjustedW)
+        config.imagePadding = 5.54
+        config.imagePlacement = .leading
+        config.baseBackgroundColor = .danger500
+        config.cornerStyle = .capsule
+        config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer {
+            var attrs = $0
+            attrs.font = .custom(.headingH3_5)
+            return attrs
+        }
+
+        let button = UIButton(configuration: config)
+        return button
+    }
+    
     private func createActionButton(image: UIImage) -> UIButton {
         let button = UIButton()
         button.setImage(image, for: .normal)
-        
         return button
     }
     
@@ -127,6 +163,19 @@ final class NotificationView: BaseView {
         }
         
         return textLabel
+    }
+    
+    private func makeLayoutConstraints(
+        _ actionView: UIView,
+        _ actionButton: UIButton
+    ) {
+        actionView.snp.makeConstraints {
+            $0.width.equalTo(302.adjustedW)
+            $0.height.equalTo(66.46.adjustedH)
+        }
+        actionButton.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
     }
     
     private func makeLayoutConstraints(
