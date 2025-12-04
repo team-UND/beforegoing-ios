@@ -32,15 +32,16 @@ final class NotificationManager {
         let identifiersToRemove = (0...6).map { "\(identifier)_\($0)" }
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiersToRemove)
         
+        let uuidString = UUID().uuidString
         let notificationContent = createNotificationContent(
             title: title,
             body: body,
-            identifier: identifier,
+            identifier: identifier + uuidString,
             sound: UNNotificationSound.default
         )
         
         for day in daysOfWeek {
-            let requestIdentifier = "\(identifier)_\(day)"
+            let requestIdentifier = "\(identifier)_\(day)_\(uuidString)"
             let triggerComponents = createTriggerComponents(date: date, day: day)
             let trigger = createCalendarTrigger(components: triggerComponents)
             let request = createNotificationRequest(
