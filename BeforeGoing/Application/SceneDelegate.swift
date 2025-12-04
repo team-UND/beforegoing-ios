@@ -112,8 +112,10 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
         }
                 
         switch notificationIdentifier {
-        case .pushNotice, .terminate:
-            ViewControllerUtil.replaceRootViewController(to: BottomNavigationViewController())
+        case .pushNotice :
+            ViewControllerUtil.replaceRootViewController(
+                to: BottomNavigationViewController(scenarioTitle: request.content.title)
+            )
             
         case .callNotice(let sequence):
             ViewControllerUtil.replaceRootViewController(
@@ -123,6 +125,9 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
                     identifier: notificationIdentifier.identifier
                 )
             )
-        }        
+        
+        case .terminate:
+            ViewControllerUtil.replaceRootViewController(to: BottomNavigationViewController())
+        }
     }
 }
