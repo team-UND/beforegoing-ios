@@ -82,7 +82,7 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
         let identifier = notification.request.identifier
         if NotificationIdentifier.isCallNotice(identifier: identifier) {
             HapticManager.shared.notice(feedbackType: .warning)
-            AudioServicesPlaySystemSound(SystemSoundID(1315))
+            AudioServicesPlaySystemSound(SystemSoundID(1005))
         }
         return [.banner, .sound, .badge]
     }
@@ -99,7 +99,7 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
         
         if NotificationIdentifier.isCallNotice(identifier: identifier) {
             HapticManager.shared.notice(feedbackType: .warning)
-            AudioServicesPlaySystemSound(SystemSoundID(1315))
+            AudioServicesPlaySystemSound(SystemSoundID(1005))
         }
         
         completionHandler()
@@ -107,7 +107,6 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
     
     private func navigateToScreen(for request: UNNotificationRequest) {
         guard let window = self.window,
-              let rootVC = window.rootViewController,
               let notificationIdentifier = NotificationIdentifier.convertIdentifier(from: request.identifier) else {
             return
         }
