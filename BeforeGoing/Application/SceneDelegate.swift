@@ -106,7 +106,7 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
     }
     
     private func navigateToScreen(for request: UNNotificationRequest) {
-        guard let window = self.window,
+        guard let _ = self.window,
               let notificationIdentifier = NotificationIdentifier.convertIdentifier(from: request.identifier) else {
             return
         }
