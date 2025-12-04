@@ -155,10 +155,14 @@ final class HomeViewController: BaseViewController {
                 if let pendingTitle = self.scenarioTitle {
                     DispatchQueue.main.async { [weak self] in
                         guard let self,
-                              let homeDate else { return }
+                              let homeDate = DateUtil.convertDateFormat(dateString: homeDate)
+                        else {
+                            return
+                        }
                         
                         let tag = self.getScenariosViewModel.findTagByTitle(pendingTitle)
-                        
+                        self.rootView.modalView.headerView.updateTappedLabel(tag: tag)
+                        self.fetchScenario(tag: tag, date: homeDate)
                         self.scenarioTitle = nil
                     }
                 }
@@ -340,19 +344,19 @@ extension HomeViewController: ToastPresentable {
             return
         }
         
-        fetchScenario(tag: view.tag, homeDate: homeDate)
+        let tag = view.tag
+        rootView.modalView.headerView.updateTappedLabel(tag: tag)
+        fetchScenario(tag: tag, date: homeDate)
     }
     
-    private func fetchScenario(tag: Int, homeDate: String) {
+    private func fetchScenario(tag: Int, date: String) {
         let scenarioID = getScenariosViewModel.getScenarioID(at: tag)
-        
-        rootView.modalView.headerView.updateTappedLabel(tag: tag)
         
         Task {
             guard let result = try await homeViewModel.action(
                 input: .scenarioDidTap(
                     scenarioID: scenarioID,
-                    date: homeDate
+                    date: date
                 )
             ) as? HomeViewModel.MissionsOutput else { return }
             

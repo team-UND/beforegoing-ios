@@ -11,6 +11,17 @@ import Then
 
 final class BottomNavigationViewController: UITabBarController {
     
+    private let scenarioTitle: String?
+    
+    init(scenarioTitle: String? = nil) {
+        self.scenarioTitle = scenarioTitle
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setViewControllers()
@@ -27,28 +38,6 @@ final class BottomNavigationViewController: UITabBarController {
         }
 
         self.selectedIndex = item.rawValue
-    }
-    
-    func handleScenarioTap(title: String) {
-        let homeIndex = BottomNavigationItem.home.rawValue
-        
-        guard let viewControllers = self.viewControllers,
-              homeIndex < viewControllers.count else {
-            return
-        }
-        
-        var homeVC = viewControllers[homeIndex]
-        
-        if let navController = homeVC as? UINavigationController,
-           let rootVC = navController.viewControllers.first {
-            homeVC = rootVC
-        }
-        
-        guard let finalHomeVC = homeVC as? HomeViewController else {
-            return
-        }
-        
-        finalHomeVC.handleScenarioTap(title: title)
     }
     
     private func setViewControllers() { 
@@ -79,6 +68,7 @@ final class BottomNavigationViewController: UITabBarController {
         
         let navigationVC = UINavigationController(rootViewController: rootViewController)
         if let viewController = rootViewController as? HomeViewController {
+            viewController.configure(scenarioTitle: scenarioTitle)
             viewController.navigationController?.setNavigationBarHidden(true, animated: false)
         }
         return navigationVC
