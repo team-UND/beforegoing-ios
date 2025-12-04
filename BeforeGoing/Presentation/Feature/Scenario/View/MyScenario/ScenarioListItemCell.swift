@@ -58,10 +58,10 @@ extension ScenarioListItemCell {
 
 extension ScenarioListItemCell {
     
-    func bind(name: String, memo: String) {
+    func bind(name: String, noticeInformation: String?) {
         scenarioItemView.do {
             $0.titleLabel.text = name
-            $0.subtitleLabel.text = memo
+            $0.subtitleLabel.text = noticeInformation
         }
     }
 }

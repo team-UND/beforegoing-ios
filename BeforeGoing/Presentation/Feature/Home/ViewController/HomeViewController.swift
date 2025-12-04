@@ -13,15 +13,16 @@ final class HomeViewController: BaseViewController {
     
     private let rootView = HomeView()
     private let homeViewModel: HomeViewModel
-    private let getScenariosViewModel: GetScenariosViewModel
+    private let getScenariosViewModel: GetAllScenariosViewModel
     private let locationManager = CLLocationManager()
     
     private var homeDate: String?
     private var memberName: String?
+    private var scenarioTitle: String?
     
     init(
         homeViewModel: HomeViewModel,
-        getScenariosViewModel: GetScenariosViewModel
+        getScenariosViewModel: GetAllScenariosViewModel
     ) {
         self.homeViewModel = homeViewModel
         self.getScenariosViewModel = getScenariosViewModel
@@ -134,7 +135,7 @@ final class HomeViewController: BaseViewController {
     
     private func getScenarios(currentDate: String) {
         Task {
-            let result = try await getScenariosViewModel.action(input: .viewWillAppear)
+            let result = try await getScenariosViewModel.action(input: .requestScenarios)
             
             switch result.scenariosResult {
             case .success(let scenarios):
@@ -149,6 +150,17 @@ final class HomeViewController: BaseViewController {
                 rootView.modalView.do {
                     $0.replaceModalView()
                     $0.listTableView.reloadData()
+                }
+                
+                if let pendingTitle = self.scenarioTitle {
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self,
+                              let homeDate else { return }
+                        
+                        let tag = self.getScenariosViewModel.findTagByTitle(pendingTitle)
+                        
+                        self.scenarioTitle = nil
+                    }
                 }
             case .failure(let error):
                 if let error = error as? BeforeGoingError,
@@ -331,14 +343,6 @@ extension HomeViewController: ToastPresentable {
         fetchScenario(tag: view.tag, homeDate: homeDate)
     }
     
-    @objc
-    func handleScenarioTap(title: String) {
-        let currentDate = DateUtil.getCurrentDate().toString()
-        
-        let tag = getScenariosViewModel.findTagByTitle(title)
-        rootView.modalView.headerView.updateTappedLabel(tag: tag)
-    }
-    
     private func fetchScenario(tag: Int, homeDate: String) {
         let scenarioID = getScenariosViewModel.getScenarioID(at: tag)
         
@@ -450,6 +454,13 @@ extension HomeViewController: ToastPresentable {
     }
 }
 
+extension HomeViewController {
+    
+    func configure(scenarioTitle: String?) {
+        self.scenarioTitle = scenarioTitle
+    }
+}
+
 extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable, NetworkRequestErrorHandler {
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
@@ -459,6 +470,7 @@ extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable, Net
         case .authorizedAlways, .authorizedWhenInUse:
             locationManager.requestLocation()
         case .restricted, .denied:
+            rootView.headerView.updateWeatherUI(information: "설정에서 위치 권한을 허용하시면,\n날씨와 추천 준비물을 알려드려요!")
             break
         case .notDetermined:
             break

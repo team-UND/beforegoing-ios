@@ -117,7 +117,7 @@ final class DomainDependencyAssembler: DependencyAssembler {
         }
         
         DIContainer.shared.register(type: RequestWeatherType.self) { _ in
-            return RequestWeatherUseCase(repository: weatherRepository)
+            return RequestWeatherUseCase()
         }
         
         DIContainer.shared.register(type: AddScenarioType.self) { _ in
@@ -125,6 +125,9 @@ final class DomainDependencyAssembler: DependencyAssembler {
         }
         DIContainer.shared.register(type: FetchScenariosType.self) { _ in
             return FetchScenariosUseCase(repository: scenarioRepository)
+        }
+        DIContainer.shared.register(type: FetchNotificationsType.self) { _ in
+            return FetchNotificationsUseCase(repository: scenarioRepository)
         }
         DIContainer.shared.register(type: DeleteScenarioType.self) { _ in
             return DeleteScenarioUseCase(repository: scenarioRepository)
