@@ -214,9 +214,7 @@ extension SettingViewController: NetworkRequestable, NetworkRequestErrorHandler 
                     message: "[나가기전에]에서 보내는 이벤트/마케팅 관련\n푸시알림 수신 여부가\n '\(isReception)'로 변경되었습니다.\n\(currentDate)",
                     preferredStyle: .alert
                 )
-                let success = UIAlertAction(title: "확인", style: .default) { action in
-                    
-                }
+                let success = UIAlertAction(title: "확인", style: .default)
                 alert.addAction(success)
                 present(alert, animated: true, completion: nil)
             } catch {
