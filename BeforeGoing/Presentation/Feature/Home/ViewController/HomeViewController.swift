@@ -187,6 +187,7 @@ final class HomeViewController: BaseViewController {
                     rootView.modalView.replaceEmptyView(target: self)
                     return
                 }
+                self.handleError(error)
                 BeforeGoingLogger.error(error)
             }
         }
