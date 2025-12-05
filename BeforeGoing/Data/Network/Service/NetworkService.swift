@@ -81,6 +81,8 @@ final class NetworkService: APIManaging {
                     return .notModifiedError
                 case 400:
                     return .badRequestError
+                case 401:
+                    return .loginExpired
                 case 404:
                     return .notFoundError
                 case 429:

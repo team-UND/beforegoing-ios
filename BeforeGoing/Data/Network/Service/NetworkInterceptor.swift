@@ -12,9 +12,11 @@ import Alamofire
 struct NetworkInterceptor: RequestInterceptor {
     
     private let keyChainService: KeyChainService
+    private let tokenReissuer: TokenReissuer
     
     init(keyChainService: KeyChainService) {
         self.keyChainService = keyChainService
+        self.tokenReissuer = TokenReissuer(keyChainService: keyChainService)
     }
     
     func adapt(
@@ -42,7 +44,6 @@ struct NetworkInterceptor: RequestInterceptor {
             completion(.doNotRetryWithError(error))
             return
         }
-        let tokenReissuer = TokenReissuer(keyChainService: keyChainService)
         
         Task {
             do {
