@@ -71,13 +71,19 @@ struct AuthRepository: AuthInterface {
             return false
         }
         
-        if !tokenValidator.isAccessTokenValid(expirationDate: accessTokenExpirationDate) {
-            guard tokenValidator.isRefreshTokenValid(expirationDate: refreshTokenExpirationDate) else {
+        if tokenValidator.isAccessTokenValid(expirationDate: accessTokenExpirationDate) {
+            return true
+        }
+        
+        if tokenValidator.isRefreshTokenValid(expirationDate: refreshTokenExpirationDate) {
+            do {
+                try await tokenReissuer.reissue()
+                return true
+            } catch {
                 return false
             }
-            try await tokenReissuer.reissue()
         }
-        return true
+        return false
     }
     
     func getLastLogin() -> Provider? {
