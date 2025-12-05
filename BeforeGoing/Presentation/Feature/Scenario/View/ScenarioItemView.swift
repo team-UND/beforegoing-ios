@@ -10,17 +10,15 @@ import UIKit
 final class ScenarioItemView: BaseView {
     
     private var height: CGFloat
-    private let isExistSubtitle: Bool
     
     private let background = UIView()
     private let dragButton = UIButton()
-    private(set) var titleLabel = UILabel()
-    private(set) var subtitleLabel = UILabel()
+    private let titleLabel = UILabel()
+    private let subtitleLabel = UILabel()
     private let labelView = UIView()
         
-    init(height: CGFloat, isExistSubtitle: Bool) {
+    init(height: CGFloat) {
         self.height = height
-        self.isExistSubtitle = isExistSubtitle
         super.init(frame: .zero)
     }
 
@@ -42,11 +40,10 @@ final class ScenarioItemView: BaseView {
             $0.textColor = .gray900
             $0.font = .custom(.bodyLGSemiBold)
         }
-        if isExistSubtitle {
-            subtitleLabel.do {
-                $0.textColor = .gray400
-                $0.font = .custom(.bodyMDRegular)
-            }
+        subtitleLabel.do {
+            $0.textColor = .gray400
+            $0.font = .custom(.bodyMDRegular)
+            $0.isHidden = true
         }
         labelView.do {
             $0.backgroundColor = .blue50
@@ -63,11 +60,9 @@ final class ScenarioItemView: BaseView {
         background.addSubviews(
             dragButton,
             titleLabel,
+            subtitleLabel,
             labelView
         )
-        if isExistSubtitle {
-            background.addSubview(subtitleLabel)
-        }
     }
     
     override func setLayout() {
@@ -80,26 +75,50 @@ final class ScenarioItemView: BaseView {
             $0.centerY.equalToSuperview()
             $0.size.equalTo(24.adjustedW)
         }
-        if isExistSubtitle {
-            titleLabel.snp.makeConstraints {
-                $0.top.equalToSuperview().inset(20.adjustedH)
-                $0.leading.equalTo(dragButton.snp.trailing).offset(12.adjustedW)
-            }
-            subtitleLabel.snp.makeConstraints {
-                $0.top.equalTo(titleLabel.snp.bottom)
-                $0.leading.equalTo(dragButton.snp.trailing).offset(12.adjustedW)
-            }
-        } else {
-            titleLabel.snp.makeConstraints {
-                $0.centerY.equalToSuperview()
-                $0.leading.equalTo(dragButton.snp.trailing).offset(12.adjustedW)
-            }
+        titleLabel.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.leading.equalTo(dragButton.snp.trailing).offset(12.adjustedW)
+        }
+        subtitleLabel.snp.makeConstraints {
+            $0.top.equalTo(titleLabel.snp.bottom)
+            $0.leading.equalTo(dragButton.snp.trailing).offset(12.adjustedW)
         }
         labelView.snp.makeConstraints {
             $0.trailing.equalToSuperview()
             $0.centerY.equalToSuperview()
             $0.width.equalTo(12.adjustedW)
             $0.height.equalTo(height.adjustedH)
+        }
+    }
+}
+
+extension ScenarioItemView {
+    
+    func updateItemName(_ name: String) {
+        self.titleLabel.text = name
+    }
+    
+    func updateNoticeInformation(_ information: String) {
+        self.subtitleLabel.text = information
+    }
+    
+    func showSubtitle(_ title: String) {
+        self.subtitleLabel.isHidden = false
+        self.subtitleLabel.text = title
+        
+        titleLabel.snp.remakeConstraints {
+            $0.top.equalToSuperview().inset(20.adjustedH)
+            $0.leading.equalTo(dragButton.snp.trailing).offset(12.adjustedW)
+        }
+    }
+    
+    func hideSubtitle() {
+        self.subtitleLabel.isHidden = true
+        self.subtitleLabel.text = ""
+        
+        titleLabel.snp.remakeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.leading.equalTo(dragButton.snp.trailing).offset(12.adjustedW)
         }
     }
 }

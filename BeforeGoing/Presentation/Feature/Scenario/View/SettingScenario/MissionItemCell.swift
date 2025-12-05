@@ -9,7 +9,7 @@ import UIKit
 
 final class MissionItemCell: UITableViewCell {
     
-    private let missionItemView = ScenarioItemView(height: 50, isExistSubtitle: false)
+    private let missionItemView = ScenarioItemView(height: 50)
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -41,6 +41,6 @@ final class MissionItemCell: UITableViewCell {
 extension MissionItemCell {
     
     func bind(mission: String) {
-        missionItemView.titleLabel.text = mission
+        missionItemView.updateItemName(mission)
     }
 }

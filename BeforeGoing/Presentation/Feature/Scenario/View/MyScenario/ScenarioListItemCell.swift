@@ -9,7 +9,7 @@ import UIKit
 
 final class ScenarioListItemCell: UITableViewCell {
     
-    private let scenarioItemView = ScenarioItemView(height: 76, isExistSubtitle: true)
+    private let scenarioItemView = ScenarioItemView(height: 76)
     var onDidTap: (() -> Void)?
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -59,9 +59,12 @@ extension ScenarioListItemCell {
 extension ScenarioListItemCell {
     
     func bind(name: String, noticeInformation: String?) {
-        scenarioItemView.do {
-            $0.titleLabel.text = name
-            $0.subtitleLabel.text = noticeInformation
+        scenarioItemView.updateItemName(name)
+        
+        if let noticeInformation {
+            scenarioItemView.showSubtitle(noticeInformation)
+            return
         }
+        scenarioItemView.hideSubtitle()
     }
 }
