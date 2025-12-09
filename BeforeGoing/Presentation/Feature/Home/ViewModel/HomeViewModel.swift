@@ -17,7 +17,7 @@ final class HomeViewModel: ViewModeling {
     private let todayMissionLimit = 20
     
     private let getMemberNameUseCase: GetMemberNameType
-    private let weatherUseCase: RequestWeatherType
+    private let weatherUseCase: FetchWeatherType
     private let getMissionsUseCase: FetchMissionsType
     private let checkMissionUseCase: CheckMissionType
     private let addTodayMissionUseCase: AddTodayMissionType
@@ -33,7 +33,7 @@ final class HomeViewModel: ViewModeling {
     
     init(
         getMemberNameUseCase: GetMemberNameType,
-        weatherUseCase: RequestWeatherType,
+        weatherUseCase: FetchWeatherType,
         getMissionsUseCase: FetchMissionsType,
         checkMissionUseCase: CheckMissionType,
         addTodayMissionUseCase: AddTodayMissionType,
@@ -228,10 +228,8 @@ final class HomeViewModel: ViewModeling {
         let result = try await weatherUseCase.execute(
             date: date,
             timezone: timezone,
-            latitude: Float(latitude),
-            longitude: Float(longitude)
+            location: CLLocation(latitude: latitude, longitude: longitude)
         )
-        
         return result
     }
     
@@ -240,20 +238,18 @@ final class HomeViewModel: ViewModeling {
         result: WeatherEntity
     ) -> NSMutableAttributedString {
         
-        let weatherInformation = makeString(result.mapInformation())
-        let supplies = makeString(
-            result.mapSupplies(),
-            color: UIColor.blue700.cgColor
-        )
+        let weatherInformation = makeWeatherString(result)
+        let supplies = makeSupplyString(result)
         
-        let weatherResult = NSMutableAttributedString()
+        var weatherResult = NSMutableAttributedString()
         
         weatherResult.do {
             $0.append(administrativeArea)
             $0.append(NSAttributedString(string: "는 지금 "))
             $0.append(weatherInformation)
             
-            if !supplies.string.isEmpty {
+            if let supplies,
+               !supplies.string.isEmpty {
                 $0.append(NSAttributedString(string: "\n"))
                 $0.append(supplies)
                 $0.append(NSAttributedString(string: " 챙겨보세요!"))
@@ -263,27 +259,27 @@ final class HomeViewModel: ViewModeling {
         return weatherResult
     }
     
-    private func makeString<T: RawRepresentable>(
-        _ array: [T?],
-        color: CGColor = UIColor.danger600.cgColor
-    ) -> NSMutableAttributedString where T.RawValue == String {
+    private func makeWeatherString(_ weather: WeatherEntity) -> NSMutableAttributedString {
+        let weatherDescription = weather.weatherCondition.description
+        let uvDescription = weather.uvIndex.description
+        let weatherString = "\(weatherDescription), 자외선 \(uvDescription)!"
+        let customedWeatherString = weatherString.customText(rangedText: "\(weatherDescription), 자외선")
         
-        let resultAttributedString = NSMutableAttributedString()
-        let separator = NSAttributedString(string: HomeViewModel.seperator)
-        
-        for (index, element) in array.compactMap({ $0?.rawValue }).enumerated() {
-            let fullText = element
-            let firstSpaceIndex = fullText.firstIndex(of: " ") ?? fullText.endIndex
-            let firstWord = String(fullText[..<firstSpaceIndex])
-            let attributedText = fullText.customText(rangedText: firstWord, color: color)
-            
-            resultAttributedString.append(attributedText)
-            
-            if index < array.compactMap({ $0?.rawValue }).count - 1 {
-                resultAttributedString.append(separator)
-            }
+        return customedWeatherString
+    }
+    
+    private func makeSupplyString(_ weather: WeatherEntity) -> NSMutableAttributedString? {
+        guard let weatherSupply = weather.weatherCondition.supply,
+              let uvSupply = weather.uvIndex.supply else {
+            return nil
         }
-        return resultAttributedString
+                
+        let supplyString = "\(weatherSupply), \(uvSupply)!"
+        let customedSupplyString = supplyString.customText(
+            rangedText: supplyString,
+            color: UIColor.blue700.cgColor
+        )
+        return customedSupplyString
     }
     
     private func addMissionContent(
