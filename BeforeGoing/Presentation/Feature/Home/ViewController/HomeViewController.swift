@@ -41,6 +41,7 @@ final class HomeViewController: BaseViewController {
         super.viewWillAppear(animated)
         
         getScenarios(currentDate: DateUtil.getCurrentDate(format: "yyyy-MM-dd"))
+        updateWeatherInformation()
     }
     
     override func viewDidLoad() {
@@ -189,6 +190,30 @@ final class HomeViewController: BaseViewController {
                 }
                 self.handleError(error)
                 BeforeGoingLogger.error(error)
+            }
+        }
+    }
+    
+    private func updateWeatherInformation() {
+        guard let latitude = locationManager.location?.coordinate.latitude,
+              let longitude = locationManager.location?.coordinate.longitude else {
+            return
+        }
+        
+        Task {
+            guard let result = try await homeViewModel.action(
+                input: .requestWeather(latitude: latitude, longitude: longitude)
+            ) as? HomeViewModel.WeatherOutput else {
+                return
+            }
+            
+            switch result.weatherResult {
+            case .success(let weatherInformation):
+                self.rootView.headerView.updateWeatherUI(information: weatherInformation)
+            case .failure(let error):
+                self.handleError(error)
+                BeforeGoingLogger.error(error)
+                BeforeGoingLogger.error(BeforeGoingError.requestWeatherFailed)
             }
         }
     }
@@ -487,26 +512,7 @@ extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable, Net
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.first {
-            let latitude = location.coordinate.latitude
-            let longitude = location.coordinate.longitude
-            
-            Task {
-                do {
-                    guard let result = try await homeViewModel.action(
-                        input: .requestWeather(latitude: latitude, longitude: longitude)
-                    ) as? HomeViewModel.WeatherOutput else {
-                        return
-                    }
-                    self.rootView.headerView.updateWeatherUI(information: result.weatherResult)
-                    manager.stopUpdatingLocation()
-                } catch (let error) {
-                    self.handleError(error)
-                    BeforeGoingLogger.error(error)
-                    BeforeGoingLogger.error(BeforeGoingError.requestWeatherFailed)
-                }
-            }
-        }
+        
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
