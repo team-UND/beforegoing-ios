@@ -68,7 +68,7 @@ final class HomeViewModel: ViewModeling {
     }
     
     struct WeatherOutput: HomeOutput {
-        let weatherResult: NSMutableAttributedString
+        let weatherResult: Result<NSMutableAttributedString, Error>
     }
     
     struct MissionsOutput: HomeOutput {
@@ -96,19 +96,30 @@ final class HomeViewModel: ViewModeling {
             return DateOutput(date: date)
             
         case .requestWeather(let latitude, let longitude) :
-            let administrativeArea = try await getAdministrativeArea(
-                latitude: latitude,
-                longitude: longitude
-            )
-            let result = try await requestWeatherResult(
-                latitude: latitude,
-                longitude: longitude
-            )
-            let weatherResult = convertWeatherResult(
-                administrativeArea: administrativeArea,
-                result: result
-            )
-            return WeatherOutput(weatherResult: weatherResult)
+            let administrativeArea: NSMutableAttributedString
+            
+            do {
+                administrativeArea = try await getAdministrativeArea(
+                    latitude: latitude,
+                    longitude: longitude
+                )
+            } catch (let error) {
+                return WeatherOutput(weatherResult: .failure(error))
+            }
+            
+            do {
+                let result = try await requestWeatherResult(
+                    latitude: latitude,
+                    longitude: longitude
+                )
+                let weatherResult = convertWeatherResult(
+                    administrativeArea: administrativeArea,
+                    result: result
+                )
+                return WeatherOutput(weatherResult: .success(weatherResult))
+            } catch (let error) {
+                return WeatherOutput(weatherResult: .failure(error))
+            }
             
         case .scenarioDidTap(let scenarioID, let date):
             do {
