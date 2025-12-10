@@ -31,7 +31,7 @@ final class DomainDependencyAssembler: DependencyAssembler {
             DIContainer.shared.register(type: GetMemberNameType.self) { _ in MockGetMemberNameUseCase() }
             DIContainer.shared.register(type: MemberWithdrawType.self) { _ in MockMemberWithdrawUseCase() }
             
-            DIContainer.shared.register(type: RequestWeatherUseCase.self) { _ in MockRequestWeatherUseCase() }
+            DIContainer.shared.register(type: FetchWeatherType.self) { _ in MockFetchWeatherUseCase() }
             
             DIContainer.shared.register(type: AddScenarioType.self) { _ in MockAddScenarioUseCase() }
             DIContainer.shared.register(type: FetchScenariosType.self) { _ in MockFetchScenariosUseCase() }
@@ -61,11 +61,6 @@ final class DomainDependencyAssembler: DependencyAssembler {
         }
         
         guard let memberRepository = DIContainer.shared.resolve(type: MemberInterface.self) else {
-            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            return
-        }
-        
-        guard let weatherRepository = DIContainer.shared.resolve(type: WeatherInterface.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             return
         }
@@ -116,8 +111,8 @@ final class DomainDependencyAssembler: DependencyAssembler {
             return SaveOnboardingCompletedUseCase(repository: memberRepository)
         }
         
-        DIContainer.shared.register(type: RequestWeatherType.self) { _ in
-            return RequestWeatherUseCase()
+        DIContainer.shared.register(type: FetchWeatherType.self) { _ in
+            return FetchWeatherUseCase()
         }
         
         DIContainer.shared.register(type: AddScenarioType.self) { _ in

@@ -66,7 +66,7 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
-        guard let requestWeatherUseCase = DIContainer.shared.resolve(type: RequestWeatherType.self) else {
+        guard let requestWeatherUseCase = DIContainer.shared.resolve(type: FetchWeatherType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
         }
