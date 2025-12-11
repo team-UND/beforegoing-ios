@@ -36,15 +36,17 @@ extension AlarmAuthorizationViewController {
     @objc
     private func agreeButtonDidTap() {
         UNUserNotificationCenter.current().getNotificationSettings { [weak self] settings in
-            switch settings.authorizationStatus {
-            case .notDetermined:
-                self?.requestAuthorization()
-            case .denied:
-                self?.moveSetting()
-            case .authorized, .provisional, .ephemeral:
-                self?.moveLocationAuthorization()
-            @unknown default:
-                self?.moveLocationAuthorization()
+            DispatchQueue.main.async {
+                switch settings.authorizationStatus {
+                case .notDetermined:
+                    self?.requestAuthorization()
+                case .denied:
+                    self?.moveSetting()
+                case .authorized, .provisional, .ephemeral:
+                    self?.moveLocationAuthorization()
+                @unknown default:
+                    self?.moveLocationAuthorization()
+                }
             }
         }
     }
