@@ -13,11 +13,11 @@ struct DateUtil {
     private static let apiDateFormat = "yyyy-MM-dd"
     private static let monthAndDayDateFormat = "MM월 dd일"
     private static let seoulTimeZoneIdentifier = "Asia/Seoul"
-
+    
     private static var seoulTimeZone: TimeZone? {
         return TimeZone(identifier: seoulTimeZoneIdentifier)
     }
-
+    
     private static var seoulCalendar: Calendar {
         var cal = Calendar(identifier: .gregorian)
         if let tz = seoulTimeZone {
@@ -86,7 +86,7 @@ struct DateUtil {
     static func getPreviousMonth(from date: Date) -> Date {
         return getMonth(from: date, offset: -1)
     }
-
+    
     static func getNextMonth(from date: Date) -> Date {
         return getMonth(from: date, offset: 1)
     }
@@ -97,7 +97,7 @@ struct DateUtil {
         on date: Date = Date()
     ) -> Date? {
         let current = seoulCalendar.dateComponents([.year, .month, .day], from: date)
-
+        
         var dateComponents = DateComponents()
         dateComponents.timeZone = seoulTimeZone
         dateComponents.year = current.year
@@ -118,11 +118,23 @@ struct DateUtil {
         return monthAndDayDateFormatter.string(from: date)
     }
     
+    static func toMonthAndDay(date: Date) -> String? {
+        return monthAndDayDateFormatter.string(from: date)
+    }
+    
     static func isTwoMonthsApart(from startDate: Date, to endDate: Date) -> Bool {
         let calendar = Calendar.current
         let components = calendar.dateComponents([.month, .day], from: startDate, to: endDate)
-
+        
         return (components.month ?? 0) > 1
+    }
+    
+    static func isWithinThreeDaysFromToday(startDate: Date, endDate: Date) -> Bool {
+        let diffComponents = Calendar.current.dateComponents([.day], from: startDate, to: endDate)
+        guard  let diff = diffComponents.day else {
+            return false
+        }
+        return diff >= 0 && diff <= 3
     }
     
     private static func getMonth(from date: Date, offset: Int) -> Date {

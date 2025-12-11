@@ -40,28 +40,17 @@ final class HomeViewController: BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        getScenarios(currentDate: DateUtil.getCurrentDate(format: "yyyy-MM-dd"))
-        updateWeatherInformation()
+        let currentDate = DateUtil.getCurrentDate()
+        let currentDateString = DateUtil.getCurrentDate(format: "yyyy-MM-dd")
+        
+        getScenarios(currentDate: currentDateString)
+        updateWeatherInformation(date: currentDate)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setLocationManager()
-        
-        Task {
-            do {
-                guard let result = try await homeViewModel.action(
-                    input: .requestName
-                ) as? HomeViewModel.MemberNameOutput else {
-                    return
-                }
-                
-                self.memberName = result.memberName
-            } catch {
-                BeforeGoingLogger.error(error)
-            }
-        }
-        
         requestDate()
         checkLoactionAuthorization()
     }
@@ -194,15 +183,21 @@ final class HomeViewController: BaseViewController {
         }
     }
     
-    private func updateWeatherInformation() {
+    private func updateWeatherInformation(date: Date) {
         guard let latitude = locationManager.location?.coordinate.latitude,
               let longitude = locationManager.location?.coordinate.longitude else {
             return
         }
         
         Task {
+            try await getMemberName()
+            
+            guard let memberName else {
+                return
+            }
+            
             guard let result = try await homeViewModel.action(
-                input: .requestWeather(latitude: latitude, longitude: longitude)
+                input: .requestWeather(date: date, memberName: memberName, latitude: latitude, longitude: longitude)
             ) as? HomeViewModel.WeatherOutput else {
                 return
             }
@@ -213,8 +208,21 @@ final class HomeViewController: BaseViewController {
             case .failure(let error):
                 self.handleError(error)
                 BeforeGoingLogger.error(error)
-                BeforeGoingLogger.error(BeforeGoingError.requestWeatherFailed)
             }
+        }
+    }
+    
+    private func getMemberName() async throws {
+        do {
+            guard let result = try await homeViewModel.action(
+                input: .requestName
+            ) as? HomeViewModel.MemberNameOutput else {
+                return
+            }
+            
+            self.memberName = result.memberName
+        } catch {
+            BeforeGoingLogger.error(error)
         }
     }
     
@@ -255,12 +263,7 @@ extension HomeViewController: ToastPresentable {
         let calendar = CalendarViewController()
         calendar.modalPresentationStyle = .overFullScreen
         
-        if let homeDateString = self.homeDate,
-           let date = DateUtil.toDate(dateString: homeDateString) {
-            calendar.initialSelectedDate = date
-        } else {
-            calendar.initialSelectedDate = DateUtil.getCurrentDate()
-        }
+        initSelectedDate(calendar: calendar)
         
         calendar.onDayDidTap = { [weak self] date in
             let dateString = DateUtil.toString(date: date)
@@ -271,23 +274,14 @@ extension HomeViewController: ToastPresentable {
                 return
             }
             
-            self.homeDate = dateString
-            updateHeaderDate(date: dateString)
-            updatePlaceHolderByDate(
+            updateHomeDate(
                 date: date,
                 currentDate: currentDate,
+                dateString: dateString,
                 monthAndDay: monthAndDay
             )
             
-            if date != currentDate {
-                updateWeatherByDate(
-                    date: date,
-                    currentDate: currentDate,
-                    monthAndDay: monthAndDay
-                )
-                return
-            }
-            locationManager.requestLocation()
+            updateWeatherInformation(date: date)
         }
         calendar.onDismiss = { [weak self] in
             guard let homeDate = self?.homeDate,
@@ -389,6 +383,41 @@ extension HomeViewController: ToastPresentable {
         fetchScenario(tag: tag, date: homeDate)
     }
     
+    @objc
+    private func moveButtonDidTap() {
+        guard let bottomViewController = moveScenarioTab(),
+              let navigationController = bottomViewController.selectedViewController as? UINavigationController else {
+            return
+        }
+        
+        pushMyScenario(navigationController: navigationController)
+        pushManageScenario(navigationController: navigationController)
+    }
+    
+    private func initSelectedDate(calendar: CalendarViewController) {
+        if let homeDateString = self.homeDate,
+           let date = DateUtil.toDate(dateString: homeDateString) {
+            calendar.initialSelectedDate = date
+        } else {
+            calendar.initialSelectedDate = DateUtil.getCurrentDate()
+        }
+    }
+    
+    private func updateHomeDate(
+        date: Date,
+        currentDate: Date,
+        dateString: String,
+        monthAndDay: String
+    ) {
+        self.homeDate = dateString
+        updateHeaderDate(date: dateString)
+        updatePlaceHolderByDate(
+            date: date,
+            currentDate: currentDate,
+            monthAndDay: monthAndDay
+        )
+    }
+    
     private func fetchScenario(tag: Int, date: String) {
         let scenarioID = getScenariosViewModel.getScenarioID(at: tag)
         
@@ -411,48 +440,37 @@ extension HomeViewController: ToastPresentable {
         }
     }
     
-    @objc
-    private func moveButtonDidTap() {
-        guard let bottomViewController = moveScenarioTab(),
-              let navigationController = bottomViewController.selectedViewController as? UINavigationController else {
-            return
-        }
-        
-        pushMyScenario(navigationController: navigationController)
-        pushManageScenario(navigationController: navigationController)
-    }
-    
     private func updateHeaderDate(date: String) {
         self.rootView.headerView.updateDateUI(date: date)
     }
     
-    private func updateWeatherByDate(
-        date: Date,
-        currentDate: Date,
-        monthAndDay: String
-    ) {
-        guard let memberName = memberName,
-              currentDate != date else {
-            return
-        }
-        
-        let scenarioIntroduce = "\(memberName)님의 \(monthAndDay) 시나리오예요!"
-        let pastDateIntroduce = "해당 날짜의 기상 정보는 확인하기 어려워요"
-        let futureDateIntroduce = "지난 날짜의 기상 정보는 제공하지 않아요"
-        let customColor = UIColor.blue700.cgColor
-        
-        if date > currentDate {
-            self.rootView.headerView.updateWeatherUI(
-                information: "\(pastDateIntroduce)\n\(scenarioIntroduce)"
-                    .customText(rangedText: memberName, color: customColor)
-            )
-            return
-        }
-        self.rootView.headerView.updateWeatherUI(
-            information: "\(futureDateIntroduce)\n\(scenarioIntroduce)"
-                .customText(rangedText: memberName, color: customColor)
-        )
-    }
+//    private func updateWeatherByDate(
+//        date: Date,
+//        currentDate: Date,
+//        monthAndDay: String
+//    ) {
+//        guard let memberName = memberName,
+//              currentDate != date else {
+//            return
+//        }
+//        
+//        let scenarioIntroduce = "\(memberName)님의 \(monthAndDay) 시나리오예요!"
+//        let pastDateIntroduce = "해당 날짜의 기상 정보는 확인하기 어려워요"
+//        let futureDateIntroduce = "지난 날짜의 기상 정보는 제공하지 않아요"
+//        let customColor = UIColor.blue700.cgColor
+//        
+//        if date > currentDate {
+//            self.rootView.headerView.updateWeatherUI(
+//                information: "\(pastDateIntroduce)\n\(scenarioIntroduce)"
+//                    .customText(rangedText: memberName, color: customColor)
+//            )
+//            return
+//        }
+//        self.rootView.headerView.updateWeatherUI(
+//            information: "\(futureDateIntroduce)\n\(scenarioIntroduce)"
+//                .customText(rangedText: memberName, color: customColor)
+//        )
+//    }
     
     private func updatePlaceHolderByDate(
         date: Date,

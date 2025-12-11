@@ -50,10 +50,26 @@ final class HomeViewModel: ViewModeling {
     enum Input {
         case requestName
         case requestDate
-        case requestWeather(latitude: CLLocationDegrees, longitude: CLLocationDegrees)
-        case scenarioDidTap(scenarioID: Int, date: String)
-        case missionChecked(missionID: Int, date: String, willBeChecked: Bool)
-        case addTodayMissionButtonDidTap(scenarioID: Int, date: String, content: String)
+        case requestWeather(
+            date: Date,
+            memberName: String,
+            latitude: CLLocationDegrees,
+            longitude: CLLocationDegrees
+        )
+        case scenarioDidTap(
+            scenarioID: Int,
+            date: String
+        )
+        case missionChecked(
+            missionID: Int,
+            date: String,
+            willBeChecked: Bool
+        )
+        case addTodayMissionButtonDidTap(
+            scenarioID: Int,
+            date: String,
+            content: String
+        )
         case deleteTodayMissionButtonDidTap(missionID: Int)
     }
     
@@ -95,7 +111,7 @@ final class HomeViewModel: ViewModeling {
             let date = DateUtil.getCurrentDate(format: "yyyy년 MM월 dd일")
             return DateOutput(date: date)
             
-        case .requestWeather(let latitude, let longitude) :
+        case .requestWeather(let date, let memberName, let latitude, let longitude) :
             let administrativeArea: NSMutableAttributedString
             
             do {
@@ -109,14 +125,19 @@ final class HomeViewModel: ViewModeling {
             
             do {
                 let result = try await requestWeatherResult(
+                    date: date,
                     latitude: latitude,
                     longitude: longitude
                 )
+                
                 let weatherResult = convertWeatherResult(
+                    memberName: memberName,
+                    date: date,
                     administrativeArea: administrativeArea,
                     result: result
                 )
                 return WeatherOutput(weatherResult: .success(weatherResult))
+                
             } catch (let error) {
                 return WeatherOutput(weatherResult: .failure(error))
             }
@@ -230,11 +251,10 @@ final class HomeViewModel: ViewModeling {
     }
     
     private func requestWeatherResult(
+        date: Date,
         latitude: CLLocationDegrees,
         longitude: CLLocationDegrees
-    ) async throws -> WeatherEntity {
-        
-        let date: String = DateUtil.getCurrentDate(format: "yyyy-MM-dd")
+    ) async throws -> WeatherEntity? {
         let timezone = TimeZone.current.identifier
         let result = try await weatherUseCase.execute(
             date: date,
@@ -245,14 +265,36 @@ final class HomeViewModel: ViewModeling {
     }
     
     private func convertWeatherResult(
+        memberName: String,
+        date: Date,
         administrativeArea: NSMutableAttributedString,
-        result: WeatherEntity
+        result: WeatherEntity?
     ) -> NSMutableAttributedString {
+        
+        var weatherResult = NSMutableAttributedString()
+        
+        guard let monthAndDay = DateUtil.toMonthAndDay(date: date) else {
+            return weatherResult
+        }
+        
+        guard let result else {
+            let scenarioIntroduce = "\(memberName)님의 \(monthAndDay) 시나리오예요!".customText(
+                rangedText: "\(memberName)",
+                color: UIColor.blue700.cgColor
+            )
+            
+            if date < DateUtil.getCurrentDate() {
+                weatherResult.append(NSAttributedString(string: "지난 날짜의 기상 정보는 제공하지 않아요"))
+            } else {
+                weatherResult.append(NSAttributedString(string: "해당 날짜의 기상 정보는 확인하기 어려워요"))
+            }
+            weatherResult.append(NSAttributedString(string: "\n"))
+            weatherResult.append(scenarioIntroduce)
+            return weatherResult
+        }
         
         let weatherInformation = makeWeatherString(result)
         let supplies = makeSupplyString(result)
-        
-        var weatherResult = NSMutableAttributedString()
         
         weatherResult.do {
             $0.append(administrativeArea)
