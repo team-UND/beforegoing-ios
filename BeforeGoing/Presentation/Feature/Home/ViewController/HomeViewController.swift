@@ -341,34 +341,40 @@ extension HomeViewController: ToastPresentable {
         
         if homeViewModel.isExistMission(content: content) {
             self.presentToastMessage(type: .duplicateMission)
+            self.view.endEditing(true)
             return
         }
         
         Task {
-            guard let result = try await homeViewModel.action(
-                input: .addTodayMissionButtonDidTap(
-                    scenarioID: getScenariosViewModel.getScenarioID(),
-                    date: homeDate,
-                    content: content
-                )
-            ) as? HomeViewModel.TodayMissionOutput else {
-                return
-            }
-            
-            switch result.todayMissionResult {
-            case .success:
-                rootView.modalView.listTableView.reloadData()
-            case .failure(let error):
-                if let error = error as? BeforeGoingError {
-                    self.handleError(error)
-                    if error == .missionLimitError {
-                        self.presentToastMessage(type: .todayMissionLimit)
-                    }
+            do {
+                guard let result = try await homeViewModel.action(
+                    input: .addTodayMissionButtonDidTap(
+                        scenarioID: getScenariosViewModel.getScenarioID(),
+                        date: homeDate,
+                        content: content
+                    )
+                ) as? HomeViewModel.TodayMissionOutput else {
+                    return
                 }
+                
+                switch result.todayMissionResult {
+                case .success:
+                    rootView.modalView.listTableView.reloadData()
+                case .failure(let error):
+                    if let error = error as? BeforeGoingError {
+                        self.handleError(error)
+                        if error == .missionLimitError {
+                            self.presentToastMessage(type: .todayMissionLimit)
+                        }
+                    }
+                    BeforeGoingLogger.error(error)
+                }
+                
+                self.view.endEditing(true)
+            } catch {
                 BeforeGoingLogger.error(error)
             }
         }
-        self.view.endEditing(true)
     }
     
     @objc
@@ -444,34 +450,6 @@ extension HomeViewController: ToastPresentable {
         self.rootView.headerView.updateDateUI(date: date)
     }
     
-//    private func updateWeatherByDate(
-//        date: Date,
-//        currentDate: Date,
-//        monthAndDay: String
-//    ) {
-//        guard let memberName = memberName,
-//              currentDate != date else {
-//            return
-//        }
-//        
-//        let scenarioIntroduce = "\(memberName)님의 \(monthAndDay) 시나리오예요!"
-//        let pastDateIntroduce = "해당 날짜의 기상 정보는 확인하기 어려워요"
-//        let futureDateIntroduce = "지난 날짜의 기상 정보는 제공하지 않아요"
-//        let customColor = UIColor.blue700.cgColor
-//        
-//        if date > currentDate {
-//            self.rootView.headerView.updateWeatherUI(
-//                information: "\(pastDateIntroduce)\n\(scenarioIntroduce)"
-//                    .customText(rangedText: memberName, color: customColor)
-//            )
-//            return
-//        }
-//        self.rootView.headerView.updateWeatherUI(
-//            information: "\(futureDateIntroduce)\n\(scenarioIntroduce)"
-//                .customText(rangedText: memberName, color: customColor)
-//        )
-//    }
-    
     private func updatePlaceHolderByDate(
         date: Date,
         currentDate: Date,
@@ -524,7 +502,7 @@ extension HomeViewController {
 }
 
 extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable, NetworkRequestErrorHandler {
-
+    
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         checkLoactionAuthorization()
     }
