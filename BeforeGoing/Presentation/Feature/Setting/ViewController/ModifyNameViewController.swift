@@ -77,7 +77,7 @@ extension ModifyNameViewController: NetworkRequestable, NetworkRequestErrorHandl
         }
         guard let initialName = initialName,
               initialName != nickname else {
-            self.navigationController?.popViewController(animated: true)
+            self.navigationController?.popViewController(animated: false)
             return
         }
         
@@ -85,7 +85,7 @@ extension ModifyNameViewController: NetworkRequestable, NetworkRequestErrorHandl
             let result = try await viewModel.action(input: .confirmButtonDidTap(nickname: nickname))
             switch result.updateNicknameResult {
             case .success:
-                self.navigationController?.popViewController(animated: true)
+                self.navigationController?.popViewController(animated: false)
             case .failure(let error):
                 self.handleError(error)
                 BeforeGoingLogger.error(BeforeGoingError.updateNicknameFailed)
