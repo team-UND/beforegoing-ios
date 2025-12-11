@@ -44,6 +44,7 @@ final class HomeViewController: BaseViewController {
         let currentDateString = DateUtil.getCurrentDate(format: "yyyy-MM-dd")
         
         getScenarios(currentDate: currentDateString)
+        checkLoactionAuthorization()
         updateWeatherInformation(date: currentDate)
     }
     
@@ -52,7 +53,6 @@ final class HomeViewController: BaseViewController {
         
         setLocationManager()
         requestDate()
-        checkLoactionAuthorization()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -128,11 +128,8 @@ final class HomeViewController: BaseViewController {
         switch locationManager.authorizationStatus {
         case .authorizedAlways, .authorizedWhenInUse:
             locationManager.requestLocation()
-        case .restricted, .denied:
+        case .restricted, .denied, .notDetermined:
             rootView.headerView.updateWeatherUI(information: "설정에서 위치 권한을 허용하시면,\n날씨와 추천 준비물을 알려드려요!")
-            break
-        case .notDetermined:
-            break
         @unknown default:
             break
         }
