@@ -46,14 +46,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return .portrait
     }
     
-    func applicationWillTerminate(_ application: UIApplication) {
-        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
-            if !requests.isEmpty {
-                Task {
-                    await NotificationManager.shared.pushTerminateNotification()
-                }
-            }
-        }
-    }
+    func applicationWillTerminate(_ application: UIApplication) {}
 }
 
