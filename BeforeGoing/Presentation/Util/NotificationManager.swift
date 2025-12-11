@@ -82,7 +82,7 @@ final class NotificationManager {
             .removeDeliveredNotifications(withIdentifiers: identifiers)
     }
     
-    func pushTerminateNotification() async {
+    func pushTerminateNotification() {
         let terminateIdentifier = NotificationIdentifier.terminate.identifier
         let request = createNotificationRequest(
             identifier: terminateIdentifier,
