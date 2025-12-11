@@ -87,7 +87,6 @@ enum ScenarioType: String, CaseIterable {
                     "에어컨 / 보일러 끄기",
                     "조명 불 끄기",
                     "창문 / 베란다 문 단속",
-                    "지갑 / 카드 챙기기",
                     "현관문 단속",
                     "텀블러 챙기기"]
         case .leaveWork:
