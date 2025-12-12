@@ -58,7 +58,7 @@ extension AnyNotificationDTO {
         if let inactiveData = inactiveData {
             return .init(inactive: inactiveData.toEntity())
         }
-        fatalError("Neither activeData nor inactiveData is available")
+        return .stub()
     }
 }
 
