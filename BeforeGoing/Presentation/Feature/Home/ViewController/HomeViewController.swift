@@ -141,21 +141,25 @@ final class HomeViewController: BaseViewController {
             
             switch result.scenariosResult {
             case .success(let scenarios):
-                rootView.modalView.headerView.clear()
-                setGesture(scenarios: scenarios)
+                DispatchQueue.main.async { [weak self] in
+                    self?.rootView.modalView.headerView.clear()
+                    self?.setGesture(scenarios: scenarios)
+                }
+                
                 let _ = try await homeViewModel.action(
                     input: .scenarioDidTap(
                         scenarioID: getScenariosViewModel.firstScenarioID,
                         date: currentDate
                     )
                 )
-                rootView.modalView.do {
-                    $0.replaceModalView()
-                    $0.listTableView.reloadData()
-                }
                 
-                if let pendingTitle = self.scenarioTitle {
-                    DispatchQueue.main.async { [weak self] in
+                DispatchQueue.main.async { [weak self] in
+                    self?.rootView.modalView.do {
+                        $0.replaceModalView()
+                        $0.listTableView.reloadData()
+                    }
+                    
+                    if let pendingTitle = self?.scenarioTitle {
                         guard let self,
                               let homeDate = DateUtil.convertDateFormat(dateString: homeDate)
                         else {
@@ -168,13 +172,19 @@ final class HomeViewController: BaseViewController {
                         self.scenarioTitle = nil
                     }
                 }
+                
             case .failure(let error):
                 if let error = error as? BeforeGoingError,
                    error == .notFoundError {
-                    rootView.modalView.replaceEmptyView(target: self)
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self else { return }
+                        self.rootView.modalView.replaceEmptyView(target: self)
+                    }
                     return
                 }
-                self.handleError(error)
+                DispatchQueue.main.async { [weak self] in
+                    self?.handleError(error)
+                }
                 BeforeGoingLogger.error(error)
             }
         }

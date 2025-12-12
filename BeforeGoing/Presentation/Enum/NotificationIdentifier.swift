@@ -9,6 +9,10 @@ import Foundation
 
 enum NotificationIdentifier: CaseIterable {
     
+    case pushNotice
+    case callNotice(sequence: NotificationSequence)
+    case terminate
+    
     static var allCases: [NotificationIdentifier] {
         var cases: [NotificationIdentifier] = [.pushNotice, .terminate]
         
@@ -18,10 +22,6 @@ enum NotificationIdentifier: CaseIterable {
         
         return cases
     }
-    
-    case pushNotice
-    case callNotice(sequence: NotificationSequence)
-    case terminate
     
     var identifier: String {
         switch self {
