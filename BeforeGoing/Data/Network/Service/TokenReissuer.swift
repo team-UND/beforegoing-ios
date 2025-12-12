@@ -5,19 +5,29 @@
 //  Created by APPLE on 9/12/25.
 //
 
+import UIKit
+
 import Alamofire
 
-struct TokenReissuer {
+final class TokenReissuer {
     
+    private var isPresentingLoginExpired = false
     private let keyChainService: KeyChainService
     
     init(keyChainService: KeyChainService) {
         self.keyChainService = keyChainService
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleLoginExpired),
+            name: .loginExpired,
+            object: nil
+        )
     }
     
     func reissue() async throws {
         guard let accessToken = keyChainService.load(key: .accessToken),
-           let refreshToken = keyChainService.load(key: .refreshToken) else {
+              let refreshToken = keyChainService.load(key: .refreshToken) else {
             throw BeforeGoingError.reissueTokenFailed
         }
         
@@ -47,11 +57,33 @@ struct TokenReissuer {
             encoding: endPoint.parameterEncoding,
             headers: endPoint.headers
         )
-            .validate()
+        .validate()
     }
     
     private func saveNewTokens(response: TokensResponseDTO) {
         keyChainService.save(response.accessToken, forKey: .accessToken)
         keyChainService.save(response.refreshToken, forKey: .refreshToken)
+    }
+}
+
+extension TokenReissuer {
+    
+    @objc
+    private func handleLoginExpired() {
+        guard !isPresentingLoginExpired else { return }
+        isPresentingLoginExpired = true
+        
+        DispatchQueue.main.async {
+            guard let viewController = UIApplication.shared.topViewController() else {
+                return
+            }
+
+            let modalView = ModalView(type: .expirationLogin)
+            let modalViewController = ModalViewController(
+                modalView: modalView,
+                action: { viewController.dismiss(animated: true) }
+            )
+            viewController.present(modalViewController, animated: true)
+        }
     }
 }

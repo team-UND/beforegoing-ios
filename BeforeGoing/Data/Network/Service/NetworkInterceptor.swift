@@ -9,7 +9,7 @@ import Foundation
 
 import Alamofire
 
-struct NetworkInterceptor: RequestInterceptor {
+final class NetworkInterceptor: RequestInterceptor {
     
     private let keyChainService: KeyChainService
     private let tokenReissuer: TokenReissuer
@@ -50,6 +50,9 @@ struct NetworkInterceptor: RequestInterceptor {
                 try await tokenReissuer.reissue()
             } catch (let error) {
                 completion(.doNotRetryWithError(error))
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .loginExpired, object: nil)
+                }
             }
         }
     }
