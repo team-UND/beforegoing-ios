@@ -182,6 +182,7 @@ extension SettingViewController: NetworkRequestable, NetworkRequestErrorHandler 
                     break
                 case .notDetermined:
                     self?.requestAuthorization()
+                    return
                 @unknown default:
                     break
                 }
@@ -205,6 +206,7 @@ extension SettingViewController: NetworkRequestable, NetworkRequestErrorHandler 
                 $0.delegate = self
                 $0.requestAlwaysAuthorization()
             }
+            return
         @unknown default:
             break
         }
