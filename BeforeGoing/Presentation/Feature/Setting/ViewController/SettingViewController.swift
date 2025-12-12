@@ -11,12 +11,12 @@ import UIKit
 final class SettingViewController: BaseViewController {
     
     private let rootView = SettingView()
+    private let locationManager = CLLocationManager()
     private let viewModel: SettingViewModel
     
     init(viewModel: SettingViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
-        
         
         guard let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String else {
             return
@@ -172,34 +172,59 @@ extension SettingViewController: NetworkRequestable, NetworkRequestErrorHandler 
     @objc
     func checkPushNoticeAuthorization() {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
                 var isAgreed = false
                 
                 switch settings.authorizationStatus {
                 case .authorized, .provisional, .ephemeral:
                     isAgreed = (settings.alertSetting == .enabled)
-                default:
+                case .denied:
+                    break
+                case .notDetermined:
+                    self?.requestAuthorization()
+                @unknown default:
                     break
                 }
                 
-                self.rootView.settingNoticeView.basicPushNoticeView.updateSwitch(isAgreed: isAgreed)
+                self?.rootView.settingNoticeView.basicPushNoticeView.updateSwitch(isAgreed: isAgreed)
             }
         }
     }
     
     @objc
     func checkLocationAuthorization() {
-        let locationManager = CLLocationManager()
         var isAgreed = false
         
         switch locationManager.authorizationStatus {
         case .authorizedAlways, .authorizedWhenInUse:
             isAgreed = true
-        default:
+        case .denied, .restricted:
+            break
+        case .notDetermined:
+            locationManager.do {
+                $0.delegate = self
+                $0.requestAlwaysAuthorization()
+            }
+        @unknown default:
             break
         }
         
         rootView.settingNoticeView.locationAuthorizationView.updateSwitch(isAgreed: isAgreed)
+    }
+    
+    @objc
+    private func noticeButtonDidTap() {
+        ExternalLink.notice.openURL(for: self)
+    }
+    
+    @objc
+    private func termButtonDidTap() {
+        ExternalLink.term.openURL(for: self)
+    }
+    
+    @objc
+    private func privacyButtonDidTap() {
+        ExternalLink.privacy.openURL(for: self)
     }
     
     private func alertEventPushChange(isSwitchedOn: Bool) {
@@ -223,18 +248,20 @@ extension SettingViewController: NetworkRequestable, NetworkRequestErrorHandler 
         }
     }
     
-    @objc
-    private func noticeButtonDidTap() {
-        ExternalLink.notice.openURL(for: self)
+    private func requestAuthorization() {
+        let authOptions: UNAuthorizationOptions = [.alert, .sound, .badge]
+        
+        UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { _, _ in
+            DispatchQueue.main.async { [weak self] in
+                self?.checkPushNoticeAuthorization()
+            }
+        }
     }
+}
+
+extension SettingViewController: CLLocationManagerDelegate {
     
-    @objc
-    private func termButtonDidTap() {
-        ExternalLink.term.openURL(for: self)
-    }
-    
-    @objc
-    private func privacyButtonDidTap() {
-        ExternalLink.privacy.openURL(for: self)
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        checkLocationAuthorization()
     }
 }
