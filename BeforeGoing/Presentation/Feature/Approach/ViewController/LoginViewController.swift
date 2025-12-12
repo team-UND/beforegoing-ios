@@ -117,6 +117,33 @@ extension LoginViewController: NetworkRequestable, NetworkRequestErrorHandler {
     }
     
     private func moveHome() {
+        if let request = AuthManager.shared.pendingNotificationRequest {
+            AuthManager.shared.pendingNotificationRequest = nil
+            
+            guard let notificationIdentifier = NotificationIdentifier.convertIdentifier(from: request.identifier) else {
+                return
+            }
+                    
+            switch notificationIdentifier {
+            case .pushNotice :
+                ViewControllerUtil.replaceRootViewController(
+                    to: BottomNavigationViewController(scenarioTitle: request.content.title)
+                )
+                
+            case .callNotice(let sequence):
+                ViewControllerUtil.replaceRootViewController(
+                    to: NotificationViewController(
+                        notificationViewType: .init(sequence: sequence),
+                        content: request.content,
+                        identifier: notificationIdentifier.identifier
+                    )
+                )
+            
+            case .terminate:
+                ViewControllerUtil.replaceRootViewController(to: BottomNavigationViewController())
+            }
+            return
+        }
         let viewController = BottomNavigationViewController()
         ViewControllerUtil.replaceRootViewController(to: viewController)
     }

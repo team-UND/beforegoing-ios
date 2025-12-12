@@ -15,7 +15,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
     
-    
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
@@ -94,14 +93,23 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
         let notificationRequest = response.notification.request
         let identifier = notificationRequest.identifier
         
-        navigateToScreen(for: notificationRequest)
-        
         if NotificationIdentifier.isCallNotice(identifier: identifier) {
             HapticManager.shared.notice(feedbackType: .warning)
             AudioServicesPlaySystemSound(SystemSoundID(1005))
         }
         
-        completionHandler()
+        DispatchQueue.main.async { [weak self] in
+            if AuthManager.shared.isAutoLoginEnabled {
+                self?.navigateToScreen(for: notificationRequest)
+                completionHandler()
+            } else {
+                AuthManager.shared.pendingNotificationRequest = notificationRequest
+                let loginVC = ViewControllerFactory.shared.makeLoginViewController()
+                ViewControllerUtil.replaceRootViewController(to: loginVC)
+
+                completionHandler()
+            }
+        }
     }
     
     private func navigateToScreen(for request: UNNotificationRequest) {
