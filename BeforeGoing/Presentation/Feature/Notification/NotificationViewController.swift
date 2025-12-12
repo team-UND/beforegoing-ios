@@ -10,7 +10,7 @@ import UIKit
 
 final class NotificationViewController: BaseViewController {
     
-    private let snoozeTime: Double = 5
+    private let snoozeTimeInMinutes: Double = 5
     private let rootView: NotificationView
     private let content: UNNotificationContent
     private let identifier: String
@@ -70,7 +70,7 @@ extension NotificationViewController {
         NotificationManager.shared.reserveSnooze(
             originalContent: self.content,
             identifier: self.identifier,
-            delayMinutes: snoozeTime
+            delayMinutes: snoozeTimeInMinutes
         )
     }
     
