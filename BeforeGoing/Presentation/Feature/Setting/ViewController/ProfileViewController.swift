@@ -108,12 +108,12 @@ extension ProfileViewController: NetworkRequestable, NetworkRequestErrorHandler 
         var action: () -> Void
         
         switch modalType {
-        case .expirationLogin, .eventPushAgree, .tooManyRequest:
-            action = {}
         case .logout:
             action = defineLogout()
         case .withdraw:
             action = defineWithdrawal()
+        default:
+            action = {}
         }
         
         let viewController = ModalViewController(
@@ -136,7 +136,8 @@ extension ProfileViewController: NetworkRequestable, NetworkRequestErrorHandler 
                     }
                     if result.isSucceedLogout {
                         let loginViewController = ViewControllerFactory.shared.makeLoginViewController()
-                        ViewControllerUtil.replaceRootViewController(to: loginViewController)
+                        let navigationController = UINavigationController(rootViewController: loginViewController)
+                        ViewControllerUtil.replaceRootViewController(to: navigationController)
                         return
                     }
                 } catch {

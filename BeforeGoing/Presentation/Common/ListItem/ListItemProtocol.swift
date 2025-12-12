@@ -8,6 +8,7 @@
 import UIKit
 
 protocol ListItemProtocol: BaseView {
+    var checkBoxView: UIView { get }
     var checkBox: CheckBox { get }
     
     func updateText(_ text: String)

@@ -18,8 +18,12 @@ final class AlarmAuthorizationView: BaseView {
     private(set) var disagreeButton = UIButton()
     
     override func setStyle() {
-        backgroundImageView.image = .bgSplash
-        backgroundCharacterView.image = .bgCharacter
+        backgroundImageView.do {
+            $0.image = .bgAuthorization
+        }
+        backgroundCharacterView.do {
+            $0.image = .bgCharacter
+        }
         mainLabel.do {
             $0.text = "까먹지 않게,\n설정한 시간에 알람을 보내드려요"
             $0.textColor = .gray900

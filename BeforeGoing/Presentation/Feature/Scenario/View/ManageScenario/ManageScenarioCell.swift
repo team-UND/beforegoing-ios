@@ -38,6 +38,9 @@ final class ManageScenarioCell: UITableViewCell {
             $0.layer.borderWidth = 1
             $0.layer.borderColor = UIColor.blue50.cgColor
         }
+        templateImageView.do {
+            $0.contentMode = .center
+        }
         titleLabel.do {
             $0.textColor = .gray900
             $0.font = .custom(.bodyLGSemiBold)
@@ -69,11 +72,11 @@ final class ManageScenarioCell: UITableViewCell {
         }
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview().inset(20.adjustedH)
-            $0.leading.equalTo(templateImageView.snp.trailing).offset(8.adjustedW)
+            $0.leading.equalTo(templateImageView.snp.trailing).offset(10.adjustedW)
         }
         subtitleLabel.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom)
-            $0.leading.equalTo(templateImageView.snp.trailing).offset(8.adjustedW)
+            $0.leading.equalTo(templateImageView.snp.trailing).offset(10.adjustedW)
         }
     }
 }

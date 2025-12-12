@@ -9,12 +9,14 @@ import Foundation
 
 import Alamofire
 
-struct NetworkInterceptor: RequestInterceptor {
+final class NetworkInterceptor: RequestInterceptor {
     
     private let keyChainService: KeyChainService
+    private let tokenReissuer: TokenReissuer
     
     init(keyChainService: KeyChainService) {
         self.keyChainService = keyChainService
+        self.tokenReissuer = TokenReissuer(keyChainService: keyChainService)
     }
     
     func adapt(
@@ -42,13 +44,15 @@ struct NetworkInterceptor: RequestInterceptor {
             completion(.doNotRetryWithError(error))
             return
         }
-        let tokenReissuer = TokenReissuer(keyChainService: keyChainService)
         
         Task {
             do {
                 try await tokenReissuer.reissue()
             } catch (let error) {
                 completion(.doNotRetryWithError(error))
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: .loginExpired, object: nil)
+                }
             }
         }
     }

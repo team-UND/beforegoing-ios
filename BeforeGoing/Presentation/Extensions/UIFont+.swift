@@ -9,7 +9,7 @@ extension UIFont {
     enum CustomFont {
         private static let scaleRatio: CGFloat = max(Screen.height(1), Screen.width(1))
         
-        case headingH1, headingH2, headingH3, headingH4, headingH5
+        case headingH1, headingH2, headingH3, headingH3_5, headingH4, headingH5
         case bodyLGSemiBold, bodyLGMedium, bodyLGRegular
         case bodyMDSemiBold, bodyMDMedium, bodyMDRegular
         case bodySMSemiBold, bodySMMedium, bodySMRegular
@@ -18,7 +18,7 @@ extension UIFont {
         
         var weight: String {
             switch self {
-            case .headingH1, .headingH2, .headingH3, .headingH4, .headingH5, .bodyLGSemiBold, .bodyMDSemiBold, .bodySMSemiBold:
+            case .headingH1, .headingH2, .headingH3, .headingH3_5, .headingH4, .headingH5, .bodyLGSemiBold, .bodyMDSemiBold, .bodySMSemiBold:
                 "Pretendard-SemiBold"
             case .bodyLGMedium, .bodyMDMedium, .bodySMMedium, .bodySmallMedium:
                 "Pretendard-Medium"
@@ -40,6 +40,7 @@ extension UIFont {
             case .headingH1: 36
             case .headingH2: 28
             case .headingH3, .brandingH3: 24
+            case .headingH3_5: 22.15
             case .headingH4: 20
             case .headingH5: 18
             case .bodyLGSemiBold, .bodyLGMedium, .bodyLGRegular: 16

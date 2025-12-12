@@ -16,15 +16,15 @@ final class UserScenarioModalHeaderView: BaseView {
     
     override func setStyle() {
         scenarioScrollView.do {
+            $0.backgroundColor = .clear
             $0.showsHorizontalScrollIndicator = false
-            $0.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         }
         scenarioStackView.do {
             $0.axis = .horizontal
             $0.spacing = 0
         }
         addScenarioView.do {
-            $0.backgroundColor = .white
+            $0.backgroundColor = .clear
         }
         addScenarioButton.do {
             $0.setImage(.plusCircle.withTintColor(.gray900), for: .normal)

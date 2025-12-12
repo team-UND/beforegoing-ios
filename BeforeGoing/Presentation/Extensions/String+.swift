@@ -33,7 +33,7 @@ extension String {
     
     func customText(
         rangedText: String,
-        color: CGColor? = UIColor.warning600.cgColor
+        color: CGColor? = UIColor.danger600.cgColor
     ) -> NSMutableAttributedString {
         guard let color = color else { return NSMutableAttributedString(string: "") }
         

@@ -10,6 +10,6 @@ import UIKit
 struct OnboardingComponent {
     let title: String
     let description: String
-    let image: UIImage
+    let image: UIImage?
     let bottomButton: CustomButton?
 }

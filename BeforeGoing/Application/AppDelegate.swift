@@ -46,10 +46,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return .portrait
     }
     
-    func applicationWillTerminate(_ application: UIApplication) {
-        Task {
-            await NotificationManager.shared.pushTerminateNotification()
-        }
-    }
+    func applicationWillTerminate(_ application: UIApplication) {}
 }
 

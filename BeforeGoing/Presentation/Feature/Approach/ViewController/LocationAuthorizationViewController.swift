@@ -5,8 +5,9 @@
 //  Created by APPLE on 10/20/25.
 //
 
-import Foundation
 import CoreLocation
+import Foundation
+import UIKit
 
 final class LocationAuthorizationViewController: BaseViewController {
     
@@ -33,13 +34,30 @@ final class LocationAuthorizationViewController: BaseViewController {
 
 extension LocationAuthorizationViewController: CLLocationManagerDelegate {
     
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        moveHome()
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
+        BeforeGoingLogger.error(error)
+        moveHome()
+    }
+}
+
+extension LocationAuthorizationViewController {
+    
     @objc
     private func agreeButtonDidTap() {
-        locationManager.do {
-            $0.delegate = self
-            $0.requestAlwaysAuthorization()
+        switch locationManager.authorizationStatus {
+        case .notDetermined:
+            requestAuthorization()
+        case .restricted, .denied:
+            moveSetting()
+        case .authorizedAlways, .authorizedWhenInUse:
+            moveHome()
+        @unknown default:
+            moveHome()
         }
-        checkStatus(locationManager.authorizationStatus)
     }
     
     @objc
@@ -47,31 +65,27 @@ extension LocationAuthorizationViewController: CLLocationManagerDelegate {
         moveHome()
     }
     
+    private func requestAuthorization() {
+        locationManager.do {
+            $0.delegate = self
+            $0.requestAlwaysAuthorization()
+        }
+    }
+    
+    private func moveSetting() {
+        DispatchQueue.main.async {
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(url) { [weak self] isOpened in
+                    if isOpened {
+                        self?.moveHome()
+                    }
+                }
+            }
+        }
+    }
+    
     private func moveHome() {
         let viewController = BottomNavigationViewController()
         ViewControllerUtil.replaceRootViewController(to: viewController)
-    }
-    
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        checkStatus(manager.authorizationStatus)
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
-        BeforeGoingLogger.error(error)
-        moveHome()
-    }
-    
-    private func checkStatus(_ status: CLAuthorizationStatus) {
-        switch status {
-        case .authorizedAlways, .authorizedWhenInUse:
-            locationManager.requestAlwaysAuthorization()
-            moveHome()
-        case .restricted, .denied:
-            moveHome()
-        case .notDetermined:
-            break
-        @unknown default:
-            break
-        }
     }
 }

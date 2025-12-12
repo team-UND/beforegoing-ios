@@ -16,7 +16,6 @@ struct DataDependencyAssembler: DependencyAssembler {
     private let termsRequestMapper = TermsRequestMapper()
     private let updateTermRequestMapper = UpdateTermRequestMapper()
     private let updateNicknameRequestMapper = UpdateNicknameRequestMapper()
-    private let weatherResponseMapper = WeatherResponseMapper()
     private let addScenarioRequestMapper = AddScenarioRequestMapper()
     private let updateScenarioRequestMapper = UpdateScenarioRequestMapper()
     private let updateScenarioOrderRequestMapper = UpdateScenarioOrderRequestMapper()
@@ -34,7 +33,6 @@ struct DataDependencyAssembler: DependencyAssembler {
         DIContainer.shared.register(updateTermRequestMapper)
         DIContainer.shared.register(updateScenarioRequestMapper)
         DIContainer.shared.register(updateNicknameRequestMapper)
-        DIContainer.shared.register(weatherResponseMapper)
         
         DIContainer.shared.register(type: AuthInterface.self) { _ in
             AuthRepository(
@@ -62,13 +60,6 @@ struct DataDependencyAssembler: DependencyAssembler {
                 keyChainService: keyChainService,
                 userDefaultsService: userDefaultsService,
                 updateNicknameRequestMapper: updateNicknameRequestMapper
-            )
-        }
-        DIContainer.shared.register(type: WeatherInterface.self) { _ in
-            WeatherRepository(
-                networkService: networkService,
-                keyChainServcie: keyChainService,
-                weatherResponseMapper: weatherResponseMapper
             )
         }
         DIContainer.shared.register(type: ScenarioInterface.self) { _ in

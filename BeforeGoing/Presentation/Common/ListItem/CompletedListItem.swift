@@ -7,8 +7,9 @@
 
 import UIKit
 
-final class CompletedListItem: TodayListItemComponentView, ListItemProtocol {
+final class CompletedListItem: TodayListItemComponentView {
     
+    private(set) var checkBoxView = UIView()
     private(set) var checkBox = CheckBox(currentState: .unchecked)
     private let contentLabel = UILabel()
     
@@ -30,7 +31,6 @@ final class CompletedListItem: TodayListItemComponentView, ListItemProtocol {
             $0.checkBox.setImage(.completed, for: .normal)
             $0.checkBox.backgroundColor = .clear
             $0.checkBox.layer.borderWidth = 0
-            $0.checkBox.isEnabled = false
             $0.layer.cornerRadius = 14
             $0.backgroundColor = .gray200
         }
@@ -78,7 +78,7 @@ final class CompletedListItem: TodayListItemComponentView, ListItemProtocol {
     }
 }
 
-extension CompletedListItem {
+extension CompletedListItem: ListItemProtocol {
     
     func updateText(_ text: String) {
         contentLabel.text = text

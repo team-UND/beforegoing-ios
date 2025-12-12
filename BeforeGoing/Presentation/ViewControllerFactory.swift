@@ -26,12 +26,17 @@ final class ViewControllerFactory {
     }
     
     func makeNicknameViewController() -> NicknameViewController {
-        let viewModel = resolveViewModel(NicknameViewModel.self)
-        return .init(viewModel: viewModel)
+        let nicknameViewModel = resolveViewModel(NicknameViewModel.self)
+        let agreeItemViewModel = resolveViewModel(AgreeItemViewModel.self)
+        return .init(
+            nicknameViewModel: nicknameViewModel,
+            agreeItemViewModel: agreeItemViewModel
+        )
     }
     
     func makeOnboardingViewController() -> OnboardingViewController {
-        return OnboardingViewController()
+        let viewModel = resolveViewModel(OnboardingViewModel.self)
+        return OnboardingViewController(viewModel: viewModel)
     }
     
     func makeModifyNicknameViewController() -> ModifyNameViewController {
@@ -41,7 +46,7 @@ final class ViewControllerFactory {
     
     func makeHomeViewController() -> HomeViewController {
         let homeViewModel = resolveViewModel(HomeViewModel.self)
-        let getScenariosViewModel = resolveViewModel(GetScenariosViewModel.self)
+        let getScenariosViewModel = resolveViewModel(GetAllScenariosViewModel.self)
         return HomeViewController(
             homeViewModel: homeViewModel,
             getScenariosViewModel: getScenariosViewModel
@@ -60,6 +65,12 @@ final class ViewControllerFactory {
             deleteScenarioViewModel: deleteScenarioViewModel,
             updateScenarioOrderViewModel: updateScenarioOrderViewModel
         )
+    }
+    
+    func makeManageScenarioViewController() -> ManageScenarioViewController {
+        let manageScenarioViewModel = resolveViewModel(ManageScenarioViewModel.self)
+        
+        return ManageScenarioViewController(viewModel: manageScenarioViewModel)
     }
     
     func makeSettingViewController() -> SettingViewController {

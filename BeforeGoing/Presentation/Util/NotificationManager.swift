@@ -10,7 +10,6 @@ import UserNotifications
 final class NotificationManager {
     
     static let shared = NotificationManager()
-    private let terminateIdentifier = "terminate"
     
     private init() {}
     
@@ -33,15 +32,16 @@ final class NotificationManager {
         let identifiersToRemove = (0...6).map { "\(identifier)_\($0)" }
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiersToRemove)
         
+        let uuidString = UUID().uuidString
         let notificationContent = createNotificationContent(
             title: title,
             body: body,
-            identifier: identifier,
+            identifier: identifier + uuidString,
             sound: UNNotificationSound.default
         )
         
         for day in daysOfWeek {
-            let requestIdentifier = "\(identifier)_\(day)"
+            let requestIdentifier = "\(identifier)_\(day)_\(uuidString)"
             let triggerComponents = createTriggerComponents(date: date, day: day)
             let trigger = createCalendarTrigger(components: triggerComponents)
             let request = createNotificationRequest(
@@ -82,43 +82,24 @@ final class NotificationManager {
             .removeDeliveredNotifications(withIdentifiers: identifiers)
     }
     
-    func pushTerminateNotification() async {
-        let pendingRequests = await UNUserNotificationCenter.current().pendingNotificationRequests()
-        
-        if pendingRequests.count > 0 {
-            let request = createNotificationRequest(
-                identifier: terminateIdentifier,
-                notificationContent: createNotificationContent(
-                    title: "잠시만요!",
-                    body: "앱을 완전히 종료하면 설정한 알람이 울리지 않아요",
-                    identifier: terminateIdentifier
-                )
+    func pushTerminateNotification() {
+        let terminateIdentifier = NotificationIdentifier.terminate.identifier
+        let request = createNotificationRequest(
+            identifier: terminateIdentifier,
+            notificationContent: createNotificationContent(
+                title: "잠시만요!",
+                body: "앱을 완전히 종료하면 설정한 알람이 울리지 않아요",
+                identifier: terminateIdentifier
             )
-            addRequest(request)
-        }
-    }
-    
-    private func createNotificationContent(
-        title: String,
-        body: String,
-        identifier: String
-    ) -> UNMutableNotificationContent {
-        let notificationContent: UNMutableNotificationContent = {
-            let content = UNMutableNotificationContent()
-            content.title = title
-            content.body = body
-            content.userInfo["identifier"] = identifier
-            return content
-        }()
-        
-        return notificationContent
+        )
+        addRequest(request)
     }
     
     private func createNotificationContent(
         title: String,
         body: String,
         identifier: String,
-        sound: UNNotificationSound
+        sound: UNNotificationSound? = nil
     ) -> UNMutableNotificationContent {
         let notificationContent: UNMutableNotificationContent = {
             let content = UNMutableNotificationContent()
@@ -133,8 +114,16 @@ final class NotificationManager {
     }
     
     private func createTriggerComponents(date: Date, day: Int) -> DateComponents {
-        var dateComponents = Calendar.current.dateComponents([.hour, .minute, .second], from: date)
+        guard let seoulTZ = TimeZone(identifier: "Asia/Seoul") else {
+            return Calendar.current.dateComponents([.hour, .minute, .second], from: date)
+        }
+        var calendar = Calendar.current
+        calendar.timeZone = seoulTZ
+
+        var dateComponents = calendar.dateComponents([.hour, .minute, .second], from: date)
         dateComponents.weekday = convertWeekDay(from: day)
+        dateComponents.timeZone = seoulTZ
+        
         return dateComponents
     }
     

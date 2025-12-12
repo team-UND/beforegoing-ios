@@ -9,6 +9,10 @@ import UIKit
 
 final class OnboardingContentView: BaseView {
     
+    private let firstStepGIFName = "hi_worry"
+    private let endStepGIFName = "jump_worry"
+    private let gifExtension = "gif"
+    
     private let titleLabel = UILabel()
     private let descriptionLabel = UILabel()
     private let imageView = UIImageView()
@@ -57,7 +61,15 @@ extension OnboardingContentView {
         
         titleLabel.text = component.title
         descriptionLabel.text = component.description
-        imageView.image = component.image
+        
+        if step == .first {
+            playGIF(name: firstStepGIFName)
+        } else if step == .end {
+            playGIF(name: endStepGIFName)
+        } else {
+            imageView.stopAnimating()
+            imageView.image = component.image
+        }
         
         setLayout(step: step)
     }
@@ -110,5 +122,34 @@ extension OnboardingContentView {
                 $0.size.equalTo(260.adjustedH)
             }
         }
+    }
+    
+    private func playGIF(name: String) {
+        guard let gifSource = fetchGIF(name: name) else {
+            return
+        }
+
+        imageView.do {
+            $0.animationImages = gifSource.images
+            $0.animationDuration = TimeInterval(gifSource.frameCount) * 0.1
+            $0.animationRepeatCount = 0
+            $0.startAnimating()
+        }
+    }
+    
+    private func fetchGIF(name: String) -> (images: [UIImage], frameCount: Int)? {
+        guard
+            let gifData = NSDataAsset(name: name)?.data,
+            let source = CGImageSourceCreateWithData(gifData as CFData, nil)
+        else { return nil }
+        
+        let frameCount = CGImageSourceGetCount(source)
+        var images = [UIImage]()
+
+        (0..<frameCount)
+            .compactMap { CGImageSourceCreateImageAtIndex(source, $0, nil) }
+            .forEach { images.append(UIImage(cgImage: $0)) }
+
+        return (images, frameCount)
     }
 }

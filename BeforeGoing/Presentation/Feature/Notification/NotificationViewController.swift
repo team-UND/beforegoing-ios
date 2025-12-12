@@ -74,8 +74,7 @@ extension NotificationViewController {
     }
     
     private func replaceToHome() {
-        let bottomNavigationVC = BottomNavigationViewController()
+        let bottomNavigationVC = BottomNavigationViewController(scenarioTitle: content.title)
         ViewControllerUtil.replaceRootViewController(to: bottomNavigationVC)
-        bottomNavigationVC.handleScenarioTap(title: content.title)
     }
 }

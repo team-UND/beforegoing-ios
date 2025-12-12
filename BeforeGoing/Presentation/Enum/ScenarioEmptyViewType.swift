@@ -15,12 +15,11 @@ enum ScenarioEmptyViewType {
         return "등록된 시나리오가 없어요"
     }
     
-    var subtitle: String? {
-        switch self {
-        case .home:
-            return nil
-        case .myScenario:
-            return "버튼을 눌러 시나리오를 만들어 보세요:)"
-        }
+    var subtitle: String {
+        return "버튼을 눌러 시나리오를 만들어 보세요:)"
+    }
+    
+    var isHome: Bool {
+        self == .home
     }
 }

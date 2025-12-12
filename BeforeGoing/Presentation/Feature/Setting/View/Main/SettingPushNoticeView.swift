@@ -61,7 +61,7 @@ final class SettingPushNoticeView: BaseView {
             $0.leading.equalToSuperview().inset(20.adjustedW)
         }
         subtitleLabel.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(2.adjustedH)
             $0.leading.equalToSuperview().inset(20.adjustedW)
         }
         switchButton.snp.makeConstraints {
@@ -75,7 +75,7 @@ final class SettingPushNoticeView: BaseView {
 
 extension SettingPushNoticeView {
     
-    func updateButtonState(condition: Bool) {
-        switchButton.isOn = condition
+    func updateSwitch(isAgreed: Bool) {
+        switchButton.isOn = isAgreed
     }
 }

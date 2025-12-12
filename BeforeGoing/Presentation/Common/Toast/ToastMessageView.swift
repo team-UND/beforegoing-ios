@@ -9,12 +9,10 @@ import UIKit
 
 final class ToastMessageView: BaseView {
     
-    private let toastImageView = UIImageView()
-    private let textLabel = UILabel()
+    private let textLabel = PaddedLabel()
     
-    init(image: UIImage, text: String) {
+    init(text: String) {
         super.init(frame: .zero)
-        self.toastImageView.image = image
         self.textLabel.text = text
     }
     
@@ -23,39 +21,24 @@ final class ToastMessageView: BaseView {
     }
     
     override func setStyle() {
-        self.do {
-            $0.backgroundColor = .warning300
-            $0.layer.cornerRadius = 12
-            $0.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
-            $0.layer.shadowOpacity = 1
-            $0.layer.shadowRadius = 4
-            $0.layer.shadowOffset = CGSize(width: 0, height: 4)
-        }
         textLabel.do {
-            $0.textColor = .danger500
-            $0.font = .custom(.bodyLGRegular)
+            $0.backgroundColor = .warning50
+            $0.textColor = .warning600
+            $0.font = .custom(.bodySMSemiBold)
+            $0.textAlignment = .center
+            $0.clipsToBounds = true
+            $0.layer.cornerRadius = 14
         }
     }
     
     override func setUI() {
-        addSubviews(
-            toastImageView,
-            textLabel
-        )
+        addSubview(textLabel)
     }
     
     override func setLayout() {
-        self.snp.makeConstraints {
-            $0.height.equalTo(42.adjustedH)
-        }
-        toastImageView.snp.makeConstraints {
-            $0.leading.equalToSuperview().inset(16.adjustedW)
-            $0.centerY.equalToSuperview()
-        }
         textLabel.snp.makeConstraints {
-            $0.leading.equalTo(toastImageView.snp.trailing).offset(8.adjustedW)
-            $0.trailing.equalToSuperview().inset(16.adjustedW)
-            $0.centerY.equalToSuperview()
+            $0.center.equalToSuperview()
+            $0.height.equalTo(30.adjustedH)
         }
     }
 }

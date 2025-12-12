@@ -39,6 +39,11 @@ enum NoticeMethodType: String, CaseIterable {
         return nil
     }
     
+    static func convertMethodName(string: String) -> String? {
+        let notificationType = Self.allCases.first { $0.rawValue == string.lowercased() }
+        return notificationType?.component.methodName
+    }
+    
     var isPush: Bool {
         self == .push
     }

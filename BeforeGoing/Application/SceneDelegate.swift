@@ -5,6 +5,7 @@
 //  Created by APPLE on 5/21/25.
 //
 
+import AVFAudio
 import UIKit
 import UserNotifications
 
@@ -14,7 +15,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     var window: UIWindow?
     
-    
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
@@ -22,9 +22,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         let loginViewController = ViewControllerFactory.shared.makeLoginViewController()
+        let navigationController = UINavigationController(rootViewController: loginViewController)
         
         let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = loginViewController
+        window.rootViewController = navigationController
         window.makeKeyAndVisible()
         self.window = window
         
@@ -40,19 +41,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     func sceneDidDisconnect(_ scene: UIScene) {
-        // Called as the scene is being released by the system.
-        // This occurs shortly after the scene enters the background, or when its session is discarded.
-        // Release any resources associated with this scene that can be re-created the next time the scene connects.
-        // The scene may re-connect later, as its session was not necessarily discarded (see `application:didDiscardSceneSessions` instead).
+        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
+            if !requests.isEmpty {
+                NotificationManager.shared.pushTerminateNotification()
+            }
+        }
     }
     
     func sceneDidBecomeActive(_ scene: UIScene) {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
-        if let root = (window?.rootViewController as? UINavigationController)?
-            .viewControllers.first(where: { $0 is SettingViewController }) as? SettingViewController {
-            root.pushNoticeDidBecomeActive()
-        }
+        NotificationCenter.default.post(name: UIApplication.didBecomeActiveNotification, object: nil)
     }
     
     func sceneWillResignActive(_ scene: UIScene) {
@@ -70,8 +69,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
     }
-    
-    
 }
 
 extension SceneDelegate: UNUserNotificationCenterDelegate {
@@ -80,7 +77,11 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification
     ) async -> UNNotificationPresentationOptions {
-        HapticManager.shared.impact()
+        let identifier = notification.request.identifier
+        if NotificationIdentifier.isCallNotice(identifier: identifier) {
+            HapticManager.shared.notice(feedbackType: .warning)
+            AudioServicesPlaySystemSound(SystemSoundID(1005))
+        }
         return [.banner, .sound, .badge]
     }
     
@@ -90,26 +91,38 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
         let notificationRequest = response.notification.request
-        navigateToScreen(for: notificationRequest)
+        let identifier = notificationRequest.identifier
         
-        HapticManager.shared.impact()
+        if NotificationIdentifier.isCallNotice(identifier: identifier) {
+            HapticManager.shared.notice(feedbackType: .warning)
+            AudioServicesPlaySystemSound(SystemSoundID(1005))
+        }
         
-        completionHandler()
+        DispatchQueue.main.async { [weak self] in
+            if AuthManager.shared.isAutoLoginEnabled {
+                self?.navigateToScreen(for: notificationRequest)
+                completionHandler()
+            } else {
+                AuthManager.shared.pendingNotificationRequest = notificationRequest
+                let loginVC = ViewControllerFactory.shared.makeLoginViewController()
+                ViewControllerUtil.replaceRootViewController(to: loginVC)
+
+                completionHandler()
+            }
+        }
     }
     
     private func navigateToScreen(for request: UNNotificationRequest) {
-        guard let window = self.window,
-              let rootVC = window.rootViewController,
+        guard let _ = self.window,
               let notificationIdentifier = NotificationIdentifier.convertIdentifier(from: request.identifier) else {
             return
         }
                 
         switch notificationIdentifier {
-        case .pushNotice:
-            guard let bottomVC = rootVC.tabBarController as? BottomNavigationViewController else {
-                return
-            }
-            bottomVC.selectTab(item: .home)
+        case .pushNotice :
+            ViewControllerUtil.replaceRootViewController(
+                to: BottomNavigationViewController(scenarioTitle: request.content.title)
+            )
             
         case .callNotice(let sequence):
             ViewControllerUtil.replaceRootViewController(
@@ -119,9 +132,9 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
                     identifier: notificationIdentifier.identifier
                 )
             )
-            
-        default:
-            break
-        }        
+        
+        case .terminate:
+            ViewControllerUtil.replaceRootViewController(to: BottomNavigationViewController())
+        }
     }
 }

@@ -16,6 +16,7 @@ enum ScenarioAPI {
     case updateScenarioWithNotification(accessToken: String, scenarioID: Int, dto: WithNotificationUpdateScenarioRequestDTO)
     case updateScenarioWithoutNotification(accessToken: String, scenarioID: Int, dto: WithoutNotificationUpdateScenarioRequestDTO)
     case updateOrder(accessToken: String, scenarioID: Int, dto: UpdateScenarioOrderRequestDTO)
+    case getNotifications(accessToken: String)
 }
 
 extension ScenarioAPI: EndPoint {
@@ -37,12 +38,14 @@ extension ScenarioAPI: EndPoint {
             return basePath + "/\(scenarioID)"
         case .updateOrder(_, let scenarioID, _):
             return basePath + "/\(scenarioID)" + "/order"
+        case .getNotifications:
+            return basePath + "/notifications"
         }
     }
     
     var method: HTTPMethod {
         switch self {
-        case .getScenario, .getScenarios:
+        case .getScenario, .getScenarios, .getNotifications:
             return .get
         case .addScnearioWithNotification, .addScnearioWithoutNotification:
             return .post
@@ -68,7 +71,8 @@ extension ScenarioAPI: EndPoint {
                 .deleteScenario(let accessToken, _),
                 .updateScenarioWithoutNotification(let accessToken, _, _),
                 .updateScenarioWithNotification(let accessToken, _, _),
-                .updateOrder(let accessToken, _, _):
+                .updateOrder(let accessToken, _, _),
+                .getNotifications(let accessToken):
             return [
                 "Content-Type": "application/json",
                 "Authorization": "Bearer \(accessToken)"
@@ -80,7 +84,7 @@ extension ScenarioAPI: EndPoint {
         switch self {
         case .getScenario, .getScenarios, .deleteScenario:
             return URLEncoding.default
-        case .addScnearioWithNotification, .addScnearioWithoutNotification, .updateScenarioWithNotification, .updateScenarioWithoutNotification, .updateOrder:
+        case .addScnearioWithNotification, .addScnearioWithoutNotification, .updateScenarioWithNotification, .updateScenarioWithoutNotification, .updateOrder, .getNotifications:
             return JSONEncoding.default
         }
     }
@@ -94,14 +98,15 @@ extension ScenarioAPI: EndPoint {
                 .deleteScenario,
                 .updateScenarioWithNotification,
                 .updateScenarioWithoutNotification,
-                .updateOrder:
+                .updateOrder,
+                .getNotifications:
             return nil
         }
     }
     
     var bodyParameters: Parameters? {
         switch self {
-        case .getScenario, .getScenarios, .deleteScenario:
+        case .getScenario, .getScenarios, .deleteScenario, .getNotifications:
             return nil
         case .addScnearioWithNotification(_, let dto):
             return try? dto.toBodyParameters()

@@ -39,4 +39,6 @@ protocol ScenarioInterface {
         prevOrder: Int?,
         nextOrder: Int?
     ) async throws -> NewScenarioOrderEntity
+    
+    func fetchNotifications() async throws -> NotificationsEntity
 }

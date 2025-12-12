@@ -17,6 +17,7 @@ final class CalendarViewController: BaseViewController {
         calendar.firstWeekday = 2
         return calendar
     }()
+    var initialSelectedDate: Date?
     var firstDate: Date = DateUtil.getCurrentDate()
     var currentDate: Date = DateUtil.getCurrentDate()
     private var startOfMonth: Date {
@@ -45,7 +46,15 @@ final class CalendarViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        if let initial = initialSelectedDate {
+            currentDate = initial
+            selectedDate = initial
+        } else {
+            currentDate = DateUtil.getCurrentDate()
+            selectedDate = currentDate
+        }
+        
         setStyle()
         setUI()
         setLayout()

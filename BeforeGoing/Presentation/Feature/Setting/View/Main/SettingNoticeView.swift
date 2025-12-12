@@ -10,6 +10,10 @@ import UIKit
 final class SettingNoticeView: BaseView {
     
     private let titleLabel = UILabel()
+    private(set) var locationAuthorizationView = SettingPushNoticeView(
+        title: "위치 접근 허용 동의",
+        subtitle: "현 위치의 날씨와 준비물을 확인할 수 있어요."
+    )
     private(set) var basicPushNoticeView = SettingPushNoticeView(
         title: "푸시 알림 / 알람 설정",
         subtitle: "설정한 알림을 받아볼 수 있어요."
@@ -34,6 +38,7 @@ final class SettingNoticeView: BaseView {
     override func setUI() {
         addSubviews(
             titleLabel,
+            locationAuthorizationView,
             basicPushNoticeView,
             eventPushNoticeView,
             divider
@@ -46,8 +51,13 @@ final class SettingNoticeView: BaseView {
             $0.leading.equalToSuperview().inset(20.adjustedW)
             $0.height.equalTo(29.adjustedH)
         }
-        basicPushNoticeView.snp.makeConstraints {
+        locationAuthorizationView.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(12.adjustedH)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(46.adjustedH)
+        }
+        basicPushNoticeView.snp.makeConstraints {
+            $0.top.equalTo(locationAuthorizationView.snp.bottom).offset(16.adjustedH)
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(46.adjustedH)
         }

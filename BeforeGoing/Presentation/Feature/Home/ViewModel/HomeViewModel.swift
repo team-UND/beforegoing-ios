@@ -7,6 +7,7 @@
 
 import CoreLocation
 import Foundation
+import UIKit
 
 protocol HomeOutput {}
 
@@ -16,7 +17,7 @@ final class HomeViewModel: ViewModeling {
     private let todayMissionLimit = 20
     
     private let getMemberNameUseCase: GetMemberNameType
-    private let weatherUseCase: RequestWeatherType
+    private let weatherUseCase: FetchWeatherType
     private let getMissionsUseCase: FetchMissionsType
     private let checkMissionUseCase: CheckMissionType
     private let addTodayMissionUseCase: AddTodayMissionType
@@ -32,7 +33,7 @@ final class HomeViewModel: ViewModeling {
     
     init(
         getMemberNameUseCase: GetMemberNameType,
-        weatherUseCase: RequestWeatherType,
+        weatherUseCase: FetchWeatherType,
         getMissionsUseCase: FetchMissionsType,
         checkMissionUseCase: CheckMissionType,
         addTodayMissionUseCase: AddTodayMissionType,
@@ -49,10 +50,26 @@ final class HomeViewModel: ViewModeling {
     enum Input {
         case requestName
         case requestDate
-        case requestWeather(latitude: CLLocationDegrees, longitude: CLLocationDegrees)
-        case scenarioDidTap(scenarioID: Int, date: String)
-        case missionChecked(missionID: Int, date: String)
-        case addTodayMissionButtonDidTap(scenarioID: Int, date: String, content: String)
+        case requestWeather(
+            date: Date,
+            memberName: String,
+            latitude: CLLocationDegrees,
+            longitude: CLLocationDegrees
+        )
+        case scenarioDidTap(
+            scenarioID: Int,
+            date: String
+        )
+        case missionChecked(
+            missionID: Int,
+            date: String,
+            willBeChecked: Bool
+        )
+        case addTodayMissionButtonDidTap(
+            scenarioID: Int,
+            date: String,
+            content: String
+        )
         case deleteTodayMissionButtonDidTap(missionID: Int)
     }
     
@@ -67,7 +84,7 @@ final class HomeViewModel: ViewModeling {
     }
     
     struct WeatherOutput: HomeOutput {
-        let weatherResult: NSMutableAttributedString
+        let weatherResult: Result<NSMutableAttributedString, Error>
     }
     
     struct MissionsOutput: HomeOutput {
@@ -94,20 +111,36 @@ final class HomeViewModel: ViewModeling {
             let date = DateUtil.getCurrentDate(format: "yyyy년 MM월 dd일")
             return DateOutput(date: date)
             
-        case .requestWeather(let latitude, let longitude) :
-            let administrativeArea = try await getAdministrativeArea(
-                latitude: latitude,
-                longitude: longitude
-            )
-            let result = try await requestWeatherResult(
-                latitude: latitude,
-                longitude: longitude
-            )
-            let weatherResult = convertWeatherResult(
-                administrativeArea: administrativeArea,
-                result: result
-            )
-            return WeatherOutput(weatherResult: weatherResult)
+        case .requestWeather(let date, let memberName, let latitude, let longitude) :
+            let administrativeArea: NSMutableAttributedString
+            
+            do {
+                administrativeArea = try await getAdministrativeArea(
+                    latitude: latitude,
+                    longitude: longitude
+                )
+            } catch (let error) {
+                return WeatherOutput(weatherResult: .failure(error))
+            }
+            
+            do {
+                let result = try await requestWeatherResult(
+                    date: date,
+                    latitude: latitude,
+                    longitude: longitude
+                )
+                
+                let weatherResult = convertWeatherResult(
+                    memberName: memberName,
+                    date: date,
+                    administrativeArea: administrativeArea,
+                    result: result
+                )
+                return WeatherOutput(weatherResult: .success(weatherResult))
+                
+            } catch (let error) {
+                return WeatherOutput(weatherResult: .failure(error))
+            }
             
         case .scenarioDidTap(let scenarioID, let date):
             do {
@@ -138,15 +171,15 @@ final class HomeViewModel: ViewModeling {
                 return MissionsOutput(missionsResult: .failure(error))
             }
             
-        case .missionChecked(let missionID, let date):
+        case .missionChecked(let missionID, let date, let willBeChecked):
             do {
                 try await checkMissionUseCase.execute(
                     missionID: missionID,
                     date: date,
-                    isChecked: true
+                    isChecked: willBeChecked
                 )
                 if let index = missions.firstIndex(where: { $0.missionID == missionID }) {
-                    completeMission(at: index)
+                    willBeChecked ? completeMission(at: index) : cancelMission(at: index)
                 }
             } catch {
                 BeforeGoingLogger.error(error)
@@ -199,6 +232,12 @@ final class HomeViewModel: ViewModeling {
         }
     }
     
+    func isExistMission(content: String) -> Bool {
+        missions.contains(where: { mission in
+            mission.content == content
+        })
+    }
+    
     private func getAdministrativeArea(
         latitude: CLLocationDegrees,
         longitude: CLLocationDegrees
@@ -212,38 +251,58 @@ final class HomeViewModel: ViewModeling {
     }
     
     private func requestWeatherResult(
+        date: Date,
         latitude: CLLocationDegrees,
         longitude: CLLocationDegrees
-    ) async throws -> WeatherEntity {
-        
-        let date: String = DateUtil.getCurrentDate(format: "yyyy-MM-dd")
+    ) async throws -> WeatherEntity? {
         let timezone = TimeZone.current.identifier
         let result = try await weatherUseCase.execute(
             date: date,
             timezone: timezone,
-            latitude: Float(latitude),
-            longitude: Float(longitude)
+            location: CLLocation(latitude: latitude, longitude: longitude)
         )
-        
         return result
     }
     
     private func convertWeatherResult(
+        memberName: String,
+        date: Date,
         administrativeArea: NSMutableAttributedString,
-        result: WeatherEntity
+        result: WeatherEntity?
     ) -> NSMutableAttributedString {
         
-        let weatherInformation = makeString(result.mapInformation())
-        let supplies = makeString(result.mapSupplies())
+        var weatherResult = NSMutableAttributedString()
         
-        let weatherResult = NSMutableAttributedString()
+        guard let monthAndDay = DateUtil.toMonthAndDay(date: date) else {
+            return weatherResult
+        }
+        
+        guard let result else {
+            let scenarioIntroduce = "\(memberName)님의 \(monthAndDay) 시나리오예요!".customText(
+                rangedText: "\(memberName)",
+                color: UIColor.blue700.cgColor
+            )
+            
+            if date < DateUtil.getCurrentDate() {
+                weatherResult.append(NSAttributedString(string: "지난 날짜의 기상 정보는 제공하지 않아요"))
+            } else {
+                weatherResult.append(NSAttributedString(string: "해당 날짜의 기상 정보는 확인하기 어려워요"))
+            }
+            weatherResult.append(NSAttributedString(string: "\n"))
+            weatherResult.append(scenarioIntroduce)
+            return weatherResult
+        }
+        
+        let weatherInformation = makeWeatherString(result)
+        let supplies = makeSupplyString(result)
         
         weatherResult.do {
             $0.append(administrativeArea)
             $0.append(NSAttributedString(string: "는 지금 "))
             $0.append(weatherInformation)
             
-            if !supplies.string.isEmpty {
+            if let supplies,
+               !supplies.string.isEmpty {
                 $0.append(NSAttributedString(string: "\n"))
                 $0.append(supplies)
                 $0.append(NSAttributedString(string: " 챙겨보세요!"))
@@ -253,26 +312,27 @@ final class HomeViewModel: ViewModeling {
         return weatherResult
     }
     
-    private func makeString<T: RawRepresentable>(
-        _ array: [T?]
-    ) -> NSMutableAttributedString where T.RawValue == String {
+    private func makeWeatherString(_ weather: WeatherEntity) -> NSMutableAttributedString {
+        let weatherDescription = weather.weatherCondition.description
+        let uvDescription = weather.uvIndex.description
+        let weatherString = "\(weatherDescription), 자외선 \(uvDescription)!"
+        let customedWeatherString = weatherString.customText(rangedText: "\(weatherDescription), 자외선")
         
-        let resultAttributedString = NSMutableAttributedString()
-        let separator = NSAttributedString(string: HomeViewModel.seperator)
-        
-        for (index, element) in array.compactMap({ $0?.rawValue }).enumerated() {
-            let fullText = element
-            let firstSpaceIndex = fullText.firstIndex(of: " ") ?? fullText.endIndex
-            let firstWord = String(fullText[..<firstSpaceIndex])
-            let attributedText = fullText.customText(rangedText: firstWord)
-            
-            resultAttributedString.append(attributedText)
-            
-            if index < array.compactMap({ $0?.rawValue }).count - 1 {
-                resultAttributedString.append(separator)
-            }
+        return customedWeatherString
+    }
+    
+    private func makeSupplyString(_ weather: WeatherEntity) -> NSMutableAttributedString? {
+        guard let weatherSupply = weather.weatherCondition.supply,
+              let uvSupply = weather.uvIndex.supply else {
+            return nil
         }
-        return resultAttributedString
+                
+        let supplyString = "\(weatherSupply), \(uvSupply)!"
+        let customedSupplyString = supplyString.customText(
+            rangedText: supplyString,
+            color: UIColor.blue700.cgColor
+        )
+        return customedSupplyString
     }
     
     private func addMissionContent(
@@ -285,12 +345,6 @@ final class HomeViewModel: ViewModeling {
         if !isExistMission(content: content) {
             self.missions.append((missionID, content, beforeState, state, isChecked))
         }
-    }
-    
-    private func isExistMission(content: String) -> Bool {
-        missions.contains(where: { mission in
-            mission.content == content
-        })
     }
     
     private var isLimitTodayMissions: Bool {
@@ -333,6 +387,15 @@ extension HomeViewModel {
         missions[index].isChecked = true
         let removed = missions.remove(at: index)
         missions.append(removed)
+        
+        sortMissions()
+    }
+    
+    private func cancelMission(at index: Int) {
+        missions[index].state = missions[index].initState
+        missions[index].isChecked = false
+        let removed = missions.remove(at: index)
+        missions.insert(removed, at: 0)
         
         sortMissions()
     }

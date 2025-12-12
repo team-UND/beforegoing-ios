@@ -5,14 +5,13 @@
 //  Created by APPLE on 7/24/25.
 //
 
+import CoreLocation
 import UIKit
 
 final class SettingViewController: BaseViewController {
     
     private let rootView = SettingView()
     private let viewModel: SettingViewModel
-    
-    private var hasOpenedSettings = false
     
     init(viewModel: SettingViewModel) {
         self.viewModel = viewModel
@@ -24,7 +23,7 @@ final class SettingViewController: BaseViewController {
         }
         rootView.configure(version: version)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -35,58 +34,107 @@ final class SettingViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         Task {
             guard let result = try await viewModel.action(
                 input: .viewWillAppear
             ) as? SettingViewModel.EventPushAgreedOutput else {
                 return
             }
+            
             switch result.isEventPushAgreed {
             case .success(let eventPushAgreed):
-                rootView.settingNoticeView.eventPushNoticeView.updateButtonState(condition: eventPushAgreed)
+                rootView.settingNoticeView.eventPushNoticeView.updateSwitch(isAgreed: eventPushAgreed)
             case .failure(let error):
                 self.handleError(error)
                 BeforeGoingLogger.error(error)
             }
         }
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(checkPushNoticeAuthorization),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(checkLocationAuthorization),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        checkPushNoticeAuthorization()
+        checkLocationAuthorization()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self, name: UIApplication.didBecomeActiveNotification, object: nil)
     }
     
     override func setAction() {
+        rootView.accountView.seemoreView.addGestureRecognizer(createTapGesture(action: #selector(profileButtonDidTap)))
         rootView.accountView.seemoreView.moveButton.addTarget(
             self,
             action: #selector(profileButtonDidTap),
             for: .touchUpInside
         )
+        
+        rootView.supportView.seemoreView.addGestureRecognizer(createTapGesture(action: #selector(supportButtonDidTap)))
         rootView.supportView.seemoreView.moveButton.addTarget(
             self,
             action: #selector(supportButtonDidTap),
             for: .touchUpInside
+        )
+        
+        rootView.settingNoticeView.locationAuthorizationView.switchButton.addTarget(
+            self,
+            action: #selector(authorizationSwitchChanged(_:)),
+            for: .valueChanged
+        )
+        rootView.settingNoticeView.basicPushNoticeView.switchButton.addTarget(
+            self,
+            action: #selector(authorizationSwitchChanged(_:)),
+            for: .valueChanged
         )
         rootView.settingNoticeView.eventPushNoticeView.switchButton.addTarget(
             self,
             action: #selector(eventPushNoticeButtonDidTap),
             for: .touchUpInside
         )
-        rootView.settingNoticeView.basicPushNoticeView.switchButton.addTarget(
-            self,
-            action: #selector(pushNoticeButtonDidTap),
-            for: .touchUpInside
-        )
+        
+        rootView.policyView.noticeView.addGestureRecognizer(createTapGesture(action: #selector(noticeButtonDidTap)))
         rootView.policyView.noticeView.moveButton.addTarget(
             self,
             action: #selector(noticeButtonDidTap),
             for: .touchUpInside
         )
+        rootView.policyView.termView.addGestureRecognizer(createTapGesture(action: #selector(termButtonDidTap)))
         rootView.policyView.termView.moveButton.addTarget(
             self,
             action: #selector(termButtonDidTap),
             for: .touchUpInside
         )
+        rootView.policyView.privacyView.addGestureRecognizer(createTapGesture(action: #selector(privacyButtonDidTap)))
         rootView.policyView.privacyView.moveButton.addTarget(
             self,
             action: #selector(privacyButtonDidTap),
             for: .touchUpInside
         )
+    }
+    
+    private func createTapGesture(action: Selector) -> UITapGestureRecognizer {
+        let tapGesture = UITapGestureRecognizer(
+            target: self,
+            action: action
+        )
+        return tapGesture
     }
 }
 
@@ -108,53 +156,67 @@ extension SettingViewController: NetworkRequestable, NetworkRequestErrorHandler 
     @objc
     private func eventPushNoticeButtonDidTap() {
         let isSwitchedOn = rootView.settingNoticeView.eventPushNoticeView.switchButton.isOn
-        performTask(isSwitchedOn: isSwitchedOn)
+        alertEventPushChange(isSwitchedOn: isSwitchedOn)
     }
     
     @objc
-    private func pushNoticeButtonDidTap() {
-        UNUserNotificationCenter.current().getNotificationSettings { settings in
-            DispatchQueue.main.async { [weak self] in
-                self?.hasOpenedSettings = true
-                if let url = URL(string: UIApplication.openSettingsURLString) {
-                    UIApplication.shared.open(url)
-                }
-            }
+    private func authorizationSwitchChanged(_ sender: UISwitch) {
+        let isAgreed = sender.isOn
+        sender.setOn(isAgreed, animated: true)
+        
+        if let url = URL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(url)
         }
     }
     
-    func pushNoticeDidBecomeActive() {
-        guard hasOpenedSettings else { return }
-        hasOpenedSettings = false
-        
+    @objc
+    func checkPushNoticeAuthorization() {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             DispatchQueue.main.async {
-                let isAgreed: Bool
-
+                var isAgreed = false
+                
                 switch settings.authorizationStatus {
                 case .authorized, .provisional, .ephemeral:
-                    isAgreed = true
-                case .denied, .notDetermined:
-                    isAgreed = false
-                @unknown default:
-                    isAgreed = false
+                    isAgreed = (settings.alertSetting == .enabled)
+                default:
+                    break
                 }
                 
-                let currentDate = DateUtil.getCurrentDate().toString()
-                let modalVC = ModalViewController(
-                    modalView: ModalView(type: .eventPushAgree(isAgreed: isAgreed, currentDate: currentDate))
-                )
-                
-                self.rootView.updateSwitch(isAgreed: isAgreed)
-                self.present(modalVC, animated: true)
+                self.rootView.settingNoticeView.basicPushNoticeView.updateSwitch(isAgreed: isAgreed)
             }
         }
     }
     
-    private func performTask(isSwitchedOn: Bool) {
+    @objc
+    func checkLocationAuthorization() {
+        let locationManager = CLLocationManager()
+        var isAgreed = false
+        
+        switch locationManager.authorizationStatus {
+        case .authorizedAlways, .authorizedWhenInUse:
+            isAgreed = true
+        default:
+            break
+        }
+        
+        rootView.settingNoticeView.locationAuthorizationView.updateSwitch(isAgreed: isAgreed)
+    }
+    
+    private func alertEventPushChange(isSwitchedOn: Bool) {
+        let isReception = isSwitchedOn ? "수신 동의" : "수신 거부"
+        let currentDate = DateUtil.getCurrentDate(format: "yyyy년 MM월 dd일")
+        
         Task {
             do {
                 let _ = try await viewModel.action(input: .switchButtonDidTap(isSwitchedOn))
+                let alert = UIAlertController(
+                    title: "",
+                    message: "[나가기전에]에서 보내는 이벤트/마케팅 관련\n푸시알림 수신 여부가\n '\(isReception)'로 변경되었습니다.\n\(currentDate)",
+                    preferredStyle: .alert
+                )
+                let success = UIAlertAction(title: "확인", style: .default)
+                alert.addAction(success)
+                present(alert, animated: true, completion: nil)
             } catch {
                 self.handleError(error)
             }

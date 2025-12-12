@@ -5,6 +5,8 @@
 //  Created by APPLE on 7/22/25.
 //
 
+import Foundation
+
 struct AuthRepository: AuthInterface {
     
     private let networkService: NetworkService
@@ -33,8 +35,8 @@ struct AuthRepository: AuthInterface {
         self.tokenValidator = tokenValidator
     }
     
-    func requestNonce(provider: String) async throws -> NonceEntity {
-        let nonceRequestDTO = nonceRequestMapper.map(provider)
+    func requestNonce(provider: Provider) async throws -> NonceEntity {
+        let nonceRequestDTO = nonceRequestMapper.map(provider.rawValue)
         let response = try await networkService.request(
             endPoint: AuthAPI.nonce(dto: nonceRequestDTO),
             responseType: NonceResponseDTO.self
@@ -42,39 +44,53 @@ struct AuthRepository: AuthInterface {
         return response.toEntity()
     }
     
-    func requestLogin(provider: String) async throws -> Bool {
+    func requestLogin(provider: Provider) async throws -> Bool {
         let nonceEntity = try await requestNonce(provider: provider)
         let idToken = try await requestIDToken(nonce: nonceEntity.nonce)
         
         return try await requestLogin(provider: provider, idToken: idToken)
     }
     
-    func requestLogin(provider: String, idToken: String) async throws -> Bool {
-        let requestDTO = loginRequestMapper.map((provider, idToken))
+    func requestLogin(provider: Provider, idToken: String) async throws -> Bool {
+        let requestDTO = loginRequestMapper.map((provider.rawValue, idToken))
         let response = try await networkService.request(
             endPoint: AuthAPI.login(dto: requestDTO),
             responseType: LoginResponseDTO.self
         )
         saveKeyChain(response: response)
+        saveProvider(provider)
         
-        return isMemberNameSet
+        return isCompletedOnboarding
     }
     
     func autoLogin() async throws -> Bool {
-        guard isTokenExists, isMemberNameSet else { return false }
+        guard isTokenExists, isCompletedOnboarding else { return false }
         
         guard let accessTokenExpirationDate = keyChainService.load(key: .accessTokenExpirationDate),
               let refreshTokenExpirationDate = keyChainService.load(key: .refreshTokenExpirationDate) else {
             return false
         }
         
-        if !tokenValidator.isAccessTokenValid(expirationDate: accessTokenExpirationDate) {
-            guard tokenValidator.isRefreshTokenValid(expirationDate: refreshTokenExpirationDate) else {
+        if tokenValidator.isAccessTokenValid(expirationDate: accessTokenExpirationDate) {
+            return true
+        }
+        
+        if tokenValidator.isRefreshTokenValid(expirationDate: refreshTokenExpirationDate) {
+            do {
+                try await tokenReissuer.reissue()
+                return true
+            } catch {
                 return false
             }
-            try await tokenReissuer.reissue()
         }
-        return true
+        return false
+    }
+    
+    func getLastLogin() -> Provider? {
+        guard let lastLogin: LastLogin = userDefaultsService.load(key: .lastProvider) else {
+            return nil
+        }
+        return Provider(rawValue: lastLogin.provider)
     }
     
     func logout() async throws {
@@ -83,6 +99,7 @@ struct AuthRepository: AuthInterface {
             return
         }
         try await networkService.request(endPoint: AuthAPI.logout(accessToken: accessToken))
+        
         deleteUserInformation()
     }
     
@@ -107,6 +124,13 @@ struct AuthRepository: AuthInterface {
         }
     }
     
+    private func saveProvider(_ provider: Provider) {
+        let lastLogin = LastLogin(provider: provider.rawValue, timestamp: Date())
+        
+        let _ = userDefaultsService.save(provider.rawValue, key: .provider)
+        let _ = userDefaultsService.save(lastLogin, key: .lastProvider)
+    }
+    
     private var isTokenExists: Bool {
         if let accessToken = keyChainService.load(key: .accessToken),
            let refreshToken = keyChainService.load(key: .refreshToken),
@@ -117,14 +141,17 @@ struct AuthRepository: AuthInterface {
         return false
     }
     
-    private var isMemberNameSet: Bool {
-        let memberName: String? = userDefaultsService.load(key: .memberName)
-        return memberName != nil
+    private var isCompletedOnboarding: Bool {
+        guard let isCompleted: Bool = userDefaultsService.load(key: .isCompletedOnboarding) else {
+            return false
+        }
+        return isCompleted
     }
     
     private func deleteUserInformation() {
         for key in KeyChainKey.allCases {
             keyChainService.delete(key: key)
         }
+        let _ = userDefaultsService.delete(key: .provider)
     }
 }

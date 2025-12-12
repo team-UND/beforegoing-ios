@@ -5,6 +5,8 @@
 //  Created by APPLE on 8/7/25.
 //
 
+protocol AgreeItemOutput {}
+
 final class AgreeItemViewModel: ViewModeling {
     
     private var agreeItems = AgreeItem.allCases
@@ -13,15 +15,46 @@ final class AgreeItemViewModel: ViewModeling {
     
     enum Input {
         case nextButtonDidTap
+        case initTerms
     }
-    enum Output {
-        case agreeTermsResult(Bool)
+    
+    typealias Output = AgreeItemOutput
+    
+    struct TermsOutput: AgreeItemOutput {
+        let agreeTermsResult: Bool
     }
+    
+    struct EmptyOutput: AgreeItemOutput {}
     
     init(useCase: SendAgreeTermsType) {
         self.useCase = useCase
         agreeItems.forEach { checkBoxStates[$0] = .unchecked }
     }
+    
+    func action(input: Input) async throws -> Output {
+        switch input {
+        case .nextButtonDidTap:
+            do {
+                try await useCase.execute(
+                    termsOfServiceAgreed: matchState(item: .isTermsOfServiceAgreed),
+                    privacyPolicyAgreed: matchState(item: .isPrivacyPolicyAgreed),
+                    isOver14: matchState(item: .isOverFourteen),
+                    eventPushAgreed: matchState(item: .isPushAgreed)
+                )
+                return TermsOutput(agreeTermsResult: true)
+            }
+            catch(let error) {
+                BeforeGoingLogger.error(error)
+                return TermsOutput(agreeTermsResult: false)
+            }
+        case .initTerms:
+            agreeItems.forEach { checkBoxStates[$0] = .unchecked }
+            return EmptyOutput()
+        }
+    }
+}
+
+extension AgreeItemViewModel {
     
     var isAllNecssaryChecked: Bool {
         agreeItems
@@ -44,25 +77,6 @@ final class AgreeItemViewModel: ViewModeling {
     
     func toggleItem(item: AgreeItem, checkBoxState: CheckBoxState) {
         checkBoxStates[item] = checkBoxState
-    }
-    
-    func action(input: Input) async throws -> Output {
-        switch input {
-        case .nextButtonDidTap:
-            do {
-                try await useCase.execute(
-                    termsOfServiceAgreed: matchState(item: .isTermsOfServiceAgreed),
-                    privacyPolicyAgreed: matchState(item: .isPrivacyPolicyAgreed),
-                    isOver14: matchState(item: .isOverFourteen),
-                    eventPushAgreed: matchState(item: .isPushAgreed)
-                )
-                return .agreeTermsResult(true)
-            }
-            catch(let error) {
-                BeforeGoingLogger.error(error)
-                return .agreeTermsResult(false)
-            }
-        }
     }
     
     private func matchState(item: AgreeItem) -> Bool {

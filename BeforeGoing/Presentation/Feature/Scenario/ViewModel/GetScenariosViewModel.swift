@@ -5,37 +5,89 @@
 //  Created by APPLE on 9/26/25.
 //
 
+protocol GetScenariosOutput {}
+
 final class GetScenariosViewModel: ViewModeling {
     
-    private let useCase: FetchScenariosType
+    private let fetchScenariosUseCase: FetchScenariosType
+    private let fetchNotificationsUseCase: FetchNotificationsType
     private var scenarios: [ScenarioEntity]?
+    private var scenariosModel = ScenariosModel()
     private var pointer = 0
     
-    init(useCase: FetchScenariosType) {
-        self.useCase = useCase
+    init(
+        fetchScenariosUseCase: FetchScenariosType,
+        fetchNotificationsUseCase: FetchNotificationsType
+    ) {
+        self.fetchScenariosUseCase = fetchScenariosUseCase
+        self.fetchNotificationsUseCase = fetchNotificationsUseCase
     }
     
     enum Input {
-        case viewWillAppear
+        case requestScenarios
+        case requestNotifications
     }
     
-    struct Output {
+    typealias Output = GetScenariosOutput
+    
+    struct ScenariosOutput: GetScenariosOutput {
         let scenariosResult: Result<[ScenarioEntity], Error>
+    }
+    
+    struct NotificationsOutput: GetScenariosOutput {
+        let notificationsResult: Result<NotificationsEntity, Error>
     }
     
     func action(input: Input) async throws -> Output {
         switch input {
-        case .viewWillAppear:
+        case .requestScenarios:
             do {
-                let result = try await useCase.execute()
+                let result = try await fetchScenariosUseCase.execute()
                 if result.isEmpty {
-                    return Output(scenariosResult: .failure(BeforeGoingError.notFoundError))
+                    return ScenariosOutput(scenariosResult: .failure(BeforeGoingError.notFoundError))
                 }
                 self.scenarios = result
-                return Output(scenariosResult: .success(result))
+                return ScenariosOutput(scenariosResult: .success(result))
             } catch (let error) {
                 BeforeGoingLogger.error(error)
-                return Output(scenariosResult: .failure(error))
+                return ScenariosOutput(scenariosResult: .failure(error))
+            }
+            
+        case .requestNotifications:
+            do {
+                let result = try await fetchNotificationsUseCase.execute()
+                createScenarios(notifications: result.scenarios)
+                return NotificationsOutput(notificationsResult: .success(result))
+            } catch (let error) {
+                return NotificationsOutput(notificationsResult: .failure(error))
+            }
+        }
+    }
+    
+    private func createScenarios(notifications: [NotificationEntity]) {
+        if let scenarios {
+            scenariosModel.removeAll()
+            for i in 0..<scenarios.count {
+                let scenario = scenarios[i]
+                if let notification = notifications.first(where: { $0.scenarioID == scenario.scenarioId }) {
+                    let scenarioModel: ScenarioModel = .init(
+                        scenarioID: scenario.scenarioId,
+                        scenarioName: scenario.scenarioName,
+                        scenarioOrder: scenario.scenarioOrder,
+                        notificationMethodType: notification.notificationMethodType,
+                        daysOfWeek: notification.daysOfWeekOrdinal,
+                        startHour: notification.notificationCondition.startHour,
+                        startMinute: notification.notificationCondition.startMinute
+                    )
+                    scenariosModel.append(scenarioModel)
+                } else {
+                    let scenarioModel: ScenarioModel = .init(
+                        scenarioID: scenario.scenarioId,
+                        scenarioName: scenario.scenarioName,
+                        scenarioOrder: scenario.scenarioOrder
+                    )
+                    scenariosModel.append(scenarioModel)
+                }
             }
         }
     }
@@ -44,7 +96,7 @@ final class GetScenariosViewModel: ViewModeling {
 extension GetScenariosViewModel {
     
     var scenariosCount: Int {
-        scenarios?.count ?? 0
+        scenariosModel.scenarios.count
     }
     
     var firstScenarioID: Int {
@@ -56,59 +108,57 @@ extension GetScenariosViewModel {
     }
     
     func getScenarioName(section: Int) -> String {
-        scenarios?[section].scenarioName ?? ""
+        scenariosModel.scenarios[section].scenarioName
     }
     
-    func getScenarioMemo(section: Int) -> String {
-        scenarios?[section].memo ?? ""
+    func getNotificationInformation(section: Int) -> String? {
+        scenariosModel.getNotificationInformation(section: section)
     }
     
     func removeScenario(at: Int) {
-        scenarios?.remove(at: at)
+        scenariosModel.scenarios.remove(at: at)
     }
     
     func moveScenario(
         originalAt: Int,
         destinationAt: Int
     ) {
-        guard let movedSection = scenarios?.remove(at: originalAt) else {
-            return
-        }
-        scenarios?.insert(movedSection, at: destinationAt)
+        let movedSection = scenariosModel.scenarios.remove(at: originalAt)
+        scenariosModel.scenarios.insert(movedSection, at: destinationAt)
     }
     
     func getScenarioID() -> Int {
-        scenarios?[pointer].scenarioId ?? 0
+        scenariosModel.scenarios[pointer].scenarioID
     }
     
     func getScenarioID(at index: Int) -> Int {
-        scenarios?[index].scenarioId ?? 0
+        scenariosModel.scenarios[index].scenarioID
     }
-    
+        
     func getPreviousScenarioOrder(current: Int) -> Int? {
         if current == 0 {
             return nil
         }
-        return scenarios?[current - 1].scenarioOrder
+        return scenariosModel.scenarios[current - 1].scenarioOrder
     }
     
     func getNextScenarioOrder(current: Int) -> Int? {
         if current == scenariosCount - 1 {
             return nil
         }
-        return scenarios?[current + 1].scenarioOrder
+        return scenariosModel.scenarios[current + 1].scenarioOrder
     }
     
     func updateOrder(updates: [NewOrderEntity]) {
         updates.forEach { update in
-            if let index = scenarios?.firstIndex(where: { $0.scenarioId == update.id }) {
-                scenarios?[index].scenarioOrder = update.newOrder
+            if let index = scenariosModel.scenarios.firstIndex(where: { $0.scenarioID == update.id }) {
+                scenariosModel.scenarios[index].scenarioOrder = update.newOrder
             }
         }
     }
     
     func sortScenario() {
-        scenarios?.sort { $0.scenarioOrder < $1.scenarioOrder }
+        scenariosModel.scenarios.sort { $0.scenarioOrder < $1.scenarioOrder }
     }
     
     func updatePointer(to pointer: Int) {
@@ -116,10 +166,6 @@ extension GetScenariosViewModel {
     }
     
     func findTagByTitle(_ title: String) -> Int {
-        scenarios?.firstIndex(where: { $0.scenarioName == title }) ?? 0
-    }
-    
-    private func findScenarioByID(id: Int) -> ScenarioEntity? {
-        scenarios?.filter { $0.scenarioId == id }.first
+        scenariosModel.scenarios.firstIndex(where: { $0.scenarioName == title }) ?? 0
     }
 }

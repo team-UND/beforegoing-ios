@@ -41,12 +41,15 @@ final class MyScenarioViewController: BaseViewController {
         
         Task {
             do {
-                let result = try await getScenariosViewModel.action(input: .viewWillAppear)
+                guard let result = try await getScenariosViewModel.action(
+                    input: .requestScenarios
+                ) as? GetScenariosViewModel.ScenariosOutput else {
+                    return
+                }
                 
                 switch result.scenariosResult {
                 case .success:
                     rootView.replaceScenarioView()
-                    rootView.scenarioListTableView.reloadData()
                 case .failure(let error):
                     if let error = error as? BeforeGoingError {
                         if error == .notFoundError {
@@ -54,6 +57,19 @@ final class MyScenarioViewController: BaseViewController {
                         }
                         self.handleError(error)
                     }
+                }
+                
+                guard let result = try await getScenariosViewModel.action(
+                    input: .requestNotifications
+                ) as? GetScenariosViewModel.NotificationsOutput else {
+                    return
+                }
+                
+                switch result.notificationsResult {
+                case .success:
+                    rootView.scenarioListTableView.reloadData()
+                case .failure(let error):
+                    self.handleError(error)
                 }
             } catch {
                 BeforeGoingLogger.error(BeforeGoingError.getScenariosFailed)
@@ -93,7 +109,7 @@ extension MyScenarioViewController: NetworkRequestable, NetworkRequestErrorHandl
     
     @objc
     private func addScenarioButtonDidTap() {
-        let viewController = ManageScenarioViewController()
+        let viewController = ViewControllerFactory.shared.makeManageScenarioViewController()
         viewController.do {
             $0.navigationItem.hidesBackButton = true
             $0.hidesBottomBarWhenPushed = true
@@ -201,8 +217,8 @@ extension MyScenarioViewController: UITableViewDataSource {
     
     private func bindCell(to cell: ScenarioListItemCell, section: Int) {
         let name = getScenariosViewModel.getScenarioName(section: section)
-        let memo = getScenariosViewModel.getScenarioMemo(section: section)
-        cell.bind(name: name, memo: memo)
+        let noticeInformation = getScenariosViewModel.getNotificationInformation(section: section)
+        cell.bind(name: name, noticeInformation: noticeInformation)
     }
     
     private func createDeleteAction(tableView: UITableView, indexPath: IndexPath) -> UIContextualAction {

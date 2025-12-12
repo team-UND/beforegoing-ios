@@ -24,7 +24,7 @@ enum NotificationAction {
     var description: String {
         switch self {
         case .turnOff:
-            return "알람끄기"
+            return "알람 끄기"
         case .again:
             return "5분 뒤 다시"
         }

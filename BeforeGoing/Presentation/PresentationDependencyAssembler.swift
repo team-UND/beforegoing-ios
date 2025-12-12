@@ -26,6 +26,11 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
+        guard let getLastLoginUseCase = DIContainer.shared.resolve(type: GetLastLoginType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
         guard let logoutUseCase = DIContainer.shared.resolve(type: LogoutType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
@@ -61,7 +66,7 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
-        guard let requestWeatherUseCase = DIContainer.shared.resolve(type: RequestWeatherType.self) else {
+        guard let requestWeatherUseCase = DIContainer.shared.resolve(type: FetchWeatherType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
         }
@@ -77,6 +82,11 @@ struct PresentationDependencyAssembler: DependencyAssembler {
         }
         
         guard let fetchScenariosUseCase = DIContainer.shared.resolve(type: FetchScenariosType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
+        guard let fetchNotificationsUseCase = DIContainer.shared.resolve(type: FetchNotificationsType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
         }
@@ -116,11 +126,21 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
-        DIContainer.shared.register(AgreeItemViewModel(useCase: agreeTermsUseCase))
+        guard let saveOnboardingCompletedUseCase = DIContainer.shared.resolve(type: SaveOnboardingCompletedType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
+        DIContainer.shared.register(
+            AgreeItemViewModel(
+                useCase: agreeTermsUseCase
+            )
+        )
         DIContainer.shared.register(
             LoginViewModel(
                 autoLoginUseCase: autoLoginUseCase,
-                loginUseCase: loginUseCase
+                loginUseCase: loginUseCase,
+                getLastLoginUseCase: getLastLoginUseCase
             )
         )
         DIContainer.shared.register(
@@ -146,13 +166,51 @@ struct PresentationDependencyAssembler: DependencyAssembler {
                 updatePushNoticeUseCase: updatePushNoticeUseCase
             )
         )
-        DIContainer.shared.register(NicknameViewModel(useCase: updateNicknameUseCase))
-        DIContainer.shared.register(ModifyNicknameViewModel(useCase: updateNicknameUseCase))
+        DIContainer.shared.register(
+            NicknameViewModel(
+                useCase: updateNicknameUseCase
+            )
+        )
+        DIContainer.shared.register(
+            ModifyNicknameViewModel(
+                useCase: updateNicknameUseCase
+            )
+        )
         DIContainer.shared.register(AddScenarioViewModel(useCase: addScenarioUseCase))
-        DIContainer.shared.register(GetScenariosViewModel(useCase: fetchScenariosUseCase))
-        DIContainer.shared.register(DeleteScenarioViewModel(useCase: deleteScenarioUseCase))
-        DIContainer.shared.register(UpdateScenarioViewModel(useCase: updateScenarioUseCase))
-        DIContainer.shared.register(UpdateScenarioOrderViewModel(useCase: updateScenarioOrderUseCase))
-        DIContainer.shared.register(GetSingleScenarioViewModel(useCase: fetchSingleScenarioUsecase))
+        DIContainer.shared.register(
+            GetAllScenariosViewModel(fetchScenariosUseCase: fetchScenariosUseCase)
+        )
+        DIContainer.shared.register(
+            GetScenariosViewModel(
+                fetchScenariosUseCase: fetchScenariosUseCase,
+                fetchNotificationsUseCase: fetchNotificationsUseCase
+            )
+        )
+        DIContainer.shared.register(
+            DeleteScenarioViewModel(
+                useCase: deleteScenarioUseCase
+            )
+        )
+        DIContainer.shared.register(
+            UpdateScenarioViewModel(
+                useCase: updateScenarioUseCase
+            )
+        )
+        DIContainer.shared.register(
+            UpdateScenarioOrderViewModel(
+                useCase: updateScenarioOrderUseCase
+            )
+        )
+        DIContainer.shared.register(
+            GetSingleScenarioViewModel(
+                useCase: fetchSingleScenarioUsecase
+            )
+        )
+        DIContainer.shared.register(ManageScenarioViewModel())
+        DIContainer.shared.register(
+            OnboardingViewModel(
+                useCase: saveOnboardingCompletedUseCase
+            )
+        )
     }
 }

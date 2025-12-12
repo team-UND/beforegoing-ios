@@ -14,15 +14,12 @@ protocol ToastPresentable: AnyObject {
 extension ToastPresentable where Self: BaseViewController {
     
     func presentToastMessage(type: ToastMessageType) {
-        let toastMessageView = ToastMessageView(
-            image: type.image,
-            text: type.message
-        )
+        let toastMessageView = ToastMessageView(text: type.message)
         
         setUI(toastMessageView)
         setLayout(toastMessageView)
         
-        HapticManager.shared.impact()
+        HapticManager.shared.notice(feedbackType: .error)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             self.removeUI(toastMessageView)
@@ -36,7 +33,7 @@ extension ToastPresentable where Self: BaseViewController {
     private func setLayout(_ view: ToastMessageView) {
         view.snp.makeConstraints {
             $0.centerX.equalToSuperview()
-            $0.bottom.equalToSuperview().inset(104.adjustedH)
+            $0.bottom.equalToSuperview().inset(110.adjustedH)
         }
     }
     

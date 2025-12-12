@@ -21,15 +21,15 @@ struct LoginUseCase: LoginType {
     }
     
     func login(provider: Provider) async throws -> Bool {
-        try await repository.requestLogin(provider: provider.rawValue)
+        try await repository.requestLogin(provider: provider)
     }
     
     func login(provider: Provider, idToken: String) async throws -> Bool {
-        return try await repository.requestLogin(provider: provider.rawValue, idToken: idToken)
+        return try await repository.requestLogin(provider: provider, idToken: idToken)
     }
     
     func requestNonce(provider: Provider) async throws -> String {
-        let nonceEntity = try await repository.requestNonce(provider: provider.rawValue)
+        let nonceEntity = try await repository.requestNonce(provider: provider)
         return nonceEntity.nonce
     }
 }

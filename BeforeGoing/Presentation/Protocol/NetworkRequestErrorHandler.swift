@@ -20,6 +20,8 @@ extension NetworkRequestErrorHandler where Self: BaseViewController & NetworkReq
             presentLoginExpired()
         case .tooManyRequset:
             presentTooManyRequest()
+        case .serviceUnavailable, .unknownError:
+            presentServiceUnavailable()
         default:
             break
         }

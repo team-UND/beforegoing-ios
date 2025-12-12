@@ -11,6 +11,8 @@ import SnapKit
 
 final class UserScenarioModalView: BaseView {
     
+    private let maxTaskNameLength = 14
+    
     private(set) var headerView = UserScenarioModalHeaderView()
     private(set) var emptyView = ScenarioEmptyView(type: .home)
     private(set) var taskTextField = TextField(type: .enableAddField)
@@ -38,6 +40,8 @@ final class UserScenarioModalView: BaseView {
     override func setStyle() {
         self.do {
             $0.backgroundColor = .white
+            $0.layer.cornerRadius = 20
+            $0.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         }
         taskTextField.do {
             $0.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 20.adjustedW, height: 0))
@@ -87,7 +91,7 @@ final class UserScenarioModalView: BaseView {
         listTableView.snp.makeConstraints {
             $0.top.equalTo(taskTextField.snp.bottom).offset(16.adjustedH)
             $0.leading.trailing.equalToSuperview().inset(20.adjustedW)
-            $0.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
+            $0.bottom.equalTo(safeAreaLayoutGuide.snp.bottom).inset(145.adjustedH)
         }
     }
     
@@ -118,6 +122,18 @@ extension UserScenarioModalView {
 }
 
 extension UserScenarioModalView {
+    
+    func updateText(text: String) {
+        guard let text = taskTextField.text,
+              !text.isBlank else {
+            taskTextField.text = ""
+            return
+        }
+        let completeText = text
+            .trim(limit: maxTaskNameLength)
+            .removeLeadingSpaces()
+        taskTextField.text = completeText
+    }
     
     func updatePlaceHolder(text: String) {
         taskTextField.placeholder = text

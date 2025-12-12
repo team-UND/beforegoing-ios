@@ -18,9 +18,11 @@ final class LoginView: BaseView {
     private(set) var mainTitleLabel = UILabel()
     private(set) var kakaoLoginButton = UIButton()
     private(set) var appleLoginButton = UIButton()
+    private(set) var lastLoginBadgeView = LastLoginBadgeView()
     
     private(set) var appIconTopConstraint: Constraint?
     private(set) var kakaoLoginTopConstraint: Constraint?
+    private var lastLoginBadgeBottomConstraint: Constraint?
         
     override func setStyle() {
         backgrounImageView.do {
@@ -49,6 +51,9 @@ final class LoginView: BaseView {
             $0.setImage(.appleLogin, for: .normal)
             $0.alpha = 0
         }
+        lastLoginBadgeView.do {
+            $0.alpha = 0
+        }
     }
     
     override func setUI() {
@@ -58,7 +63,8 @@ final class LoginView: BaseView {
             subtitleLabel,
             mainTitleLabel,
             kakaoLoginButton,
-            appleLoginButton
+            appleLoginButton,
+            lastLoginBadgeView
         )
     }
     
@@ -92,6 +98,32 @@ final class LoginView: BaseView {
             $0.leading.trailing.equalToSuperview().inset(20.adjustedW)
             $0.bottom.equalToSuperview().inset(120.adjustedH)
             $0.height.equalTo(54.adjustedH)
+        }
+        lastLoginBadgeView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.bottom
+                .equalTo(kakaoLoginButton.snp.top)
+                .offset(20.adjustedH)
+        }
+    }
+}
+
+extension LoginView {
+    
+    func updateLastLoginBadgeConstraint(provider: Provider?) {
+        switch provider {
+        case .none:
+            lastLoginBadgeView.snp.removeConstraints()
+            lastLoginBadgeView.removeFromSuperview()
+        case .kakao:
+            break
+        case .apple:
+            lastLoginBadgeView.snp.remakeConstraints {
+                $0.centerX.equalToSuperview()
+                $0.bottom
+                    .equalTo(appleLoginButton.snp.top)
+                    .offset(20.adjustedH)
+            }
         }
     }
 }

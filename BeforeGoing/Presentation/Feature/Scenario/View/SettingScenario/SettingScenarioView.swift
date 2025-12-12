@@ -12,7 +12,7 @@ final class SettingScenarioView: BaseView {
     private let backgroundImageView = UIImageView()
     private let topNavigationView = TopNavigationView(title: "시나리오 설정")
     private(set) var inputScenarioView = InputInformationView(title: "시나리오명", maxLength: 10)
-    private(set) var inputMemoView = InputInformationView(title: "메모", maxLength: 15)
+    private(set) var inputMemoView = InputInformationView(title: "메모", maxLength: 14)
     private(set) var settingMissionView = SettingMissionView()
     private(set) var nextButton = CustomButton(state: .disableLongButton, title: "다음")
     

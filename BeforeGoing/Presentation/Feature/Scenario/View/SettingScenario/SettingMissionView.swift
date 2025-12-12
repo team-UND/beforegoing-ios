@@ -9,7 +9,8 @@ import UIKit
 
 final class SettingMissionView: BaseView {
     
-    private let maxLength = 20
+    private let maxMissionCount = 20
+    private let maxMissionNameLength = 14
     
     private let missionTitleLabel = UILabel()
     private(set) var missionCountLabel = UILabel()
@@ -27,7 +28,7 @@ final class SettingMissionView: BaseView {
         missionCountLabel.do {
             $0.textColor = .gray400
             $0.font = .custom(.bodyMDMedium)
-            $0.text = "0/\(maxLength)"
+            $0.text = "0/\(maxMissionCount)개"
         }
         missionTextField.do {
             $0.placeholder = "항목을 추가하세요"
@@ -41,7 +42,12 @@ final class SettingMissionView: BaseView {
             $0.setImage(.union, for: .normal)
             $0.isHidden = true
         }
-        missionTableView.separatorStyle = .none
+        missionTableView.do {
+            $0.separatorStyle = .none
+            $0.tableFooterView = UIView(
+                frame: CGRect(x: 0, y: 0, width: 0, height: 10)
+            )
+        }
     }
     
     override func setUI() {
@@ -83,7 +89,7 @@ final class SettingMissionView: BaseView {
             $0.top.equalTo(missionTextField.snp.bottom).offset(20.adjustedH)
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(236.adjustedH)
-            $0.bottom.equalToSuperview().inset(29.adjustedH)
+            $0.bottom.equalToSuperview()
         }
     }
 }
@@ -108,6 +114,16 @@ extension SettingMissionView {
         return text.removeTrailingSpaces()
     }
     
+    func trimText(_ text: String) -> String {
+        let trimmedText = text
+            .trim(limit: maxMissionNameLength)
+            .removeLeadingSpaces()
+        if text != trimmedText {
+            self.missionTextField.text = trimmedText
+        }
+        return trimmedText
+    }
+    
     func updateText() {
         guard let text = missionTextField.text,
               !text.isBlank else {
@@ -117,12 +133,12 @@ extension SettingMissionView {
         }
         addMissionButton.setImage(.plusCircle.withTintColor(.blue500), for: .normal)
         let completeText = text
-            .trim(limit: maxLength)
+            .trim(limit: maxMissionNameLength)
             .removeLeadingSpaces()
         missionTextField.text = completeText
     }
     
     func updateMissionCount(_ count: Int) {
-        missionCountLabel.text = "\(count)/\(maxLength)"
+        missionCountLabel.text = "\(count)/\(maxMissionCount)개"
     }
 }

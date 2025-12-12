@@ -13,15 +13,16 @@ final class HomeViewController: BaseViewController {
     
     private let rootView = HomeView()
     private let homeViewModel: HomeViewModel
-    private let getScenariosViewModel: GetScenariosViewModel
+    private let getScenariosViewModel: GetAllScenariosViewModel
     private let locationManager = CLLocationManager()
     
     private var homeDate: String?
     private var memberName: String?
+    private var scenarioTitle: String?
     
     init(
         homeViewModel: HomeViewModel,
-        getScenariosViewModel: GetScenariosViewModel
+        getScenariosViewModel: GetAllScenariosViewModel
     ) {
         self.homeViewModel = homeViewModel
         self.getScenariosViewModel = getScenariosViewModel
@@ -39,27 +40,18 @@ final class HomeViewController: BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        getScenarios(currentDate: DateUtil.getCurrentDate(format: "yyyy-MM-dd"))
+        let currentDate = DateUtil.getCurrentDate()
+        let currentDateString = DateUtil.getCurrentDate(format: "yyyy-MM-dd")
+        
+        getScenarios(currentDate: currentDateString)
+        checkLoactionAuthorization()
+        updateWeatherInformation(date: currentDate)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setLocationManager()
-        
-        Task {
-            do {
-                guard let result = try await homeViewModel.action(
-                    input: .requestName
-                ) as? HomeViewModel.MemberNameOutput else {
-                    return
-                }
-                
-                self.memberName = result.memberName
-            } catch {
-                BeforeGoingLogger.error(error)
-            }
-        }
-        
         requestDate()
     }
     
@@ -69,6 +61,7 @@ final class HomeViewController: BaseViewController {
     }
     
     override func setAction() {
+        setGesture()
         rootView.headerView.viewCalendarButton.addTarget(
             self,
             action: #selector(viewCalendarButtonDidTap),
@@ -122,7 +115,7 @@ final class HomeViewController: BaseViewController {
                 }
                 self.homeDate = result.date
                 rootView.headerView.updateDateUI(date: result.date)
-                rootView.modalView.updatePlaceHolder(text: "\(monthAndDay)에만 할 일을 추가해주세요")
+                rootView.modalView.updatePlaceHolder(text: "\(monthAndDay)의 미션을 추가해요")
                 rootView.modalView.updateTaskField(isEnable: true)
             } catch (let error) {
                 self.handleError(error)
@@ -131,9 +124,20 @@ final class HomeViewController: BaseViewController {
         }
     }
     
+    private func checkLoactionAuthorization() {
+        switch locationManager.authorizationStatus {
+        case .authorizedAlways, .authorizedWhenInUse:
+            locationManager.requestLocation()
+        case .restricted, .denied, .notDetermined:
+            rootView.headerView.updateWeatherUI(information: "설정에서 위치 권한을 허용하시면,\n날씨와 추천 준비물을 알려드려요!")
+        @unknown default:
+            break
+        }
+    }
+    
     private func getScenarios(currentDate: String) {
         Task {
-            let result = try await getScenariosViewModel.action(input: .viewWillAppear)
+            let result = try await getScenariosViewModel.action(input: .requestScenarios)
             
             switch result.scenariosResult {
             case .success(let scenarios):
@@ -149,15 +153,82 @@ final class HomeViewController: BaseViewController {
                     $0.replaceModalView()
                     $0.listTableView.reloadData()
                 }
+                
+                if let pendingTitle = self.scenarioTitle {
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self,
+                              let homeDate = DateUtil.convertDateFormat(dateString: homeDate)
+                        else {
+                            return
+                        }
+                        
+                        let tag = self.getScenariosViewModel.findTagByTitle(pendingTitle)
+                        self.rootView.modalView.headerView.updateTappedLabel(tag: tag)
+                        self.fetchScenario(tag: tag, date: homeDate)
+                        self.scenarioTitle = nil
+                    }
+                }
             case .failure(let error):
                 if let error = error as? BeforeGoingError,
                    error == .notFoundError {
                     rootView.modalView.replaceEmptyView(target: self)
                     return
                 }
+                self.handleError(error)
                 BeforeGoingLogger.error(error)
             }
         }
+    }
+    
+    private func updateWeatherInformation(date: Date) {
+        guard let latitude = locationManager.location?.coordinate.latitude,
+              let longitude = locationManager.location?.coordinate.longitude else {
+            return
+        }
+        
+        Task {
+            try await getMemberName()
+            
+            guard let memberName else {
+                return
+            }
+            
+            guard let result = try await homeViewModel.action(
+                input: .requestWeather(date: date, memberName: memberName, latitude: latitude, longitude: longitude)
+            ) as? HomeViewModel.WeatherOutput else {
+                return
+            }
+            
+            switch result.weatherResult {
+            case .success(let weatherInformation):
+                self.rootView.headerView.updateWeatherUI(information: weatherInformation)
+            case .failure(let error):
+                self.handleError(error)
+                BeforeGoingLogger.error(error)
+            }
+        }
+    }
+    
+    private func getMemberName() async throws {
+        do {
+            guard let result = try await homeViewModel.action(
+                input: .requestName
+            ) as? HomeViewModel.MemberNameOutput else {
+                return
+            }
+            
+            self.memberName = result.memberName
+        } catch {
+            BeforeGoingLogger.error(error)
+        }
+    }
+    
+    private func setGesture() {
+        let tapGesture = UITapGestureRecognizer(
+            target: self,
+            action: #selector(viewCalendarButtonDidTap)
+        )
+        rootView.headerView.dateStackView.addGestureRecognizer(tapGesture)
     }
     
     private func setGesture(scenarios: [ScenarioEntity]) {
@@ -178,8 +249,6 @@ final class HomeViewController: BaseViewController {
     private func setLocationManager() {
         locationManager.do {
             $0.delegate = self
-            $0.requestWhenInUseAuthorization()
-            checkStatus()
         }
     }
 }
@@ -190,6 +259,9 @@ extension HomeViewController: ToastPresentable {
     private func viewCalendarButtonDidTap() {
         let calendar = CalendarViewController()
         calendar.modalPresentationStyle = .overFullScreen
+        
+        initSelectedDate(calendar: calendar)
+        
         calendar.onDayDidTap = { [weak self] date in
             let dateString = DateUtil.toString(date: date)
             let currentDate = DateUtil.getCurrentDate()
@@ -199,16 +271,14 @@ extension HomeViewController: ToastPresentable {
                 return
             }
             
-            self.homeDate = dateString
-            updateHeaderDate(date: dateString)
+            updateHomeDate(
+                date: date,
+                currentDate: currentDate,
+                dateString: dateString,
+                monthAndDay: monthAndDay
+            )
             
-            if date != currentDate {
-                updateWeatherByDate(condition: date > currentDate, monthAndDay: monthAndDay)
-                updatePlaceHolderByDate(condition: date > currentDate, monthAndDay: monthAndDay)
-                return
-            }
-            locationManager.requestLocation()
-            updatePlaceHolderByDate(condition: date == currentDate, monthAndDay: monthAndDay)
+            updateWeatherInformation(date: date)
         }
         calendar.onDismiss = { [weak self] in
             guard let homeDate = self?.homeDate,
@@ -223,22 +293,27 @@ extension HomeViewController: ToastPresentable {
     
     @objc
     private func addScenarioButtonDidTap() {
-        moveMySceario()
+        let _ = moveScenarioTab()
     }
     
     @objc
     private func taskTextFieldEditingChanged() {
-        if let text = rootView.modalView.taskTextField.text,
-           !text.isBlank {
+        guard let text = rootView.modalView.taskTextField.text,
+              !text.isEmpty else {
             rootView.modalView.do {
-                $0.enableAddTaskButton()
-                $0.revealDeleteTaskButton()
+                $0.disableAddTaskButton()
+                $0.hideDeleteTaskButton()
             }
             return
         }
-        rootView.modalView.do {
-            $0.disableAddTaskButton()
-            $0.hideDeleteTaskButton()
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            rootView.modalView.do {
+                $0.updateText(text: text)
+                $0.enableAddTaskButton()
+                $0.revealDeleteTaskButton()
+            }
         }
     }
     
@@ -261,31 +336,42 @@ extension HomeViewController: ToastPresentable {
         
         clearTaskTextField()
         
+        if homeViewModel.isExistMission(content: content) {
+            self.presentToastMessage(type: .duplicateMission)
+            self.view.endEditing(true)
+            return
+        }
+        
         Task {
-            guard let result = try await homeViewModel.action(
-                input: .addTodayMissionButtonDidTap(
-                    scenarioID: getScenariosViewModel.getScenarioID(),
-                    date: homeDate,
-                    content: content
-                )
-            ) as? HomeViewModel.TodayMissionOutput else {
-                return
-            }
-            
-            switch result.todayMissionResult {
-            case .success:
-                rootView.modalView.listTableView.reloadData()
-            case .failure(let error):
-                if let error = error as? BeforeGoingError {
-                    self.handleError(error)
-                    if error == .missionLimitError {
-                        self.presentToastMessage(type: .todayMissionLimit)
-                    }
+            do {
+                guard let result = try await homeViewModel.action(
+                    input: .addTodayMissionButtonDidTap(
+                        scenarioID: getScenariosViewModel.getScenarioID(),
+                        date: homeDate,
+                        content: content
+                    )
+                ) as? HomeViewModel.TodayMissionOutput else {
+                    return
                 }
+                
+                switch result.todayMissionResult {
+                case .success:
+                    rootView.modalView.listTableView.reloadData()
+                case .failure(let error):
+                    if let error = error as? BeforeGoingError {
+                        self.handleError(error)
+                        if error == .missionLimitError {
+                            self.presentToastMessage(type: .todayMissionLimit)
+                        }
+                    }
+                    BeforeGoingLogger.error(error)
+                }
+                
+                self.view.endEditing(true)
+            } catch {
                 BeforeGoingLogger.error(error)
             }
         }
-        self.view.endEditing(true)
     }
     
     @objc
@@ -295,27 +381,54 @@ extension HomeViewController: ToastPresentable {
             return
         }
         
-        fetchScenario(tag: view.tag, homeDate: homeDate)
+        let tag = view.tag
+        rootView.modalView.headerView.updateTappedLabel(tag: tag)
+        fetchScenario(tag: tag, date: homeDate)
     }
     
     @objc
-    func handleScenarioTap(title: String) {
-        let currentDate = DateUtil.getCurrentDate().toString()
+    private func moveButtonDidTap() {
+        guard let bottomViewController = moveScenarioTab(),
+              let navigationController = bottomViewController.selectedViewController as? UINavigationController else {
+            return
+        }
         
-        let tag = getScenariosViewModel.findTagByTitle(title)
-        rootView.modalView.headerView.updateTappedLabel(tag: tag)
+        pushMyScenario(navigationController: navigationController)
+        pushManageScenario(navigationController: navigationController)
     }
     
-    private func fetchScenario(tag: Int, homeDate: String) {
+    private func initSelectedDate(calendar: CalendarViewController) {
+        if let homeDateString = self.homeDate,
+           let date = DateUtil.toDate(dateString: homeDateString) {
+            calendar.initialSelectedDate = date
+        } else {
+            calendar.initialSelectedDate = DateUtil.getCurrentDate()
+        }
+    }
+    
+    private func updateHomeDate(
+        date: Date,
+        currentDate: Date,
+        dateString: String,
+        monthAndDay: String
+    ) {
+        self.homeDate = dateString
+        updateHeaderDate(date: dateString)
+        updatePlaceHolderByDate(
+            date: date,
+            currentDate: currentDate,
+            monthAndDay: monthAndDay
+        )
+    }
+    
+    private func fetchScenario(tag: Int, date: String) {
         let scenarioID = getScenariosViewModel.getScenarioID(at: tag)
-        
-        rootView.modalView.headerView.updateTappedLabel(tag: tag)
         
         Task {
             guard let result = try await homeViewModel.action(
                 input: .scenarioDidTap(
                     scenarioID: scenarioID,
-                    date: homeDate
+                    date: date
                 )
             ) as? HomeViewModel.MissionsOutput else { return }
             
@@ -330,47 +443,18 @@ extension HomeViewController: ToastPresentable {
         }
     }
     
-    @objc
-    private func moveButtonDidTap() {
-        moveMySceario()
-    }
-    
-    private func moveMySceario() {
-        guard let bottomViewController = self.tabBarController as? BottomNavigationViewController else {
-            return
-        }
-        bottomViewController.selectTab(item: .scenario)
-    }
-    
     private func updateHeaderDate(date: String) {
         self.rootView.headerView.updateDateUI(date: date)
     }
     
-    private func updateWeatherByDate(condition: Bool, monthAndDay: String) {
-        guard let memberName = memberName else { return }
-        
-        let scenarioIntroduce = "\(memberName)님의 \(monthAndDay) 시나리오예요!"
-        let pastDateIntroduce = "해당 날짜의 기상 정보는 확인하기 어려워요:("
-        let futureDateIntroduce = "지난 날짜의 기상 정보는 제공하지 않아요:("
-        let customColor = UIColor.blue700.cgColor
-        
-        if condition {
-            self.rootView.headerView.updateWeatherUI(
-                information: "\(pastDateIntroduce)\n\(scenarioIntroduce)"
-                    .customText(rangedText: memberName, color: customColor)
-            )
-            return
-        }
-        self.rootView.headerView.updateWeatherUI(
-            information: "\(futureDateIntroduce)\n\(scenarioIntroduce)"
-                .customText(rangedText: memberName, color: customColor)
-        )
-    }
-    
-    private func updatePlaceHolderByDate(condition: Bool, monthAndDay: String) {
-        if condition {
+    private func updatePlaceHolderByDate(
+        date: Date,
+        currentDate: Date,
+        monthAndDay: String
+    ) {
+        if date >= currentDate {
             self.rootView.modalView.do {
-                $0.updatePlaceHolder(text: "\(monthAndDay)에만 할 일을 추가해주세요")
+                $0.updatePlaceHolder(text: "\(monthAndDay)의 미션을 추가해요")
                 $0.updateTaskField(isEnable: true)
             }
             return
@@ -380,57 +464,52 @@ extension HomeViewController: ToastPresentable {
             $0.updateTaskField(isEnable: false)
         }
     }
-}
-
-extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable, NetworkRequestErrorHandler {
-
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        let status = manager.authorizationStatus
-        
-        switch status {
-        case .authorizedAlways, .authorizedWhenInUse:
-            locationManager.requestLocation()
-        case .restricted, .denied:
-            break
-        case .notDetermined:
-            break
-        @unknown default:
-            break
+    
+    private func moveScenarioTab() -> BottomNavigationViewController? {
+        guard let bottomViewController = self.tabBarController as? BottomNavigationViewController else {
+            return nil
+        }
+        bottomViewController.selectTab(item: .scenario)
+        return bottomViewController
+    }
+    
+    private func pushMyScenario(navigationController: UINavigationController) {
+        let hasMyScenarioVC = navigationController.viewControllers.contains { $0 is MyScenarioViewController }
+        if !hasMyScenarioVC {
+            let myScenarioVC = ViewControllerFactory.shared.makeMyScenarioViewController()
+            navigationController.pushViewController(myScenarioVC, animated: false)
         }
     }
     
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.first {
-            let latitude = location.coordinate.latitude
-            let longitude = location.coordinate.longitude
-            
-            Task {
-                do {
-                    guard let result = try await homeViewModel.action(
-                        input: .requestWeather(latitude: latitude, longitude: longitude)
-                    ) as? HomeViewModel.WeatherOutput else {
-                        return
-                    }
-                    self.rootView.headerView.updateWeatherUI(information: result.weatherResult)
-                    manager.stopUpdatingLocation()
-                } catch (let error) {
-                    self.handleError(error)
-                    BeforeGoingLogger.error(error)
-                    BeforeGoingLogger.error(BeforeGoingError.requestWeatherFailed)
-                }
-            }
+    private func pushManageScenario(navigationController: UINavigationController) {
+        let manageScenarioVC = ViewControllerFactory.shared.makeManageScenarioViewController()
+        manageScenarioVC.do {
+            $0.navigationItem.hidesBackButton = true
+            $0.hidesBottomBarWhenPushed = true
         }
+        navigationController.pushViewController(manageScenarioVC, animated: true)
+    }
+}
+
+extension HomeViewController {
+    
+    func configure(scenarioTitle: String?) {
+        self.scenarioTitle = scenarioTitle
+    }
+}
+
+extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable, NetworkRequestErrorHandler {
+    
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        checkLoactionAuthorization()
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
         BeforeGoingLogger.error(error)
-    }
-    
-    private func checkStatus() {
-        let status = locationManager.authorizationStatus
-        if status == .authorizedAlways || status == .authorizedWhenInUse {
-            locationManager.requestLocation()
-        }
     }
 }
 
@@ -487,10 +566,12 @@ extension HomeViewController: UITableViewDataSource {
                     let _ = try await self.homeViewModel.action(
                         input: .missionChecked(
                             missionID: missionID,
-                            date: homeDate
+                            date: homeDate,
+                            willBeChecked: cell.willBeChecked
                         )
                     )
                     tableView.reloadData()
+                    HapticManager.shared.impact()
                 } catch (let error) {
                     self.handleError(error)
                 }

@@ -172,6 +172,19 @@ struct ScenarioRepository: ScenarioInterface {
         return result.toEntity()
     }
     
+    func fetchNotifications() async throws -> NotificationsEntity {
+        guard let accessToken = keyChainService.load(key: .accessToken) else {
+            BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
+            return .stub()
+        }
+        
+        let result = try await networkService.request(
+            endPoint: ScenarioAPI.getNotifications(accessToken: accessToken),
+            responseType: NotificationsDTO.self
+        )
+        return result.toEntity()
+    }
+    
     private func decideEndPoint(dto: AddScenarioRequestDTO, accessToken: String) -> EndPoint {
         switch dto {
         case .withNotification(let withNotificationAddScenarioRequestDTO):

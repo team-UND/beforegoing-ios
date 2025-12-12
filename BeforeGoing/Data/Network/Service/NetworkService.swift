@@ -1,3 +1,5 @@
+import Foundation
+
 import Alamofire
 import KakaoSDKAuth
 import KakaoSDKUser
@@ -7,6 +9,8 @@ protocol APIManaging {
         endPoint: EndPoint,
         responseType: T.Type
     ) async throws -> T
+    func request(endPoint: any EndPoint) async throws
+    func requestKakaoIDToken(nonce: String?) async throws -> String
 }
 
 final class NetworkService: APIManaging {
@@ -63,23 +67,28 @@ final class NetworkService: APIManaging {
     }
     
     private func handleError(afError: AFError) -> BeforeGoingError {
+        if let urlError = afError.underlyingError as? URLError {
+            if case .cannotFindHost = urlError.code {
+                return .serviceUnavailable
+            }
+        }
+        
         switch afError {
         case .responseValidationFailed(let reason):
             if case .unacceptableStatusCode(let statuscode) = reason {
-                if statuscode == 304 {
+                switch statuscode {
+                case 304:
                     return .notModifiedError
-                }
-                if statuscode == 400 {
+                case 400:
                     return .badRequestError
-                }
-                if statuscode == 404 {
+                case 404:
                     return .notFoundError
-                }
-                if statuscode == 429 {
+                case 429:
                     return .tooManyRequset
-                }
-                if statuscode == 503 {
-                    return .weatherServiceError
+                case (500...599):
+                    return .serviceUnavailable
+                default:
+                    return .unknownError
                 }
             }
             return .unknownError

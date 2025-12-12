@@ -41,6 +41,18 @@ final class LoginViewController: BaseViewController {
         }
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        Task {
+            guard let output = try await viewModel.action(input: .viewWillAppear) as? LoginViewModel.LastLoginOutput else {
+                return
+            }
+            
+            rootView.updateLastLoginBadgeConstraint(provider: output.lastLoginProvider)
+        }
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         setAnimation()
@@ -62,6 +74,7 @@ final class LoginViewController: BaseViewController {
                     
                     $0.kakaoLoginButton.alpha = 1
                     $0.appleLoginButton.alpha = 1
+                    $0.lastLoginBadgeView.alpha = 1
                     $0.layoutIfNeeded()
                 }
             }
@@ -69,7 +82,7 @@ final class LoginViewController: BaseViewController {
     }
 }
 
-extension LoginViewController {
+extension LoginViewController: NetworkRequestable, NetworkRequestErrorHandler {
     
     @objc
     func kakaoLoginButtonDidTap() {
@@ -81,8 +94,9 @@ extension LoginViewController {
                     return
                 }
                 output.isRegisteredMember ? moveHome() : moveTerms()
-            } catch(let error) {
-                BeforeGoingLogger.error(error)
+            } catch (let error) {
+                self.handleError(error)
+                BeforeGoingLogger.error(BeforeGoingError.loginFailed)
             }
         }
     }
@@ -96,13 +110,40 @@ extension LoginViewController {
                     isMemberRegistered ? self?.moveHome() : self?.moveTerms()
                 }
             } catch (let error) {
-                BeforeGoingLogger.error(error)
+                self.handleError(error)
                 BeforeGoingLogger.error(BeforeGoingError.loginFailed)
             }
         }
     }
     
     private func moveHome() {
+        if let request = AuthManager.shared.pendingNotificationRequest {
+            AuthManager.shared.pendingNotificationRequest = nil
+            
+            guard let notificationIdentifier = NotificationIdentifier.convertIdentifier(from: request.identifier) else {
+                return
+            }
+                    
+            switch notificationIdentifier {
+            case .pushNotice :
+                ViewControllerUtil.replaceRootViewController(
+                    to: BottomNavigationViewController(scenarioTitle: request.content.title)
+                )
+                
+            case .callNotice(let sequence):
+                ViewControllerUtil.replaceRootViewController(
+                    to: NotificationViewController(
+                        notificationViewType: .init(sequence: sequence),
+                        content: request.content,
+                        identifier: notificationIdentifier.identifier
+                    )
+                )
+            
+            case .terminate:
+                ViewControllerUtil.replaceRootViewController(to: BottomNavigationViewController())
+            }
+            return
+        }
         let viewController = BottomNavigationViewController()
         ViewControllerUtil.replaceRootViewController(to: viewController)
     }
