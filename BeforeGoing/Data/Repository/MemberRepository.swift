@@ -72,6 +72,7 @@ struct MemberRepository: MemberInterface {
         do {
             try await networkService.request(endPoint: MemberAPI.withdraw(accessToken: accessToken))
             removeMemberInfo(provider: provider)
+            removeNotifications()
         } catch {
             throw BeforeGoingError.withdrawFailed
         }
@@ -98,6 +99,10 @@ struct MemberRepository: MemberInterface {
     private func removeMemberInfo(provider: String) {
         removeKeyChainInfo()
         removeUserDefaultsInfo(provider: provider)
+    }
+    
+    private func removeNotifications() {
+        NotificationManager.shared.removeAllNotifications()
     }
     
     private func removeKeyChainInfo() {
