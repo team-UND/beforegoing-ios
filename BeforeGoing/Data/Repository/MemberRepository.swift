@@ -69,19 +69,33 @@ struct MemberRepository: MemberInterface {
             return
         }
         
-        try await networkService.request(endPoint: MemberAPI.withdraw(accessToken: accessToken))
-        
-        removeMemberInfo(provider: provider)
+        do {
+            try await networkService.request(endPoint: MemberAPI.withdraw(accessToken: accessToken))
+            removeMemberInfo(provider: provider)
+            removeNotifications()
+        } catch {
+            throw BeforeGoingError.withdrawFailed
+        }
     }
     
     func completeOnboarding() -> Bool {
-        let isSaved = userDefaultsService.save(true, key: .isCompletedOnboarding)
+        guard let providerString: String = userDefaultsService.load(key: .provider),
+              let provider = Provider(rawValue: providerString) else {
+            return false
+        }
+        
+let key: UserDefaultsKey = (provider == .apple) ? .isAppleCompletedOnboarding : .isKakaoCompletedOnboarding
+        let isSaved = userDefaultsService.save(true, key: key)
         return isSaved
     }
     
     private func removeMemberInfo(provider: String) {
         removeKeyChainInfo()
         removeUserDefaultsInfo(provider: provider)
+    }
+    
+    private func removeNotifications() {
+        NotificationManager.shared.removeAllNotifications()
     }
     
     private func removeKeyChainInfo() {
@@ -91,16 +105,24 @@ struct MemberRepository: MemberInterface {
     }
     
     private func removeUserDefaultsInfo(provider: String) {
-        let excludedKey: UserDefaultsKey? = {
+        let excludedKeys: [UserDefaultsKey?] = {
             switch provider {
-            case Provider.kakao.rawValue: return .appleMemberName
-            case Provider.apple.rawValue: return .kakaoMemberName
-            default: return nil
+            case Provider.kakao.rawValue: return [
+                .appleMemberName,
+                .isAppleCompletedOnboarding,
+                .isAppleCompletedAgreeTerms
+            ]
+            case Provider.apple.rawValue: return [
+                .kakaoMemberName,
+                .isKakaoCompletedOnboarding,
+                .isKakaoCompletedAgreeTerms
+            ]
+default: return []
             }
         }()
 
         UserDefaultsKey.allCases
-            .filter { $0 != excludedKey }
+            .filter { !excludedKeys.contains($0) }
             .forEach { let _ = userDefaultsService.delete(key: $0) }
     }
 }

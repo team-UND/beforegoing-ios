@@ -51,7 +51,14 @@ struct TermsRepository: TermsInterface {
             return
         }
         
-        if let _: Bool = userDefaultsService.load(key: .isCompletedAgreeTerms) {
+        guard let providerString: String = userDefaultsService.load(key: .provider) else {
+            return
+        }
+        
+        let provider = Provider(rawValue: providerString)
+        let key: UserDefaultsKey = (provider == .apple) ? .isAppleCompletedAgreeTerms : .isKakaoCompletedAgreeTerms
+
+        if let _: Bool = userDefaultsService.load(key: key) {
             try await updateAgreementTerm(eventPushAgreed: eventPushAgreed)
             return
         }
@@ -69,7 +76,7 @@ struct TermsRepository: TermsInterface {
             responseType: TermsResponseDTO.self
         )
         
-        let _ = userDefaultsService.save(true, key: .isCompletedAgreeTerms)
+        let _ = (provider == .apple) ? userDefaultsService.save(true, key: .isAppleCompletedAgreeTerms) : userDefaultsService.save(true, key: .isKakaoCompletedAgreeTerms)
     }
     
     func updateAgreementTerm(eventPushAgreed: Bool) async throws {

@@ -41,11 +41,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     func sceneDidDisconnect(_ scene: UIScene) {
-        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
-            if !requests.isEmpty {
-                NotificationManager.shared.pushTerminateNotification()
-            }
-        }
+        NotificationManager.shared.pushTerminateNotification()
     }
     
     func sceneDidBecomeActive(_ scene: UIScene) {

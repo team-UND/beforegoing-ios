@@ -60,11 +60,18 @@ struct AuthRepository: AuthInterface {
         saveKeyChain(response: response)
         saveProvider(provider)
         
-        return isCompletedOnboarding
+        return isCompletedOnboarding(provider: provider)
     }
     
     func autoLogin() async throws -> Bool {
-        guard isTokenExists, isCompletedOnboarding else { return false }
+        guard let providerString: String = userDefaultsService.load(key: .provider),
+              let provider = Provider(rawValue: providerString) else {
+            return false
+        }
+        
+        guard isTokenExists, isCompletedOnboarding(provider: provider) else {
+            return false
+        }
         
         guard let accessTokenExpirationDate = keyChainService.load(key: .accessTokenExpirationDate),
               let refreshTokenExpirationDate = keyChainService.load(key: .refreshTokenExpirationDate) else {
@@ -141,8 +148,10 @@ struct AuthRepository: AuthInterface {
         return false
     }
     
-    private var isCompletedOnboarding: Bool {
-        guard let isCompleted: Bool = userDefaultsService.load(key: .isCompletedOnboarding) else {
+    private func isCompletedOnboarding(provider: Provider) -> Bool {
+        let key: UserDefaultsKey = (provider == .apple) ? .isAppleCompletedOnboarding : .isKakaoCompletedOnboarding
+        
+        guard let isCompleted: Bool = userDefaultsService.load(key: key) else {
             return false
         }
         return isCompleted
