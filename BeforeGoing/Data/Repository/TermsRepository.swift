@@ -51,10 +51,23 @@ struct TermsRepository: TermsInterface {
             return
         }
         
-        if let _: Bool = userDefaultsService.load(key: .isCompletedAgreeTerms) {
-            try await updateAgreementTerm(eventPushAgreed: eventPushAgreed)
+        guard let providerString: String = userDefaultsService.load(key: .provider) else {
             return
         }
+        
+        let provider = Provider(rawValue: providerString)
+        if provider == .apple {
+            if let _: Bool = userDefaultsService.load(key: .isAppleCompletedOnboarding) {
+                try await updateAgreementTerm(eventPushAgreed: eventPushAgreed)
+                return
+            }
+        } else {
+            if let _: Bool = userDefaultsService.load(key: .isKakaoCompletedOnboarding) {
+                try await updateAgreementTerm(eventPushAgreed: eventPushAgreed)
+                return
+            }
+        }
+        
         
         let requestDTO = termsRequestMapper.map(
             (
@@ -69,7 +82,7 @@ struct TermsRepository: TermsInterface {
             responseType: TermsResponseDTO.self
         )
         
-        let _ = userDefaultsService.save(true, key: .isCompletedAgreeTerms)
+        let _ = (provider == .apple) ? userDefaultsService.save(true, key: .isAppleCompletedAgreeTerms) : userDefaultsService.save(true, key: .isKakaoCompletedAgreeTerms)
     }
     
     func updateAgreementTerm(eventPushAgreed: Bool) async throws {

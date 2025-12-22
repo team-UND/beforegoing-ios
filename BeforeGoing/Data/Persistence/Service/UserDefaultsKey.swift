@@ -6,8 +6,10 @@
 //
 
 enum UserDefaultsKey: String, CaseIterable {
-    case isCompletedAgreeTerms
-    case isCompletedOnboarding
+    case isKakaoCompletedAgreeTerms
+    case isAppleCompletedAgreeTerms
+    case isKakaoCompletedOnboarding
+    case isAppleCompletedOnboarding
     case kakaoMemberName
     case appleMemberName
     case provider

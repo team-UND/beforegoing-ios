@@ -28,4 +28,5 @@ enum BeforeGoingError: Error, Equatable {
     case loginExpired
     case missionLimitError
     case tooManyRequset
+    case withdrawFailed
 }
