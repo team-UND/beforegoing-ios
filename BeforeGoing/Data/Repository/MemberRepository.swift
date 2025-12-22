@@ -84,14 +84,7 @@ struct MemberRepository: MemberInterface {
             return false
         }
         
-        var key: UserDefaultsKey = .isAppleCompletedOnboarding
-        
-        switch provider {
-        case .apple:
-            key = .isAppleCompletedOnboarding
-        case .kakao:
-            key = .isKakaoCompletedOnboarding
-        }
+let key: UserDefaultsKey = (provider == .apple) ? .isAppleCompletedOnboarding : .isKakaoCompletedOnboarding
         let isSaved = userDefaultsService.save(true, key: key)
         return isSaved
     }
@@ -124,7 +117,7 @@ struct MemberRepository: MemberInterface {
                 .isKakaoCompletedOnboarding,
                 .isKakaoCompletedAgreeTerms
             ]
-            default: return [nil]
+default: return []
             }
         }()
 
