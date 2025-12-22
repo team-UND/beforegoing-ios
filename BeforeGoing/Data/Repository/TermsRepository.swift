@@ -56,18 +56,12 @@ struct TermsRepository: TermsInterface {
         }
         
         let provider = Provider(rawValue: providerString)
-        if provider == .apple {
-            if let _: Bool = userDefaultsService.load(key: .isAppleCompletedOnboarding) {
-                try await updateAgreementTerm(eventPushAgreed: eventPushAgreed)
-                return
-            }
-        } else {
-            if let _: Bool = userDefaultsService.load(key: .isKakaoCompletedOnboarding) {
-                try await updateAgreementTerm(eventPushAgreed: eventPushAgreed)
-                return
-            }
+        let key: UserDefaultsKey = (provider == .apple) ? .isAppleCompletedAgreeTerms : .isKakaoCompletedAgreeTerms
+
+        if let _: Bool = userDefaultsService.load(key: key) {
+            try await updateAgreementTerm(eventPushAgreed: eventPushAgreed)
+            return
         }
-        
         
         let requestDTO = termsRequestMapper.map(
             (
