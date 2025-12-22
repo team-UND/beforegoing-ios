@@ -69,13 +69,9 @@ struct AuthRepository: AuthInterface {
             return false
         }
         
-        guard let isCompletedOnboarding: Bool = (provider == .apple) ? userDefaultsService.load(
-            key: .isAppleCompletedOnboarding) : userDefaultsService.load(key: .isKakaoCompletedOnboarding)
-        else {
+        guard isTokenExists, isCompletedOnboarding(provider: provider) else {
             return false
         }
-        
-        guard isTokenExists, isCompletedOnboarding else { return false }
         
         guard let accessTokenExpirationDate = keyChainService.load(key: .accessTokenExpirationDate),
               let refreshTokenExpirationDate = keyChainService.load(key: .refreshTokenExpirationDate) else {
