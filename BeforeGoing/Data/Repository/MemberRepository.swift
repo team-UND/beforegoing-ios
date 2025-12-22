@@ -117,7 +117,7 @@ let key: UserDefaultsKey = (provider == .apple) ? .isAppleCompletedOnboarding : 
                 .isKakaoCompletedOnboarding,
                 .isKakaoCompletedAgreeTerms
             ]
-            default: return [nil]
+default: return []
             }
         }()
 
