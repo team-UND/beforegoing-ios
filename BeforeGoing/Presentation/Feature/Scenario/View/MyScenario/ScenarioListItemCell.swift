@@ -62,9 +62,9 @@ extension ScenarioListItemCell {
         scenarioItemView.updateItemName(name)
         
         if let noticeInformation {
-            scenarioItemView.showSubtitle(noticeInformation)
+            scenarioItemView.updateNotice(noticeInformation)
             return
         }
-        scenarioItemView.hideSubtitle()
+        scenarioItemView.updateNotice("알림 없이 사용")
     }
 }
