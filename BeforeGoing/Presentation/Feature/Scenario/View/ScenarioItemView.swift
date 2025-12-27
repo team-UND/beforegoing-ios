@@ -43,7 +43,6 @@ final class ScenarioItemView: BaseView {
         subtitleLabel.do {
             $0.textColor = .gray400
             $0.font = .custom(.bodyMDRegular)
-            $0.isHidden = true
         }
         labelView.do {
             $0.backgroundColor = .blue50
@@ -76,7 +75,7 @@ final class ScenarioItemView: BaseView {
             $0.size.equalTo(24.adjustedW)
         }
         titleLabel.snp.makeConstraints {
-            $0.centerY.equalToSuperview()
+            $0.top.equalToSuperview().inset(20.adjustedH)
             $0.leading.equalTo(dragButton.snp.trailing).offset(12.adjustedW)
         }
         subtitleLabel.snp.makeConstraints {
@@ -98,27 +97,7 @@ extension ScenarioItemView {
         self.titleLabel.text = name
     }
     
-    func updateNoticeInformation(_ information: String) {
-        self.subtitleLabel.text = information
-    }
-    
-    func showSubtitle(_ title: String) {
-        self.subtitleLabel.isHidden = false
-        self.subtitleLabel.text = title
-        
-        titleLabel.snp.remakeConstraints {
-            $0.top.equalToSuperview().inset(20.adjustedH)
-            $0.leading.equalTo(dragButton.snp.trailing).offset(12.adjustedW)
-        }
-    }
-    
-    func hideSubtitle() {
-        self.subtitleLabel.isHidden = true
-        self.subtitleLabel.text = ""
-        
-        titleLabel.snp.remakeConstraints {
-            $0.centerY.equalToSuperview()
-            $0.leading.equalTo(dragButton.snp.trailing).offset(12.adjustedW)
-        }
+    func updateNotice(_ notice: String) {
+        self.subtitleLabel.text = notice
     }
 }
