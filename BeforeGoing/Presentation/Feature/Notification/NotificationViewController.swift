@@ -43,6 +43,12 @@ final class NotificationViewController: BaseViewController {
         AudioManager.shared.startSound()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        AudioManager.shared.stopSound()
+    }
+    
     override func setAction() {
         rootView.actionButtons.forEach {
             switch $0.value {
@@ -67,13 +73,11 @@ extension NotificationViewController {
     
     @objc
     private func turnOffNotificationDidTap() {
-        AudioManager.shared.stopSound()
         replaceToHome()
     }
     
     @objc
     private func againNotificationDidTap() {
-        AudioManager.shared.stopSound()
         replaceToHome()
         NotificationManager.shared.reserveSnooze(
             originalContent: self.content,
