@@ -31,25 +31,9 @@ final class SettingViewController: BaseViewController {
     override func loadView() {
         view = rootView
     }
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        Task {
-            guard let result = try await viewModel.action(
-                input: .viewWillAppear
-            ) as? SettingViewModel.EventPushAgreedOutput else {
-                return
-            }
-            
-            switch result.isEventPushAgreed {
-            case .success(let eventPushAgreed):
-                rootView.settingNoticeView.eventPushNoticeView.updateSwitch(isAgreed: eventPushAgreed)
-            case .failure(let error):
-                self.handleError(error)
-                BeforeGoingLogger.error(error)
-            }
-        }
         
         NotificationCenter.default.addObserver(
             self,
@@ -71,6 +55,7 @@ final class SettingViewController: BaseViewController {
         
         checkPushNoticeAuthorization()
         checkLocationAuthorization()
+        checkEventPush()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -227,6 +212,24 @@ extension SettingViewController: NetworkRequestable, NetworkRequestErrorHandler 
     @objc
     private func privacyButtonDidTap() {
         ExternalLink.privacy.openURL(for: self)
+    }
+    
+    private func checkEventPush() {
+        Task {
+            guard let result = try await viewModel.action(
+                input: .viewWillAppear
+            ) as? SettingViewModel.EventPushAgreedOutput else {
+                return
+            }
+            
+            switch result.isEventPushAgreed {
+            case .success(let eventPushAgreed):
+                rootView.settingNoticeView.eventPushNoticeView.updateSwitch(isAgreed: eventPushAgreed)
+            case .failure(let error):
+                self.handleError(error)
+                BeforeGoingLogger.error(error)
+            }
+        }
     }
     
     private func alertEventPushChange(isSwitchedOn: Bool) {
