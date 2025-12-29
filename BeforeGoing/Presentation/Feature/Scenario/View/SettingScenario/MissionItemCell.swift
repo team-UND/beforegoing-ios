@@ -9,7 +9,7 @@ import UIKit
 
 final class MissionItemCell: UITableViewCell {
     
-    private let missionItemView = ScenarioItemView(height: 50)
+    private let missionItemView = ScenarioItemView(height: 50, isNeedSubtitle: false)
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
