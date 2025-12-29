@@ -122,7 +122,9 @@ final class HomeHeaderView: BaseView {
         }
 
         wordLabel.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16))
+            $0.edges.equalToSuperview().inset(
+                UIEdgeInsets(top: 8, left: 25, bottom: 8, right: 25)
+            )
         }
     }
 }
