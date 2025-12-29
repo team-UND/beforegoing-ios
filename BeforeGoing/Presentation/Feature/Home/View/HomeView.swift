@@ -7,6 +7,8 @@
 
 import UIKit
 
+import SnapKit
+
 final class HomeView: BaseView {
     
     private let backgroundImageView = UIImageView()
@@ -38,11 +40,8 @@ final class HomeView: BaseView {
             $0.height.equalTo(200.adjustedH)
         }
         modalView.snp.makeConstraints {
-            $0.height.equalTo(modalView.maxHeight)
-            $0.leading.trailing.equalToSuperview()
-            modalView.bottomConstraint =
-            $0.bottom.equalToSuperview().offset(modalView.maxHeight - modalView.minHeight).constraint
+            $0.leading.trailing.bottom.equalToSuperview()
+            modalView.modalHeightConstraint = $0.height.equalTo(modalView.minHeight).constraint
         }
-
     }
 }
