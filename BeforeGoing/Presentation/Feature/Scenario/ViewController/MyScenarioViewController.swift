@@ -113,7 +113,9 @@ extension MyScenarioViewController: NetworkRequestable, NetworkRequestErrorHandl
         viewController.do {
             $0.navigationItem.hidesBackButton = true
             $0.hidesBottomBarWhenPushed = true
+            $0.configure(scenarioNames: getScenariosViewModel.getScenarioNames())
         }
+        
         self.navigationController?.pushViewController(viewController, animated: false)
     }
     
@@ -149,6 +151,7 @@ extension MyScenarioViewController: NetworkRequestable, NetworkRequestErrorHandl
             $0.hidesBottomBarWhenPushed = true
             $0.configure(
                 scenarioID: scenario.scenarioID,
+                scenarioNames: getScenariosViewModel.getScenarioNames(),
                 scenarioName: scenario.scenarioName,
                 memo: scenario.memo,
                 missions: scenario.basicMissions.map { (missionID: $0.missionId, content: $0.content) },

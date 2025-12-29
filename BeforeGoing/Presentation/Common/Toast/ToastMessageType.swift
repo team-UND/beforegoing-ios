@@ -12,6 +12,7 @@ enum ToastMessageType {
     case todayMissionLimit
     case missionLimit
     case duplicateMission
+    case duplicateScenario
     
     var message: String {
         switch self {
@@ -21,6 +22,8 @@ enum ToastMessageType {
             return "* 미션은 20개까지만 설정할 수 있어요"
         case .duplicateMission:
             return "* 중복된 이름의 미션은 설정할 수 없어요"
+        case .duplicateScenario:
+            return "* 중복된 이름의 시나리오는 설정할 수 없어요"
         }
     }
 }

@@ -14,6 +14,7 @@ final class ManageScenarioViewController: BaseViewController {
     
     private var didCellTap: Bool = false
     private var selectedIndex: Int?
+    private var scenarioNames: [String]?
     
     init(viewModel: ManageScenarioViewModel) {
         self.viewModel = viewModel
@@ -68,9 +69,20 @@ extension ManageScenarioViewController {
         let viewController = ViewControllerFactory.shared.makeSettingScenarioViewController()
         
         viewController.navigationItem.hidesBackButton = true
-        viewController.configure(scenarioType: scenarioType, enterType: .addScenario)
+        viewController.configure(
+            scenarioType: scenarioType,
+            enterType: .addScenario,
+            scenarioNames: scenarioNames
+        )
         
         self.navigationController?.pushViewController(viewController, animated: false)
+    }
+}
+
+extension ManageScenarioViewController {
+    
+    func configure(scenarioNames: [String]) {
+        self.scenarioNames = scenarioNames
     }
 }
 
