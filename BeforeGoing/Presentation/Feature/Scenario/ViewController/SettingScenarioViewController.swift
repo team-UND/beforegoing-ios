@@ -332,9 +332,9 @@ extension SettingScenarioViewController: ToastPresentable {
         
         Task {
             do {
-                if canUpdateName(
-                    origianlScenarioName: originalScenarioName,
-                    scenarioName: scenarioName
+                if isDuplicateNameForUpdate(
+                    originalScenarioName: originalScenarioName,
+                    newScenarioName: scenarioName
                 ) {
                     self.presentToastMessage(type: .duplicateScenario)
                     return
