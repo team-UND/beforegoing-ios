@@ -111,6 +111,10 @@ extension GetScenariosViewModel {
         scenariosModel.scenarios[section].scenarioName
     }
     
+    func getScenarioNames() -> [String] {
+        scenariosModel.scenarios.map { $0.scenarioName }
+    }
+    
     func getNotificationInformation(section: Int) -> String? {
         scenariosModel.getNotificationInformation(section: section)
     }

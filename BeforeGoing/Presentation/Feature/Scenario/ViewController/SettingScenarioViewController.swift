@@ -13,7 +13,9 @@ final class SettingScenarioViewController: BaseViewController {
     
     private let missionLimit = 20
     private var scenarioID: Int?
+    private var originalScenarioName: String?
     private var enterType: SettingScenarioEnterType?
+    private var scenarioNames: [String]?
     private var isNotificationActive: Bool?
     private var daysOfWeek: [Int]?
     private var startHour: Int?
@@ -31,7 +33,7 @@ final class SettingScenarioViewController: BaseViewController {
         self.updateScenarioViewModel = updateScnearioViewModel
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -119,9 +121,12 @@ extension SettingScenarioViewController {
     
     func configure(
         scenarioType: ScenarioType,
-        enterType: SettingScenarioEnterType
+        enterType: SettingScenarioEnterType,
+        scenarioNames: [String]?
     ) {
         self.enterType = enterType
+        self.scenarioNames = scenarioNames
+        
         addScenarioViewModel.setMissions(missions: scenarioType.basicMissions)
         rootView.settingMissionView.updateMissionCount(addScenarioViewModel.missionsCount)
         
@@ -145,6 +150,7 @@ extension SettingScenarioViewController {
     
     func configure(
         scenarioID: Int,
+        scenarioNames: [String]?,
         scenarioName: String,
         memo: String,
         missions: [(missionID: Int, content: String)],
@@ -156,13 +162,15 @@ extension SettingScenarioViewController {
         enterType: SettingScenarioEnterType
     ) {
         self.scenarioID = scenarioID
+        self.scenarioNames = scenarioNames
+        self.originalScenarioName = scenarioName
         self.isNotificationActive = isNotificationActive
         self.daysOfWeek = daysOfWeek
         self.startHour = startHour
         self.startMinute = startMinute
         self.notificationMethod = notificationMethod
         self.enterType = enterType
-
+        
         addScenarioViewModel.setMissions(missions: missions)
         
         rootView.inputScenarioView.do {
@@ -189,19 +197,6 @@ extension SettingScenarioViewController: ToastPresentable {
     @objc
     private func memoTextFieldDidTap() {
         bindTextField(view: rootView.inputMemoView)
-    }
-    
-    private func bindTextField(view: InputInformationView) {
-        guard let text = view.textField.text else { return }
-        
-        DispatchQueue.main.async { [weak self] in
-            guard self != nil else { return }
-            
-            text.isBlank ? view.hideDeleteButton() : view.revealDeleteButton()
-            let trimmedText = view.trimText(text)
-            view.updateTextCount(trimmedText.count)
-        }
-        checkNextButtonState()
     }
     
     @objc
@@ -271,7 +266,24 @@ extension SettingScenarioViewController: ToastPresentable {
             addScenario(scenarioName: scenarioName, memo: memo)
             return
         }
-        updateScenario(scenarioName: scenarioName, memo: memo)
+        updateScenario(
+            origianlScenarioName: originalScenarioName,
+            scenarioName: scenarioName,
+            memo: memo
+        )
+    }
+    
+    private func bindTextField(view: InputInformationView) {
+        guard let text = view.textField.text else { return }
+        
+        DispatchQueue.main.async { [weak self] in
+            guard self != nil else { return }
+            
+            text.isBlank ? view.hideDeleteButton() : view.revealDeleteButton()
+            let trimmedText = view.trimText(text)
+            view.updateTextCount(trimmedText.count)
+        }
+        checkNextButtonState()
     }
     
     private func checkNextButtonState() {
@@ -285,9 +297,15 @@ extension SettingScenarioViewController: ToastPresentable {
     private func addScenario(scenarioName: String, memo: String) {
         let scenarioName = scenarioName.removeTrailingSpaces()
         let memo = memo.removeTrailingSpaces()
-
+        
         Task {
             do {
+                guard let scenarioNames,
+                      !scenarioNames.contains(scenarioName) else {
+                    self.presentToastMessage(type: .duplicateScenario)
+                    return
+                }
+                
                 let _ = try await addScenarioViewModel.action(
                     input: .nextButtonInSetScenarioDidTap(
                         scenarioName: scenarioName,
@@ -302,14 +320,26 @@ extension SettingScenarioViewController: ToastPresentable {
         }
     }
     
-    private func updateScenario(scenarioName: String, memo: String) {
+    private func updateScenario(
+        origianlScenarioName: String?,
+        scenarioName: String,
+        memo: String
+    ) {
         guard let scenarioID = scenarioID else { return }
-
+        
         let scenarioName = scenarioName.removeTrailingSpaces()
         let memo = memo.removeTrailingSpaces()
         
         Task {
             do {
+                if isDuplicateNameForUpdate(
+                    originalScenarioName: originalScenarioName,
+                    newScenarioName: scenarioName
+                ) {
+                    self.presentToastMessage(type: .duplicateScenario)
+                    return
+                }
+                
                 let _ = try await updateScenarioViewModel.action(
                     input: .nextButtonInSetScenarioDidTap(
                         scenarioID: scenarioID,
@@ -337,6 +367,19 @@ extension SettingScenarioViewController: ToastPresentable {
             enterType: enterType
         )
         self.navigationController?.pushViewController(viewController, animated: false)
+    }
+    
+    private func isDuplicateNameForUpdate(
+        originalScenarioName: String?,
+        newScenarioName: String
+    ) -> Bool {
+        guard let originalScenarioName,
+              let scenarioNames else {
+            return false
+        }
+        
+        let isDuplicate = originalScenarioName != newScenarioName && scenarioNames.contains(newScenarioName)
+        return isDuplicate
     }
 }
 
