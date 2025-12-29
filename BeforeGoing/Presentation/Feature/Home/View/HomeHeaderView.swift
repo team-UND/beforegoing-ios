@@ -53,7 +53,7 @@ final class HomeHeaderView: BaseView {
         }
         wordLabel.do {
             $0.font = .custom(.bodyMDRegular)
-            $0.textAlignment = .right
+            $0.textAlignment = .center
             $0.numberOfLines = 0
         }
         path.do {
