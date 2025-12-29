@@ -369,17 +369,17 @@ extension SettingScenarioViewController: ToastPresentable {
         self.navigationController?.pushViewController(viewController, animated: false)
     }
     
-    private func canUpdateName(
-        origianlScenarioName: String?,
-        scenarioName: String
+    private func isDuplicateNameForUpdate(
+        originalScenarioName: String?,
+        newScenarioName: String
     ) -> Bool {
         guard let originalScenarioName,
               let scenarioNames else {
             return false
         }
         
-        let canUpdate = origianlScenarioName != scenarioName && scenarioNames.contains(scenarioName)
-        return canUpdate
+        let isDuplicate = originalScenarioName != newScenarioName && scenarioNames.contains(newScenarioName)
+        return isDuplicate
     }
 }
 
