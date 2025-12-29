@@ -322,12 +322,16 @@ final class HomeViewModel: ViewModeling {
     }
     
     private func makeSupplyString(_ weather: WeatherEntity) -> NSMutableAttributedString? {
-        guard let weatherSupply = weather.weatherCondition.supply,
-              let uvSupply = weather.uvIndex.supply else {
+        let supplies = [
+            weather.weatherCondition.supply,
+            weather.uvIndex.supply
+        ].compactMap { $0 }
+        
+        guard !supplies.isEmpty else {
             return nil
         }
-                
-        let supplyString = "\(weatherSupply), \(uvSupply)!"
+        
+        let supplyString = supplies.joined(separator: ", ")
         let customedSupplyString = supplyString.customText(
             rangedText: supplyString,
             color: UIColor.blue700.cgColor
