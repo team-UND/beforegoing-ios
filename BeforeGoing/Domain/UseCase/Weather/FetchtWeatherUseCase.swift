@@ -31,7 +31,7 @@ struct FetchWeatherUseCase: FetchWeatherType {
         }
         
         if date > currentDate && DateUtil.isWithinThreeDaysFromToday(startDate: currentDate, endDate: date) {
-            return try await fetchDayWeather(location: location)
+            return try await fetchDayWeather(location: location, targetDate: date)
         }
         
         return nil
@@ -45,14 +45,22 @@ struct FetchWeatherUseCase: FetchWeatherType {
         return .init(weatherCondition: condition, uvIndex: uv)
     }
     
-    private func fetchDayWeather(location: CLLocation) async throws -> WeatherEntity? {
+    private func fetchDayWeather(
+        location: CLLocation,
+        targetDate: Date
+    ) async throws -> WeatherEntity? {
         let dailyWeather = try await WeatherService.shared.weather(for: location, including: .daily)
-        guard let dailyFirstWeather = dailyWeather.forecast.first else {
+        
+        let calendar = Calendar.current
+        
+        guard let targetDayWeather = dailyWeather.forecast.first(where: {
+            calendar.isDate($0.date, inSameDayAs: targetDate)
+        }) else {
             return nil
         }
-           
-        let condition = dailyFirstWeather.condition
-        let uv = dailyFirstWeather.uvIndex
+        
+        let condition = targetDayWeather.condition
+        let uv = targetDayWeather.uvIndex
         
         return .init(weatherCondition: condition, uvIndex: uv)
     }
