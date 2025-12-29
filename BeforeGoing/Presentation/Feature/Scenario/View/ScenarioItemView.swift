@@ -81,15 +81,13 @@ final class ScenarioItemView: BaseView {
                 $0.top.equalToSuperview().inset(20.adjustedH)
                 $0.leading.equalTo(dragButton.snp.trailing).offset(12.adjustedW)
             }
+            subtitleLabel.snp.makeConstraints {
+                $0.top.equalTo(titleLabel.snp.bottom)
+                $0.leading.equalTo(dragButton.snp.trailing).offset(12.adjustedW)
+            }
         } else {
             titleLabel.snp.makeConstraints {
                 $0.centerY.equalToSuperview()
-                $0.leading.equalTo(dragButton.snp.trailing).offset(12.adjustedW)
-            }
-        }
-        if isNeedSubtitle {
-            subtitleLabel.snp.makeConstraints {
-                $0.top.equalTo(titleLabel.snp.bottom)
                 $0.leading.equalTo(dragButton.snp.trailing).offset(12.adjustedW)
             }
         }
