@@ -140,13 +140,12 @@ extension UserScenarioModalView {
         taskTextField.text = completeText
     }
     
-    func updatePlaceHolder(text: String) {
-        taskTextField.placeholder = text
-    }
-    
-    func updateTaskField(isEnable: Bool) {
-        taskTextField.currentType = isEnable ? .enableAddField : .disableAddField
-        taskTextField.isEnabled = isEnable
+    func updateTaskField(isEnabled: Bool, text: String) {
+        taskTextField.do {
+            $0.currentType = isEnabled ? .enableAddField : .disableAddField
+            $0.isEnabled = isEnabled
+            $0.placeholder = text
+        }
     }
     
     func enableAddTaskButton() {
