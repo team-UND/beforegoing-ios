@@ -81,7 +81,12 @@ extension TokenReissuer {
             let modalView = ModalView(type: .expirationLogin)
             let modalViewController = ModalViewController(
                 modalView: modalView,
-                action: { viewController.dismiss(animated: true) }
+                action: {
+                    viewController.dismiss(animated: true) {
+                        let loginViewController = ViewControllerFactory.shared.makeLoginViewController()
+                        ViewControllerUtil.replaceRootViewController(to: loginViewController)
+                    }
+                }
             )
             viewController.present(modalViewController, animated: true)
         }

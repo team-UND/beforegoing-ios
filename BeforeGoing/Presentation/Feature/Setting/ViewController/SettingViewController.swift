@@ -224,7 +224,9 @@ extension SettingViewController: NetworkRequestable, NetworkRequestErrorHandler 
             
             switch result.isEventPushAgreed {
             case .success(let eventPushAgreed):
-                rootView.settingNoticeView.eventPushNoticeView.updateSwitch(isAgreed: eventPushAgreed)
+                DispatchQueue.main.async { [weak self] in
+                    self?.rootView.settingNoticeView.eventPushNoticeView.updateSwitch(isAgreed: eventPushAgreed)
+                }
             case .failure(let error):
                 self.handleError(error)
                 BeforeGoingLogger.error(error)

@@ -13,16 +13,17 @@ final class UserScenarioModalView: BaseView {
     
     private let maxTaskNameLength = 14
     
+    var modalHeightConstraint: Constraint?
+    private(set) var currentHeight: CGFloat = 555.adjustedH
+    private let maxHeight: CGFloat = 705.adjustedH
+    private(set) var minHeight: CGFloat = 555.adjustedH
+    
     private(set) var headerView = UserScenarioModalHeaderView()
     private(set) var emptyView = ScenarioEmptyView(type: .home)
     private(set) var taskTextField = TextField(type: .enableAddField)
     private(set) var addTaskButton = UIButton()
     private(set) var deleteTaskButton = UIButton()
     private(set) var listTableView = UITableView()
-    
-    var bottomConstraint: Constraint?
-    private(set) var maxHeight: CGFloat = 705.adjustedH
-    private(set) var minHeight: CGFloat = 555.adjustedH
     
     init() {
         super.init(frame: .zero)
@@ -32,7 +33,7 @@ final class UserScenarioModalView: BaseView {
         setLayout()
         setGesture()
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -91,7 +92,7 @@ final class UserScenarioModalView: BaseView {
         listTableView.snp.makeConstraints {
             $0.top.equalTo(taskTextField.snp.bottom).offset(16.adjustedH)
             $0.leading.trailing.equalToSuperview().inset(20.adjustedW)
-            $0.bottom.equalTo(safeAreaLayoutGuide.snp.bottom).inset(145.adjustedH)
+            $0.bottom.equalToSuperview().inset(20.adjustedH)
         }
     }
     
@@ -109,14 +110,18 @@ extension UserScenarioModalView {
         guard let superview = superview else { return }
         
         let translation = gesture.translation(in: superview)
-        var newOffset = (bottomConstraint?.layoutConstraints.first?.constant ?? 0) + translation.y
-        newOffset = min(max(newOffset, 0), maxHeight - minHeight)
+        let newHeight = currentHeight - translation.y
         
-        bottomConstraint?.update(offset: newOffset)
-        gesture.setTranslation(.zero, in: superview)
-        
-        if gesture.state == .ended {
-            newOffset < (maxHeight - minHeight) / 2 ? show() : hide()
+        switch gesture.state {
+        case .changed:
+            if newHeight >= minHeight && newHeight <= maxHeight {
+                modalHeightConstraint?.update(offset: newHeight)
+            }
+        case .ended:
+            let threshold = (maxHeight + minHeight) / 2
+            newHeight > threshold ? show() : hide()
+        default:
+            break
         }
     }
 }
@@ -161,12 +166,14 @@ extension UserScenarioModalView {
     }
     
     func show() {
-        bottomConstraint?.update(offset: 0)
+        currentHeight = maxHeight
+        modalHeightConstraint?.update(offset: maxHeight)
         animateLayout()
     }
     
     func hide() {
-        bottomConstraint?.update(offset: maxHeight - minHeight)
+        currentHeight = minHeight
+        modalHeightConstraint?.update(offset: minHeight)
         animateLayout()
     }
     

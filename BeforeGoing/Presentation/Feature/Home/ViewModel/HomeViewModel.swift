@@ -134,7 +134,7 @@ final class HomeViewModel: ViewModeling {
                     memberName: memberName,
                     date: date,
                     administrativeArea: administrativeArea,
-                    result: result
+                    weather: result
                 )
                 return WeatherOutput(weatherResult: .success(weatherResult))
                 
@@ -268,7 +268,7 @@ final class HomeViewModel: ViewModeling {
         memberName: String,
         date: Date,
         administrativeArea: NSMutableAttributedString,
-        result: WeatherEntity?
+        weather: WeatherEntity?
     ) -> NSMutableAttributedString {
         
         var weatherResult = NSMutableAttributedString()
@@ -277,24 +277,54 @@ final class HomeViewModel: ViewModeling {
             return weatherResult
         }
         
-        guard let result else {
-            let scenarioIntroduce = "\(memberName)님의 \(monthAndDay) 시나리오예요!".customText(
-                rangedText: "\(memberName)",
-                color: UIColor.blue700.cgColor
+        guard let weather else {
+            makeNoWeatherDataString(
+                memberName: memberName,
+                monthAndDay: monthAndDay,
+                date: date,
+                weatherResult: weatherResult
             )
-            
-            if date < DateUtil.getCurrentDate() {
-                weatherResult.append(NSAttributedString(string: "지난 날짜의 기상 정보는 제공하지 않아요"))
-            } else {
-                weatherResult.append(NSAttributedString(string: "해당 날짜의 기상 정보는 확인하기 어려워요"))
-            }
-            weatherResult.append(NSAttributedString(string: "\n"))
-            weatherResult.append(scenarioIntroduce)
             return weatherResult
         }
         
-        let weatherInformation = makeWeatherString(result)
-        let supplies = makeSupplyString(result)
+        makeWeatherDataString(
+            weather: weather,
+            weatherResult: weatherResult,
+            administrativeArea: administrativeArea
+        )
+        
+        addLineSpacing(weatherResult: weatherResult)
+        
+        return weatherResult
+    }
+    
+    private func makeNoWeatherDataString(
+        memberName: String,
+        monthAndDay: String,
+        date: Date,
+        weatherResult: NSMutableAttributedString
+    ) {
+        let scenarioIntroduce = "\(memberName)님의 \(monthAndDay) 시나리오예요!".customText(
+            rangedText: "\(memberName)",
+            color: UIColor.blue700.cgColor
+        )
+        
+        if date < DateUtil.getCurrentDate() {
+            weatherResult.append(NSAttributedString(string: "지난 날짜의 기상 정보는 제공하지 않아요"))
+        } else {
+            weatherResult.append(NSAttributedString(string: "해당 날짜의 기상 정보는 확인하기 어려워요"))
+        }
+        weatherResult.append(NSAttributedString(string: "\n"))
+        weatherResult.append(scenarioIntroduce)
+    }
+    
+    private func makeWeatherDataString(
+        weather: WeatherEntity,
+        weatherResult: NSMutableAttributedString,
+        administrativeArea: NSMutableAttributedString
+    ) {
+        let weatherInformation = makeWeatherString(weather)
+        let supplies = makeSupplyString(weather)
         
         weatherResult.do {
             $0.append(administrativeArea)
@@ -308,8 +338,18 @@ final class HomeViewModel: ViewModeling {
                 $0.append(NSAttributedString(string: " 챙겨보세요!"))
             }
         }
+    }
+    
+    private func addLineSpacing(weatherResult: NSMutableAttributedString) {
+        let style = NSMutableParagraphStyle()
+        style.lineSpacing = 4
+        style.alignment = .center
         
-        return weatherResult
+        weatherResult.addAttribute(
+            .paragraphStyle,
+            value: style,
+            range: NSRange(location: 0, length: weatherResult.length)
+        )
     }
     
     private func makeWeatherString(_ weather: WeatherEntity) -> NSMutableAttributedString {

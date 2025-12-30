@@ -16,7 +16,7 @@ enum ScenarioEmptyViewType {
     }
     
     var subtitle: String {
-        return "버튼을 눌러 시나리오를 만들어 보세요:)"
+        return "버튼을 눌러 시나리오를 만들어 보세요!"
     }
     
     var isHome: Bool {

@@ -9,7 +9,7 @@ import UIKit
 
 final class ScenarioListItemCell: UITableViewCell {
     
-    private let scenarioItemView = ScenarioItemView(height: 76)
+    private let scenarioItemView = ScenarioItemView(height: 76, isNeedSubtitle: true)
     var onDidTap: (() -> Void)?
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
