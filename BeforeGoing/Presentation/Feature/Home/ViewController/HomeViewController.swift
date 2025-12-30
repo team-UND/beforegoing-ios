@@ -40,19 +40,19 @@ final class HomeViewController: BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        let currentDate = DateUtil.getCurrentDate()
-        let currentDateString = DateUtil.getCurrentDate(format: "yyyy-MM-dd")
-        
-        getScenarios(currentDate: currentDateString)
         checkLoactionAuthorization()
-        updateWeatherInformation(date: currentDate)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let currentDate = DateUtil.getCurrentDate()
+        let currentDateString = DateUtil.getCurrentDate(format: "yyyy-MM-dd")
+        
         setLocationManager()
         requestDate()
+        getScenarios(currentDate: currentDateString)
+        updateWeatherInformation(date: currentDate)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
