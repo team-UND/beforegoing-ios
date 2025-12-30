@@ -12,6 +12,7 @@ import UIKit
 final class HomeViewController: BaseViewController {
     
     private let rootView = HomeView()
+    private let calendarViewController = CalendarViewController()
     private let homeViewModel: HomeViewModel
     private let getScenariosViewModel: GetAllScenariosViewModel
     private let locationManager = CLLocationManager()
@@ -40,19 +41,19 @@ final class HomeViewController: BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        let currentDate = DateUtil.getCurrentDate()
-        let currentDateString = DateUtil.getCurrentDate(format: "yyyy-MM-dd")
+        let selectedDate = calendarViewController.selectedDate
+        let dateString = DateUtil.toAPIDateString(date: selectedDate)
         
-        getScenarios(currentDate: currentDateString)
+        getScenarios(currentDate: dateString)
         checkLoactionAuthorization()
-        updateWeatherInformation(date: currentDate)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+                
         setLocationManager()
         requestDate()
+        updateWeatherInformation(date: DateUtil.getCurrentDate())
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -62,6 +63,7 @@ final class HomeViewController: BaseViewController {
     
     override func setAction() {
         setGesture()
+        
         rootView.headerView.viewCalendarButton.addTarget(
             self,
             action: #selector(viewCalendarButtonDidTap),
@@ -115,8 +117,10 @@ final class HomeViewController: BaseViewController {
                 }
                 self.homeDate = result.date
                 rootView.headerView.updateDateUI(date: result.date)
-                rootView.modalView.updatePlaceHolder(text: "\(monthAndDay)의 미션을 추가해요")
-                rootView.modalView.updateTaskField(isEnable: true)
+                rootView.modalView.updateTaskField(
+                    isEnabled: true,
+                    text: "\(monthAndDay)의 미션을 추가해요"
+                )
             } catch (let error) {
                 self.handleError(error)
                 BeforeGoingLogger.error(error)
@@ -267,13 +271,12 @@ extension HomeViewController: ToastPresentable {
     
     @objc
     private func viewCalendarButtonDidTap() {
-        let calendar = CalendarViewController()
-        calendar.modalPresentationStyle = .overFullScreen
+        calendarViewController.modalPresentationStyle = .overFullScreen
         
-        initSelectedDate(calendar: calendar)
+        initSelectedDate(calendarViewController: calendarViewController)
         
-        calendar.onDayDidTap = { [weak self] date in
-            let dateString = DateUtil.toString(date: date)
+        calendarViewController.onDayDidTap = { [weak self] date in
+            let dateString = DateUtil.toHomeDateString(date: date)
             let currentDate = DateUtil.getCurrentDate()
             
             guard let self = self,
@@ -290,7 +293,7 @@ extension HomeViewController: ToastPresentable {
             
             updateWeatherInformation(date: date)
         }
-        calendar.onDismiss = { [weak self] in
+        calendarViewController.onDismiss = { [weak self] in
             guard let homeDate = self?.homeDate,
                   let date = DateUtil.convertDateFormat(dateString: homeDate) else {
                 return
@@ -298,7 +301,7 @@ extension HomeViewController: ToastPresentable {
             
             self?.getScenarios(currentDate: date)
         }
-        self.present(calendar, animated: true)
+        self.present(calendarViewController, animated: true)
     }
     
     @objc
@@ -407,12 +410,12 @@ extension HomeViewController: ToastPresentable {
         pushManageScenario(navigationController: navigationController)
     }
     
-    private func initSelectedDate(calendar: CalendarViewController) {
+    private func initSelectedDate(calendarViewController: CalendarViewController) {
         if let homeDateString = self.homeDate,
            let date = DateUtil.toDate(dateString: homeDateString) {
-            calendar.initialSelectedDate = date
+            calendarViewController.initialSelectedDate = date
         } else {
-            calendar.initialSelectedDate = DateUtil.getCurrentDate()
+            calendarViewController.initialSelectedDate = DateUtil.getCurrentDate()
         }
     }
     
@@ -424,7 +427,7 @@ extension HomeViewController: ToastPresentable {
     ) {
         self.homeDate = dateString
         updateHeaderDate(date: dateString)
-        updatePlaceHolderByDate(
+        updateTaskByDate(
             date: date,
             currentDate: currentDate,
             monthAndDay: monthAndDay
@@ -457,22 +460,22 @@ extension HomeViewController: ToastPresentable {
         self.rootView.headerView.updateDateUI(date: date)
     }
     
-    private func updatePlaceHolderByDate(
+    private func updateTaskByDate(
         date: Date,
         currentDate: Date,
         monthAndDay: String
     ) {
         if date >= currentDate {
-            self.rootView.modalView.do {
-                $0.updatePlaceHolder(text: "\(monthAndDay)의 미션을 추가해요")
-                $0.updateTaskField(isEnable: true)
-            }
+            self.rootView.modalView.updateTaskField(
+                isEnabled: true,
+                text: "\(monthAndDay)의 미션을 추가해요"
+            )
             return
         }
-        self.rootView.modalView.do {
-            $0.updatePlaceHolder(text: "지난 날짜의 리스트는 추가할 수 없어요")
-            $0.updateTaskField(isEnable: false)
-        }
+        self.rootView.modalView.updateTaskField(
+            isEnabled: false,
+            text: "지난 날짜의 리스트는 추가할 수 없어요"
+        )
     }
     
     private func moveScenarioTab() -> BottomNavigationViewController? {

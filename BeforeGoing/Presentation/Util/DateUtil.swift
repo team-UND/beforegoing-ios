@@ -64,8 +64,12 @@ struct DateUtil {
         return dateFormatter.string(from: date)
     }
     
-    static func toString(date: Date) -> String {
+    static func toHomeDateString(date: Date) -> String {
         return homeDateformatter.string(from: date)
+    }
+    
+    static func toAPIDateString(date: Date) -> String {
+        return apiDateFormatter.string(from: date)
     }
     
     static func toDate(dateString: String) -> Date? {

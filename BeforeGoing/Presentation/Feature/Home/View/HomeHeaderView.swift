@@ -115,12 +115,11 @@ final class HomeHeaderView: BaseView {
         }
         bubbleView.snp.makeConstraints {
             $0.top.equalTo(dateStackView.snp.bottom).offset(16.adjustedH)
-            $0.leading.greaterThanOrEqualToSuperview().inset(20.adjustedW)
-            $0.trailing.lessThanOrEqualToSuperview().inset(20.adjustedW)
+            $0.leading.greaterThanOrEqualToSuperview().inset(5.adjustedW)
+            $0.trailing.lessThanOrEqualToSuperview().inset(5.adjustedW)
             $0.centerX.equalToSuperview()
             $0.height.equalTo(62.adjustedH)
         }
-
         wordLabel.snp.makeConstraints {
             $0.edges.equalToSuperview().inset(
                 UIEdgeInsets(top: 8, left: 25, bottom: 8, right: 25)
