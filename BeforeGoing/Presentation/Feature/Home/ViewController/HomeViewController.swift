@@ -62,6 +62,7 @@ final class HomeViewController: BaseViewController {
     
     override func setAction() {
         setGesture()
+        
         rootView.headerView.viewCalendarButton.addTarget(
             self,
             action: #selector(viewCalendarButtonDidTap),
@@ -115,8 +116,10 @@ final class HomeViewController: BaseViewController {
                 }
                 self.homeDate = result.date
                 rootView.headerView.updateDateUI(date: result.date)
-                rootView.modalView.updatePlaceHolder(text: "\(monthAndDay)의 미션을 추가해요")
-                rootView.modalView.updateTaskField(isEnable: true)
+                rootView.modalView.updateTaskField(
+                    isEnabled: true,
+                    text: "\(monthAndDay)의 미션을 추가해요"
+                )
             } catch (let error) {
                 self.handleError(error)
                 BeforeGoingLogger.error(error)
@@ -424,7 +427,7 @@ extension HomeViewController: ToastPresentable {
     ) {
         self.homeDate = dateString
         updateHeaderDate(date: dateString)
-        updatePlaceHolderByDate(
+        updateTaskByDate(
             date: date,
             currentDate: currentDate,
             monthAndDay: monthAndDay
@@ -457,22 +460,22 @@ extension HomeViewController: ToastPresentable {
         self.rootView.headerView.updateDateUI(date: date)
     }
     
-    private func updatePlaceHolderByDate(
+    private func updateTaskByDate(
         date: Date,
         currentDate: Date,
         monthAndDay: String
     ) {
         if date >= currentDate {
-            self.rootView.modalView.do {
-                $0.updatePlaceHolder(text: "\(monthAndDay)의 미션을 추가해요")
-                $0.updateTaskField(isEnable: true)
-            }
+            self.rootView.modalView.updateTaskField(
+                isEnabled: true,
+                text: "\(monthAndDay)의 미션을 추가해요"
+            )
             return
         }
-        self.rootView.modalView.do {
-            $0.updatePlaceHolder(text: "지난 날짜의 리스트는 추가할 수 없어요")
-            $0.updateTaskField(isEnable: false)
-        }
+        self.rootView.modalView.updateTaskField(
+            isEnabled: false,
+            text: "지난 날짜의 리스트는 추가할 수 없어요"
+        )
     }
     
     private func moveScenarioTab() -> BottomNavigationViewController? {
