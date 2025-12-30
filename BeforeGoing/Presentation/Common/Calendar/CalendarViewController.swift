@@ -26,7 +26,7 @@ final class CalendarViewController: BaseViewController {
         }
         return date
     }
-    private lazy var selectedDate = currentDate
+    lazy var selectedDate = currentDate
     private var selectableStartDate: Date?
     private var selectableEndDate: Date?
     private let formatter: DateFormatter = {

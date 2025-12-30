@@ -12,6 +12,7 @@ import UIKit
 final class HomeViewController: BaseViewController {
     
     private let rootView = HomeView()
+    private let calendarViewController = CalendarViewController()
     private let homeViewModel: HomeViewModel
     private let getScenariosViewModel: GetAllScenariosViewModel
     private let locationManager = CLLocationManager()
@@ -40,19 +41,19 @@ final class HomeViewController: BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        let selectedDate = calendarViewController.selectedDate
+        let dateString = DateUtil.toAPIDateString(date: selectedDate)
+        
+        getScenarios(currentDate: dateString)
         checkLoactionAuthorization()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let currentDate = DateUtil.getCurrentDate()
-        let currentDateString = DateUtil.getCurrentDate(format: "yyyy-MM-dd")
-        
+                
         setLocationManager()
         requestDate()
-        getScenarios(currentDate: currentDateString)
-        updateWeatherInformation(date: currentDate)
+        updateWeatherInformation(date: DateUtil.getCurrentDate())
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -270,13 +271,12 @@ extension HomeViewController: ToastPresentable {
     
     @objc
     private func viewCalendarButtonDidTap() {
-        let calendar = CalendarViewController()
-        calendar.modalPresentationStyle = .overFullScreen
+        calendarViewController.modalPresentationStyle = .overFullScreen
         
-        initSelectedDate(calendar: calendar)
+        initSelectedDate(calendarViewController: calendarViewController)
         
-        calendar.onDayDidTap = { [weak self] date in
-            let dateString = DateUtil.toString(date: date)
+        calendarViewController.onDayDidTap = { [weak self] date in
+            let dateString = DateUtil.toHomeDateString(date: date)
             let currentDate = DateUtil.getCurrentDate()
             
             guard let self = self,
@@ -293,7 +293,7 @@ extension HomeViewController: ToastPresentable {
             
             updateWeatherInformation(date: date)
         }
-        calendar.onDismiss = { [weak self] in
+        calendarViewController.onDismiss = { [weak self] in
             guard let homeDate = self?.homeDate,
                   let date = DateUtil.convertDateFormat(dateString: homeDate) else {
                 return
@@ -301,7 +301,7 @@ extension HomeViewController: ToastPresentable {
             
             self?.getScenarios(currentDate: date)
         }
-        self.present(calendar, animated: true)
+        self.present(calendarViewController, animated: true)
     }
     
     @objc
@@ -410,12 +410,12 @@ extension HomeViewController: ToastPresentable {
         pushManageScenario(navigationController: navigationController)
     }
     
-    private func initSelectedDate(calendar: CalendarViewController) {
+    private func initSelectedDate(calendarViewController: CalendarViewController) {
         if let homeDateString = self.homeDate,
            let date = DateUtil.toDate(dateString: homeDateString) {
-            calendar.initialSelectedDate = date
+            calendarViewController.initialSelectedDate = date
         } else {
-            calendar.initialSelectedDate = DateUtil.getCurrentDate()
+            calendarViewController.initialSelectedDate = DateUtil.getCurrentDate()
         }
     }
     
