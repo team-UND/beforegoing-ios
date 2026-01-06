@@ -24,6 +24,17 @@ struct MemberRepository: MemberInterface {
         self.updateNicknameRequestMapper = updateNicknameRequestMapper
     }
     
+    var isAppleLogined: Bool? {
+        guard let provider: String = userDefaultsService.load(key: .provider) else {
+            return nil
+        }
+        
+        if provider == Provider.apple.rawValue {
+            return true
+        }
+        return false
+    }
+    
     func getMemberName() -> String? {
         guard let provider: String = userDefaultsService.load(key: .provider) else {
             return nil

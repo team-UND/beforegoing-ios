@@ -7,6 +7,8 @@
 
 protocol MemberInterface {
     
+    var isAppleLogined: Bool? { get }
+    
     func updateNickname(nickname: String) async throws
     func withdrawMember() async throws
     func getMemberName() -> String?
