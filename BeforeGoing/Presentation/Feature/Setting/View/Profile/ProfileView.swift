@@ -18,6 +18,7 @@ final class ProfileView: BaseView {
     private(set) var withdrawView = ProfileFeatureView(title: "회원탈퇴")
     
     override func setStyle() {
+        backgroundColor = .white
         worryImageView.do {
             $0.image = .profile
         }
