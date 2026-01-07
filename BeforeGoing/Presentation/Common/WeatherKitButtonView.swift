@@ -26,7 +26,8 @@ final class WeatherKitButtonView: BaseView {
     
     override func setLayout() {
         weatherKitButton.snp.makeConstraints {
-            $0.verticalEdges.equalToSuperview().inset(20.adjustedH)
+            $0.top.equalToSuperview().inset(20.adjustedH)
+            $0.bottom.equalToSuperview().inset(30.adjustedH)
             $0.centerX.equalToSuperview()
             $0.width.equalTo(80.adjustedW)
         }

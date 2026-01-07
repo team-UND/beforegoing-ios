@@ -36,7 +36,7 @@ final class ScenarioEmptyView: BaseView {
     
     override func setStyle() {
         worryImageView.do {
-            $0.image = .starWorry
+            $0.image = type.isHome ? .exclamation : .starWorry
             $0.contentMode = .scaleAspectFill
         }
         titleLabel.do {
@@ -67,12 +67,17 @@ final class ScenarioEmptyView: BaseView {
     
     override func setLayout() {
         worryImageView.snp.makeConstraints {
-            $0.top.equalToSuperview()
+            let topInset = type.isHome ? 20.adjustedH : 0
+            $0.top.equalToSuperview().inset(topInset)
+            
             $0.centerX.equalToSuperview()
-            $0.size.equalTo(200.adjustedW)
+            
+            let imageSize = type.isHome ? 48.adjustedW : 200.adjustedW
+            $0.size.equalTo(imageSize)
         }
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(worryImageView.snp.bottom).offset(10.adjustedH)
+            let topOffset = type.isHome ? 20.adjustedH : 10.adjustedH
+            $0.top.equalTo(worryImageView.snp.bottom).offset(topOffset)
             $0.centerX.equalToSuperview()
             $0.height.equalTo(26.adjustedH)
         }
@@ -89,6 +94,7 @@ final class ScenarioEmptyView: BaseView {
                 $0.height.equalTo(48.adjustedH)
             }
             weatherKitButtonView.snp.makeConstraints {
+                $0.top.equalTo(moveButton.snp.bottom).offset(110.adjustedH)
                 $0.horizontalEdges.equalToSuperview()
                 $0.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
             }
