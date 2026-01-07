@@ -104,6 +104,17 @@ final class HomeViewController: BaseViewController {
                 for: .touchUpInside
             )
         }
+        [
+            rootView.modalView.weatherKitButtonView,
+            rootView.modalView.emptyView.weatherKitButtonView
+        ].forEach {
+            let tapGesture = UITapGestureRecognizer(
+                target: self,
+                action: #selector(weatherKitButtonDidTap)
+            )
+            $0.isUserInteractionEnabled = true
+            $0.addGestureRecognizer(tapGesture)
+        }
     }
     
     override func setDelegate() {
