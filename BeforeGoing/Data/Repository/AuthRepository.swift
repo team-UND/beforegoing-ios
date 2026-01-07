@@ -51,7 +51,7 @@ struct AuthRepository: AuthInterface {
         return try await requestLogin(provider: provider, idToken: idToken)
     }
     
-    func requestLogin(provider: Provider, idToken: String) async throws -> Bool {
+    private func requestLogin(provider: Provider, idToken: String) async throws -> Bool {
         let requestDTO = loginRequestMapper.map((provider.rawValue, idToken))
         let response = try await networkService.request(
             endPoint: AuthAPI.login(dto: requestDTO),
@@ -61,6 +61,12 @@ struct AuthRepository: AuthInterface {
         saveProvider(provider)
         
         return isCompletedOnboarding(provider: provider)
+    }
+    
+    func requestLogin(provider: Provider, idToken: String, name: String?) async throws -> Bool {
+        let isCompletedOnboarding = try await requestLogin(provider: provider, idToken: idToken)
+        saveMemberName(name)
+        return isCompletedOnboarding
     }
     
     func autoLogin() async throws -> Bool {
@@ -136,6 +142,18 @@ struct AuthRepository: AuthInterface {
         
         let _ = userDefaultsService.save(provider.rawValue, key: .provider)
         let _ = userDefaultsService.save(lastLogin, key: .lastProvider)
+    }
+    
+    private func saveMemberName(_ name: String?) {
+        if let name, !name.isBlank {
+            let _ = userDefaultsService.save(name, key: .appleCrendentialName)
+            let _ = userDefaultsService.save(name, key: .appleMemberName)
+            return
+        }
+        
+        if let credentialName: String = userDefaultsService.load(key: .appleCrendentialName) {
+            let _ = userDefaultsService.save(credentialName, key: .appleMemberName)
+        }
     }
     
     private var isTokenExists: Bool {

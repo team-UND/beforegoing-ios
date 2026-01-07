@@ -8,7 +8,7 @@
 protocol LoginType {
     
     func login(provider: Provider) async throws -> Bool
-    func login(provider: Provider, idToken: String) async throws -> Bool
+    func login(provider: Provider, idToken: String, name: String?) async throws -> Bool
     func requestNonce(provider: Provider) async throws -> String
 }
 
@@ -24,8 +24,12 @@ struct LoginUseCase: LoginType {
         try await repository.requestLogin(provider: provider)
     }
     
-    func login(provider: Provider, idToken: String) async throws -> Bool {
-        return try await repository.requestLogin(provider: provider, idToken: idToken)
+    func login(provider: Provider, idToken: String, name: String?) async throws -> Bool {
+        return try await repository.requestLogin(
+            provider: provider,
+            idToken: idToken,
+            name: name
+        )
     }
     
     func requestNonce(provider: Provider) async throws -> String {
@@ -39,7 +43,7 @@ struct MockLoginUseCase: LoginType {
         return true
     }
     
-    func login(provider: Provider, idToken: String) -> Bool {
+    func login(provider: Provider, idToken: String, name: String?) -> Bool {
         return true
     }
     

@@ -11,6 +11,12 @@ import AuthenticationServices
 
 final class LoginViewModel: NSObject, ViewModeling {
     
+    private let personNameFormatter: PersonNameComponentsFormatter = {
+        let formatter = PersonNameComponentsFormatter()
+        formatter.style = .default
+        return formatter
+    }()
+    
     private let autoLoginUseCase: AutoLoginType
     private let loginUseCase: LoginType
     private let getLastLoginUseCase: GetLastLoginType
@@ -67,6 +73,7 @@ final class LoginViewModel: NSObject, ViewModeling {
         case .appleLoginDidTap:
             let provider = ASAuthorizationAppleIDProvider()
             let request = provider.createRequest()
+            request.requestedScopes = [.fullName]
             
             let nonce = try await loginUseCase.requestNonce(provider: .apple)
             request.nonce = nonce
@@ -94,10 +101,16 @@ extension LoginViewModel: ASAuthorizationControllerDelegate {
               let idToken = String(data: identityTokenData, encoding: .utf8) else {
              return
         }
+
+        let name = credential.fullName.flatMap { personNameFormatter.string(from: $0) }
         
         Task {
             do {
-                let isMemberRegistered = try await loginUseCase.login(provider: .apple, idToken: idToken)
+                let isMemberRegistered = try await loginUseCase.login(
+                    provider: .apple,
+                    idToken: idToken,
+                    name: name
+                )
                 onAppleLoginPerformed?(isMemberRegistered)
             } catch (let error) {
                 BeforeGoingLogger.error(error)

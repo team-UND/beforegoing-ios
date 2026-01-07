@@ -12,6 +12,7 @@ enum UserDefaultsKey: String, CaseIterable {
     case isAppleCompletedOnboarding
     case kakaoMemberName
     case appleMemberName
+    case appleCrendentialName
     case provider
     case lastProvider
 }
