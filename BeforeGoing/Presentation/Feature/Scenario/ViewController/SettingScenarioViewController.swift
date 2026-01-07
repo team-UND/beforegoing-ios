@@ -300,8 +300,7 @@ extension SettingScenarioViewController: ToastPresentable {
         
         Task {
             do {
-                guard let scenarioNames,
-                      !scenarioNames.contains(scenarioName) else {
+                if let scenarioNames, scenarioNames.contains(scenarioName) {
                     self.presentToastMessage(type: .duplicateScenario)
                     return
                 }
