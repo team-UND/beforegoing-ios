@@ -50,7 +50,7 @@ final class HomeViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-                
+        
         setLocationManager()
         requestDate()
         updateWeatherInformation(date: DateUtil.getCurrentDate())
@@ -94,6 +94,16 @@ final class HomeViewController: BaseViewController {
             action: #selector(moveButtonDidTap),
             for: .touchUpInside
         )
+        [
+            rootView.modalView.weatherKitButtonView.weatherKitButton,
+            rootView.modalView.emptyView.weatherKitButtonView.weatherKitButton
+        ].forEach {
+            $0.addTarget(
+                self,
+                action: #selector(weatherKitButtonDidTap),
+                for: .touchUpInside
+            )
+        }
     }
     
     override func setDelegate() {
@@ -408,6 +418,11 @@ extension HomeViewController: ToastPresentable {
         
         pushMyScenario(navigationController: navigationController)
         pushManageScenario(navigationController: navigationController)
+    }
+    
+    @objc
+    private func weatherKitButtonDidTap() {
+        ExternalLink.weatherLegal.openURL(for: self)
     }
     
     private func initSelectedDate(calendarViewController: CalendarViewController) {

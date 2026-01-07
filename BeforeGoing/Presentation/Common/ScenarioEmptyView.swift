@@ -18,6 +18,9 @@ final class ScenarioEmptyView: BaseView {
         state: .addScenarioButton,
         title: "+ 시나리오 추가"
     )
+    private(set) var weatherKitButtonView = WeatherKitButtonView(
+        frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 52.adjustedH)
+    )
     
     init(type: ScenarioEmptyViewType) {
         self.type = type
@@ -55,7 +58,10 @@ final class ScenarioEmptyView: BaseView {
             subtitleLabel
         )
         if type.isHome {
-            addSubview(moveButton)
+            addSubviews(
+                moveButton,
+                weatherKitButtonView
+            )
         }
     }
     
@@ -81,7 +87,10 @@ final class ScenarioEmptyView: BaseView {
                 $0.centerX.equalToSuperview()
                 $0.width.equalTo(139.adjustedW)
                 $0.height.equalTo(48.adjustedH)
-                $0.bottom.equalToSuperview()
+            }
+            weatherKitButtonView.snp.makeConstraints {
+                $0.horizontalEdges.equalToSuperview()
+                $0.bottom.equalTo(safeAreaLayoutGuide.snp.bottom)
             }
         }
     }
