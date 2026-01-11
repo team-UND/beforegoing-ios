@@ -11,4 +11,5 @@ struct LoginEntity {
     let accessTokenExpiresIn: Int
     let refreshToken: String
     let refreshTokenExpiresIn: Int
+    let isNewMember: Bool
 }

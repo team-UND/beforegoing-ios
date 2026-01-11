@@ -4,6 +4,7 @@ struct LoginResponseDTO: Decodable {
     let accessTokenExpiresIn: Int
     let refreshToken: String
     let refreshTokenExpiresIn: Int
+    let isNewMember: Bool
 }
 
 extension LoginResponseDTO {
@@ -13,7 +14,8 @@ extension LoginResponseDTO {
             accessToken: accessToken,
             accessTokenExpiresIn: accessTokenExpiresIn,
             refreshToken: refreshToken,
-            refreshTokenExpiresIn: refreshTokenExpiresIn
+            refreshTokenExpiresIn: refreshTokenExpiresIn,
+            isNewMember: isNewMember
         )
     }
 }

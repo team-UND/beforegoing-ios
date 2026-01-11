@@ -84,7 +84,6 @@ struct MemberRepository: MemberInterface {
             try await networkService.request(endPoint: MemberAPI.withdraw(accessToken: accessToken))
             removeMemberInfo(provider: provider)
             removeNotifications()
-            removeNotifications()
         } catch {
             throw BeforeGoingError.withdrawFailed
         }

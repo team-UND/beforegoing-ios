@@ -60,13 +60,14 @@ struct AuthRepository: AuthInterface {
         saveKeyChain(response: response)
         saveProvider(provider)
         
-        return isCompletedOnboarding(provider: provider)
+        let isCompletedJoin = !response.isNewMember && isCompletedOnboarding(provider: provider)
+        return isCompletedJoin
     }
     
     func requestLogin(provider: Provider, idToken: String, name: String?) async throws -> Bool {
-        let isCompletedOnboarding = try await requestLogin(provider: provider, idToken: idToken)
+        let isRegisterdMember = try await requestLogin(provider: provider, idToken: idToken)
         saveMemberName(name)
-        return isCompletedOnboarding
+        return isRegisterdMember
     }
     
     func autoLogin() async throws -> Bool {
