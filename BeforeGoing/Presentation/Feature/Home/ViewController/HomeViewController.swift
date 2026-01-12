@@ -18,7 +18,7 @@ final class HomeViewController: BaseViewController {
     private let locationManager = CLLocationManager()
     
     private var homeDate: String?
-    private var memberName: String?
+    private var memberName: String = "워리"
     private var scenarioTitle: String?
     
     init(
@@ -52,8 +52,14 @@ final class HomeViewController: BaseViewController {
         super.viewDidLoad()
         
         setLocationManager()
-        requestDate()
-        updateWeatherInformation(date: DateUtil.getCurrentDate())
+        
+        Task {
+            async let dateResult: () = requestDate()
+            async let updateWeatherResult: () = updateWeatherInformation(date: DateUtil.getCurrentDate())
+            
+            let _ = try await dateResult
+            let _ = try await updateWeatherResult
+        }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -126,26 +132,24 @@ final class HomeViewController: BaseViewController {
         }
     }
     
-    private func requestDate() {
-        Task {
-            do {
-                guard let result = try await homeViewModel.action(
-                    input: .requestDate
-                ) as? HomeViewModel.DateOutput,
-                      let monthAndDay = DateUtil.toMonthAndDay(date: result.date)
-                else {
-                    return
-                }
-                self.homeDate = result.date
-                rootView.headerView.updateDateUI(date: result.date)
-                rootView.modalView.updateTaskField(
-                    isEnabled: true,
-                    text: "\(monthAndDay)의 미션을 추가해요"
-                )
-            } catch (let error) {
-                self.handleError(error)
-                BeforeGoingLogger.error(error)
+    private func requestDate() async throws {
+        do {
+            guard let result = try await homeViewModel.action(
+                input: .requestDate
+            ) as? HomeViewModel.DateOutput,
+                  let monthAndDay = DateUtil.toMonthAndDay(date: result.date)
+            else {
+                return
             }
+            self.homeDate = result.date
+            rootView.headerView.updateDateUI(date: result.date)
+            rootView.modalView.updateTaskField(
+                isEnabled: true,
+                text: "\(monthAndDay)의 미션을 추가해요"
+            )
+        } catch (let error) {
+            self.handleError(error)
+            BeforeGoingLogger.error(error)
         }
     }
     
@@ -215,32 +219,26 @@ final class HomeViewController: BaseViewController {
         }
     }
     
-    private func updateWeatherInformation(date: Date) {
+    private func updateWeatherInformation(date: Date) async throws {
         guard let latitude = locationManager.location?.coordinate.latitude,
               let longitude = locationManager.location?.coordinate.longitude else {
             return
         }
         
-        Task {
-            try await getMemberName()
-            
-            guard let memberName else {
-                return
-            }
-            
-            guard let result = try await homeViewModel.action(
-                input: .requestWeather(date: date, memberName: memberName, latitude: latitude, longitude: longitude)
-            ) as? HomeViewModel.WeatherOutput else {
-                return
-            }
-            
-            switch result.weatherResult {
-            case .success(let weatherInformation):
-                self.rootView.headerView.updateWeatherUI(information: weatherInformation)
-            case .failure(let error):
-                self.handleError(error)
-                BeforeGoingLogger.error(error)
-            }
+        try await getMemberName()
+        
+        guard let result = try await homeViewModel.action(
+            input: .requestWeather(date: date, memberName: memberName, latitude: latitude, longitude: longitude)
+        ) as? HomeViewModel.WeatherOutput else {
+            return
+        }
+        
+        switch result.weatherResult {
+        case .success(let weatherInformation):
+            self.rootView.headerView.updateWeatherUI(information: weatherInformation)
+        case .failure(let error):
+            self.handleError(error)
+            BeforeGoingLogger.error(error)
         }
     }
     
@@ -312,7 +310,9 @@ extension HomeViewController: ToastPresentable {
                 monthAndDay: monthAndDay
             )
             
-            updateWeatherInformation(date: date)
+            Task {
+                try await self.updateWeatherInformation(date: date)
+            }
         }
         calendarViewController.onDismiss = { [weak self] in
             guard let homeDate = self?.homeDate,
