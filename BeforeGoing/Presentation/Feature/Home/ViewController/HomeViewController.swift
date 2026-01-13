@@ -103,17 +103,6 @@ final class HomeViewController: BaseViewController {
                 for: .touchUpInside
             )
         }
-        [
-            rootView.modalView.weatherKitButtonView,
-            rootView.modalView.emptyView.weatherKitButtonView
-        ].forEach {
-            let tapGesture = UITapGestureRecognizer(
-                target: self,
-                action: #selector(weatherKitButtonDidTap)
-            )
-            $0.isUserInteractionEnabled = true
-            $0.addGestureRecognizer(tapGesture)
-        }
     }
     
     override func setDelegate() {
@@ -278,11 +267,23 @@ final class HomeViewController: BaseViewController {
     }
     
     private func setGesture() {
-        let tapGesture = UITapGestureRecognizer(
+        let calendarTapGesture = UITapGestureRecognizer(
             target: self,
             action: #selector(viewCalendarButtonDidTap)
         )
-        rootView.headerView.dateStackView.addGestureRecognizer(tapGesture)
+        rootView.headerView.dateStackView.addGestureRecognizer(calendarTapGesture)
+        
+        [
+            rootView.modalView.weatherKitButtonView,
+            rootView.modalView.emptyView.weatherKitButtonView
+        ].forEach {
+            let weatherKitLogoTapGesture = UITapGestureRecognizer(
+                target: self,
+                action: #selector(weatherKitButtonDidTap)
+            )
+            $0.isUserInteractionEnabled = true
+            $0.addGestureRecognizer(weatherKitLogoTapGesture)
+        }
     }
     
     private func setGesture(scenarios: [ScenarioEntity]) {
