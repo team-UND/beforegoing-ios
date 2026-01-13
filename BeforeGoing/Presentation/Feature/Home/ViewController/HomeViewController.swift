@@ -52,14 +52,7 @@ final class HomeViewController: BaseViewController {
         super.viewDidLoad()
         
         setLocationManager()
-        
-        Task {
-            async let dateResult: () = requestDate()
-            async let updateWeatherResult: () = updateWeatherInformation(date: DateUtil.getCurrentDate())
-            
-            let _ = try await dateResult
-            let _ = try await updateWeatherResult
-        }
+        updateDateAndWeather()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -129,6 +122,34 @@ final class HomeViewController: BaseViewController {
             $0.dataSource = self
             $0.register(ListItemCell.self, forCellReuseIdentifier: ListItemCell.identifier)
             $0.reloadData()
+        }
+    }
+    
+    private func updateDateAndWeather() {
+        Task {
+            if #available(iOS 17.0, *) {
+                try await withThrowingDiscardingTaskGroup { group in
+                    group.addTask { [weak self] in
+                        try await self?.requestDate()
+                    }
+                    
+                    group.addTask { [weak self] in
+                        try await self?.updateWeatherInformation(date: DateUtil.getCurrentDate())
+                    }
+                }
+            } else {
+                try await withThrowingTaskGroup(of: Void.self) { group in
+                    group.addTask { [weak self] in
+                        try await self?.requestDate()
+                    }
+                    
+                    group.addTask { [weak self] in
+                        try await self?.updateWeatherInformation(date: DateUtil.getCurrentDate())
+                    }
+                    
+                    try await group.waitForAll()
+                }
+            }
         }
     }
     
