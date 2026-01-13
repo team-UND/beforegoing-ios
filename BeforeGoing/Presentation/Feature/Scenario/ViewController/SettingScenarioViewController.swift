@@ -104,7 +104,7 @@ final class SettingScenarioViewController: BaseViewController {
             $0.register(MissionItemCell.self, forCellReuseIdentifier: MissionItemCell.identifier)
             $0.delegate = self
             $0.dataSource = self
-            $0.dragDelegate = self
+            $0.dragDelegate = TableViewDragHandler.shared
             $0.dropDelegate = self
         }
     }
@@ -466,13 +466,6 @@ extension SettingScenarioViewController: UITableViewDataSource {
         let config = UISwipeActionsConfiguration(actions: [deleteAction])
         config.performsFirstActionWithFullSwipe = false
         return config
-    }
-}
-
-extension SettingScenarioViewController: UITableViewDragDelegate, DragAction {
-    
-    func tableView(_ tableView: UITableView, itemsForBeginning session: any UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-        return makeDragItems()
     }
 }
 

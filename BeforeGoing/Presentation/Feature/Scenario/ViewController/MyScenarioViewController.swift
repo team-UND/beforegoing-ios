@@ -98,7 +98,7 @@ final class MyScenarioViewController: BaseViewController {
         rootView.scenarioListTableView.do {
             $0.delegate = self
             $0.dataSource = self
-            $0.dragDelegate = self
+            $0.dragDelegate = TableViewDragHandler.shared
             $0.dropDelegate = self
             $0.register(ScenarioListItemCell.self, forCellReuseIdentifier: ScenarioListItemCell.identifier)
         }
@@ -275,17 +275,6 @@ extension MyScenarioViewController: UITableViewDataSource {
         let config = UISwipeActionsConfiguration(actions: [deleteAction])
         config.performsFirstActionWithFullSwipe = false
         return config
-    }
-}
-
-extension MyScenarioViewController: UITableViewDragDelegate, DragAction {
-    
-    func tableView(
-        _ tableView: UITableView,
-        itemsForBeginning session: any UIDragSession,
-        at indexPath: IndexPath
-    ) -> [UIDragItem] {
-        return makeDragItems()
     }
 }
 
