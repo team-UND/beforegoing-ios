@@ -199,17 +199,17 @@ extension ManageScenarioViewController: UITableViewDataSource {
 
 extension ManageScenarioViewController: UITableViewDropDelegate {
     
-    func tableView(_ tableView: UITableView, performDropWith coordinator: UITableViewDropCoordinator) {
-        guard let destinationIndexPath = coordinator.destinationIndexPath else { return }
-        let destinationSection = destinationIndexPath.section
-        
-        for item in coordinator.items {
-            guard let sourceIndexPath = item.sourceIndexPath,
-                  let movedSection = viewModel.removeScenarioType(at: sourceIndexPath.section) else {
+    func tableView(
+        _ tableView: UITableView,
+        performDropWith coordinator: UITableViewDropCoordinator
+    ) {
+        handleDrop(with: coordinator) { sourceSection, destinationSection in
+            guard let movedSection = viewModel.removeScenarioType(at: sourceSection) else {
                 return
             }
             viewModel.addScenarioType(movedSection, at: destinationSection)
         }
+        
         tableView.reloadData()
     }
     
@@ -218,9 +218,6 @@ extension ManageScenarioViewController: UITableViewDropDelegate {
         dropSessionDidUpdate session: UIDropSession,
         withDestinationIndexPath destinationIndexPath: IndexPath?
     ) -> UITableViewDropProposal {
-        if session.localDragSession != nil {
-            return UITableViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
-        }
-        return UITableViewDropProposal(operation: .cancel, intent: .unspecified)
+        handleDropProposal(dropSessionDidUpdate: session)
     }
 }

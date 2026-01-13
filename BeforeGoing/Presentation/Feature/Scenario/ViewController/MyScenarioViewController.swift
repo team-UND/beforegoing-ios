@@ -280,17 +280,15 @@ extension MyScenarioViewController: UITableViewDataSource {
 
 extension MyScenarioViewController: UITableViewDropDelegate {
     
-    func tableView(_ tableView: UITableView, performDropWith coordinator: UITableViewDropCoordinator) {
-        guard let destinationIndexPath = coordinator.destinationIndexPath else { return }
-        let destinationSection = destinationIndexPath.section
-        
-        for item in coordinator.items {
-            guard let sourceIndexPath = item.sourceIndexPath else { continue }
-            let sourceSection = sourceIndexPath.section
-            
+    func tableView(
+        _ tableView: UITableView,
+        performDropWith coordinator: UITableViewDropCoordinator
+    ) {
+        handleDrop(with: coordinator) { sourceSection, destinationSection in
             moveScenario(originalAt: sourceSection, destinationAt: destinationSection)
             updateScenarioOrder(originalAt: sourceSection, destinationAt: destinationSection)
         }
+        
         tableView.reloadData()
     }
     
@@ -299,10 +297,7 @@ extension MyScenarioViewController: UITableViewDropDelegate {
         dropSessionDidUpdate session: UIDropSession,
         withDestinationIndexPath destinationIndexPath: IndexPath?
     ) -> UITableViewDropProposal {
-        if session.localDragSession != nil {
-            return UITableViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
-        }
-        return UITableViewDropProposal(operation: .cancel, intent: .unspecified)
+        handleDropProposal(dropSessionDidUpdate: session)
     }
     
     private func moveScenario(originalAt: Int, destinationAt: Int) {
