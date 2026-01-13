@@ -700,8 +700,11 @@ extension HomeViewController: UITableViewDataSource {
     }
     
     private func createSwipeAction(deleteAction: UIContextualAction) -> UISwipeActionsConfiguration {
-        let config = UISwipeActionsConfiguration(actions: [deleteAction])
-        config.performsFirstActionWithFullSwipe = false
-        return config
+        let swipeActionsConfig: UISwipeActionsConfiguration = {
+            let config = UISwipeActionsConfiguration(actions: [deleteAction])
+            config.performsFirstActionWithFullSwipe = false
+            return config
+        }()
+        return swipeActionsConfig
     }
 }
