@@ -104,7 +104,7 @@ final class SettingScenarioViewController: BaseViewController {
             $0.register(MissionItemCell.self, forCellReuseIdentifier: MissionItemCell.identifier)
             $0.delegate = self
             $0.dataSource = self
-            $0.dragDelegate = TableViewDragHandler.shared
+            $0.dragDelegate = self
             $0.dropDelegate = self
         }
     }

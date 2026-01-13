@@ -50,7 +50,7 @@ final class ManageScenarioViewController: BaseViewController {
         rootView.templateTableView.do {
             $0.delegate = self
             $0.dataSource = self
-            $0.dragDelegate = TableViewDragHandler.shared
+            $0.dragDelegate = self
             $0.dropDelegate = self
             $0.register(ManageScenarioCell.self, forCellReuseIdentifier: ManageScenarioCell.identifier)
         }
