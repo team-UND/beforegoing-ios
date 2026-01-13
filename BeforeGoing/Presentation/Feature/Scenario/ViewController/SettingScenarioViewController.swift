@@ -469,10 +469,10 @@ extension SettingScenarioViewController: UITableViewDataSource {
     }
 }
 
-extension SettingScenarioViewController: UITableViewDragDelegate {
+extension SettingScenarioViewController: UITableViewDragDelegate, DragAction {
     
     func tableView(_ tableView: UITableView, itemsForBeginning session: any UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-        return [UIDragItem(itemProvider: NSItemProvider())]
+        return makeDragItems()
     }
 }
 

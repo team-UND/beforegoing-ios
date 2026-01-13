@@ -197,14 +197,14 @@ extension ManageScenarioViewController: UITableViewDataSource {
     }
 }
 
-extension ManageScenarioViewController: UITableViewDragDelegate {
+extension ManageScenarioViewController: UITableViewDragDelegate, DragAction {
     
     func tableView(
         _ tableView: UITableView,
         itemsForBeginning session: any UIDragSession,
         at indexPath: IndexPath
     ) -> [UIDragItem] {
-        return [UIDragItem(itemProvider: NSItemProvider())]
+        return makeDragItems()
     }
 }
 
