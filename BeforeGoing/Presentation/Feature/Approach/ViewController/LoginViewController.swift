@@ -33,7 +33,7 @@ final class LoginViewController: BaseViewController {
             do {
                 if let output = try await viewModel.action(input: .viewDidLoad) as? LoginViewModel.AutoLoginOutput,
                    output.isSucceed {
-                    moveHome()
+                    moveByNotification()
                 }
             } catch {
                 BeforeGoingLogger.error(BeforeGoingError.autoLoginFailed)
@@ -93,7 +93,7 @@ extension LoginViewController: NetworkRequestable, NetworkRequestErrorHandler {
                 ) as? LoginViewModel.SocialLoginOutput else {
                     return
                 }
-                output.isRegisteredMember ? moveHome() : moveTerms()
+                output.isRegisteredMember ? moveByNotification() : moveTerms()
             } catch (let error) {
                 self.handleError(error)
                 BeforeGoingLogger.error(BeforeGoingError.loginFailed)
@@ -107,7 +107,7 @@ extension LoginViewController: NetworkRequestable, NetworkRequestErrorHandler {
             do {
                 let _ = try await viewModel.action(input: .appleLoginDidTap)
                 viewModel.onAppleLoginPerformed = { [weak self] isMemberRegistered in
-                    isMemberRegistered ? self?.moveHome() : self?.moveTerms()
+                    isMemberRegistered ? self?.moveByNotification() : self?.moveTerms()
                 }
             } catch (let error) {
                 self.handleError(error)
@@ -116,7 +116,7 @@ extension LoginViewController: NetworkRequestable, NetworkRequestErrorHandler {
         }
     }
     
-    private func moveHome() {
+    private func moveByNotification() {
         if let request = AuthManager.shared.pendingNotificationRequest {
             AuthManager.shared.pendingNotificationRequest = nil
             
@@ -126,24 +126,26 @@ extension LoginViewController: NetworkRequestable, NetworkRequestErrorHandler {
                     
             switch notificationIdentifier {
             case .pushNotice :
-                ViewControllerUtil.replaceRootViewController(
-                    to: BottomNavigationViewController(scenarioTitle: request.content.title)
+                replaceViewController(
+                    to: BottomNavigationViewController(
+                        scenarioTitle: request.content.title
+                    )
                 )
-                
             case .callNotice(let sequence):
-                ViewControllerUtil.replaceRootViewController(
+                replaceViewController(
                     to: NotificationViewController(
                         notificationViewType: .init(sequence: sequence),
                         content: request.content,
                         identifier: notificationIdentifier.identifier
                     )
                 )
-            
             case .terminate:
-                ViewControllerUtil.replaceRootViewController(to: BottomNavigationViewController())
+                replaceViewController(to: BottomNavigationViewController())
             }
+            
             return
         }
+        
         let viewController = BottomNavigationViewController()
         ViewControllerUtil.replaceRootViewController(to: viewController)
     }
@@ -152,5 +154,9 @@ extension LoginViewController: NetworkRequestable, NetworkRequestErrorHandler {
         let viewController = ViewControllerFactory.shared.makeAgreeTermsViewController()
         viewController.navigationItem.hidesBackButton = true
         self.navigationController?.pushViewController(viewController, animated: true)
+    }
+    
+    private func replaceViewController(to viewController: UIViewController) {
+        ViewControllerUtil.replaceRootViewController(to: viewController)
     }
 }
