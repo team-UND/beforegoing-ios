@@ -51,7 +51,7 @@ final class HomeViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setLocationManager()
+        locationManager.delegate = self
         updateDateAndWeather()
     }
     
@@ -298,12 +298,6 @@ final class HomeViewController: BaseViewController {
                 tag: index,
                 tapGesture: tapGesture
             )
-        }
-    }
-    
-    private func setLocationManager() {
-        locationManager.do {
-            $0.delegate = self
         }
     }
 }
