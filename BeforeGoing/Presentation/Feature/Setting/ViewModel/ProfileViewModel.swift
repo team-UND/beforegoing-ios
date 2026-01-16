@@ -46,7 +46,7 @@ final class ProfileViewModel: ViewModeling {
     func action(input: Input) async throws -> Output {
         switch input {
         case .viewWillAppear:
-            let name = getMemberNameUseCase.execute()
+            let name = try await getMemberNameUseCase.execute()
             return MemberNameOutput(name: name)
         case .logoutButtonDidTap:
             do {

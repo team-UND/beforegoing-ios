@@ -60,23 +60,35 @@ struct AuthRepository: AuthInterface {
         saveKeyChain(response: response)
         saveProvider(provider)
         
-        let isCompletedJoin = !response.isNewMember && isCompletedOnboarding(provider: provider)
+        let isAgreedTerms = try await isAgreedTerms(accessToken: response.accessToken)
+        let isCompletedJoin = !response.isNewMember && isAgreedTerms
         return isCompletedJoin
     }
     
     func requestLogin(provider: Provider, idToken: String, name: String?) async throws -> Bool {
-        let isRegisterdMember = try await requestLogin(provider: provider, idToken: idToken)
-        saveMemberName(name)
-        return isRegisterdMember
+        let isCompletedJoin = try await requestLogin(provider: provider, idToken: idToken)
+        
+        if let name,
+           !name.isBlank,
+           let accessToken = keyChainService.load(key: .accessToken) {
+            try await networkService.request(
+                endPoint: MemberAPI.updateNickname(
+                    accessToken: accessToken,
+                    dto: .init(nickname: name)
+                )
+            )
+        }
+        
+        return isCompletedJoin
     }
     
     func autoLogin() async throws -> Bool {
-        guard let providerString: String = userDefaultsService.load(key: .provider),
-              let provider = Provider(rawValue: providerString) else {
+        guard let accessToken = keyChainService.load(key: .accessToken) else {
             return false
         }
         
-        guard isTokenExists, isCompletedOnboarding(provider: provider) else {
+        guard isTokenExists,
+              try await isAgreedTerms(accessToken: accessToken) else {
             return false
         }
         
@@ -145,18 +157,6 @@ struct AuthRepository: AuthInterface {
         let _ = userDefaultsService.save(lastLogin, key: .lastProvider)
     }
     
-    private func saveMemberName(_ name: String?) {
-        if let name, !name.isBlank {
-            let _ = userDefaultsService.save(name, key: .appleCrendentialName)
-            let _ = userDefaultsService.save(name, key: .appleMemberName)
-            return
-        }
-        
-        if let credentialName: String = userDefaultsService.load(key: .appleCrendentialName) {
-            let _ = userDefaultsService.save(credentialName, key: .appleMemberName)
-        }
-    }
-    
     private var isTokenExists: Bool {
         if let accessToken = keyChainService.load(key: .accessToken),
            let refreshToken = keyChainService.load(key: .refreshToken),
@@ -167,13 +167,16 @@ struct AuthRepository: AuthInterface {
         return false
     }
     
-    private func isCompletedOnboarding(provider: Provider) -> Bool {
-        let key: UserDefaultsKey = (provider == .apple) ? .isAppleCompletedOnboarding : .isKakaoCompletedOnboarding
-        
-        guard let isCompleted: Bool = userDefaultsService.load(key: key) else {
+    private func isAgreedTerms(accessToken: String) async throws -> Bool {
+        do {
+            let _ = try await networkService.request(
+                endPoint: TermsAPI.getTerms(accessToken: accessToken),
+                responseType: TermsResponseDTO.self
+            )
+            return true
+        } catch {
             return false
         }
-        return isCompleted
     }
     
     private func deleteUserInformation() {

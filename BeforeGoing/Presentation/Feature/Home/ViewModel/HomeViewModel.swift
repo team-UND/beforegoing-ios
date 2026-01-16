@@ -104,7 +104,7 @@ final class HomeViewModel: ViewModeling {
     func action(input: Input) async throws -> Output {
         switch input {
         case .requestName:
-            let memberName = getMemberNameUseCase.execute()
+            let memberName = try await getMemberNameUseCase.execute()
             return MemberNameOutput(memberName: memberName)
             
         case .requestDate:
