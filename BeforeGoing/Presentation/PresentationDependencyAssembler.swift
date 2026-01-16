@@ -41,6 +41,11 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
+        guard let isAppleLoginedUseCase = DIContainer.shared.resolve(type: IsAppleLoginType.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            fatalError()
+        }
+        
         guard let updatePushNoticeUseCase = DIContainer.shared.resolve(type: UpdatePushNoticeType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
@@ -126,14 +131,10 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
-        guard let saveOnboardingCompletedUseCase = DIContainer.shared.resolve(type: SaveOnboardingCompletedType.self) else {
-            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            fatalError()
-        }
-        
         DIContainer.shared.register(
             AgreeItemViewModel(
-                useCase: agreeTermsUseCase
+                sendAgreeUseCase: agreeTermsUseCase,
+                isAppleLoginedUseCase: isAppleLoginedUseCase
             )
         )
         DIContainer.shared.register(
@@ -207,10 +208,5 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             )
         )
         DIContainer.shared.register(ManageScenarioViewModel())
-        DIContainer.shared.register(
-            OnboardingViewModel(
-                useCase: saveOnboardingCompletedUseCase
-            )
-        )
     }
 }

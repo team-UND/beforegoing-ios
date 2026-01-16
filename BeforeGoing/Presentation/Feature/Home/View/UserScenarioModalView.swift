@@ -24,6 +24,9 @@ final class UserScenarioModalView: BaseView {
     private(set) var addTaskButton = UIButton()
     private(set) var deleteTaskButton = UIButton()
     private(set) var listTableView = UITableView()
+    private(set) lazy var weatherKitButtonView = WeatherKitButtonView(
+        frame: CGRect(x: 0, y: 0, width: 80.adjustedW, height: 52.adjustedH)
+    )
     
     init() {
         super.init(frame: .zero)
@@ -57,6 +60,7 @@ final class UserScenarioModalView: BaseView {
         }
         listTableView.do {
             $0.separatorStyle = .none
+            $0.tableFooterView = weatherKitButtonView
         }
     }
     
@@ -188,19 +192,27 @@ extension UserScenarioModalView {
             listTableView,
             taskTextField,
             addTaskButton,
-            deleteTaskButton
-        ].forEach { $0.removeFromSuperview() }
+            deleteTaskButton,
+            weatherKitButtonView
+        ].forEach { $0.isHidden = true }
         addSubview(emptyView)
+        emptyView.isHidden = false
         emptyView.snp.makeConstraints {
             $0.top.equalToSuperview().inset(80.adjustedH)
             $0.horizontalEdges.equalToSuperview().inset(20.adjustedW)
-            $0.height.equalTo(285.adjustedH)
+            $0.bottom.equalToSuperview()
         }
     }
     
     func replaceModalView() {
-        emptyView.removeFromSuperview()
-        setUI()
-        setLayout()
+        emptyView.isHidden = true
+        [
+            headerView,
+            listTableView,
+            taskTextField,
+            addTaskButton,
+            deleteTaskButton,
+            weatherKitButtonView
+        ].forEach { $0.isHidden = false }
     }
 }

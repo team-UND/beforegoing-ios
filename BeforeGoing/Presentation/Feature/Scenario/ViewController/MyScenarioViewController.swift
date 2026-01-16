@@ -182,7 +182,7 @@ extension MyScenarioViewController: UITableViewDelegate {
     }
 }
 
-extension MyScenarioViewController: UITableViewDataSource {
+extension MyScenarioViewController: UITableViewDataSource, TableViewSwipeAction {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return getScenariosViewModel.scenariosCount
@@ -209,26 +209,7 @@ extension MyScenarioViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView,
                    trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath)
     -> UISwipeActionsConfiguration? {
-        
-        let deleteAction = createDeleteAction(tableView: tableView, indexPath: indexPath)
-        let largeConfig = createLargeConfig()
-        setDeleteActionStyle(deleteAction: deleteAction, largeConfig: largeConfig)
-        
-        let config = createSwipeAction(deleteAction: deleteAction)
-        return config
-    }
-    
-    private func bindCell(to cell: ScenarioListItemCell, section: Int) {
-        let name = getScenariosViewModel.getScenarioName(section: section)
-        let noticeInformation = getScenariosViewModel.getNotificationInformation(section: section)
-        cell.bind(name: name, noticeInformation: noticeInformation)
-    }
-    
-    private func createDeleteAction(tableView: UITableView, indexPath: IndexPath) -> UIContextualAction {
-        return UIContextualAction(
-            style: .normal,
-            title: nil
-        ) { [weak self] (_, view, completion) in
+        return createSwipeActionConfig(tableView: tableView, indexPath: indexPath) { [weak self] in
             Task {
                 guard let self = self else { return }
                 
@@ -248,33 +229,14 @@ extension MyScenarioViewController: UITableViewDataSource {
                     self.handleError(error)
                     BeforeGoingLogger.error(error)
                 }
-                completion(true)
             }
         }
     }
     
-    
-    private func createLargeConfig() -> UIImage.SymbolConfiguration {
-        return UIImage.SymbolConfiguration(pointSize: 12.0, weight: .bold, scale: .large)
-    }
-    
-    private func setDeleteActionStyle(
-        deleteAction: UIContextualAction,
-        largeConfig: UIImage.SymbolConfiguration
-    ) {
-        deleteAction.do {
-            $0.backgroundColor = .white
-            $0.image = UIImage(
-                systemName: "trash",
-                withConfiguration: largeConfig
-            )?.withTintColor(.white, renderingMode: .alwaysTemplate).addBackgroundCircle(.warning500)
-        }
-    }
-    
-    private func createSwipeAction(deleteAction: UIContextualAction) -> UISwipeActionsConfiguration {
-        let config = UISwipeActionsConfiguration(actions: [deleteAction])
-        config.performsFirstActionWithFullSwipe = false
-        return config
+    private func bindCell(to cell: ScenarioListItemCell, section: Int) {
+        let name = getScenariosViewModel.getScenarioName(section: section)
+        let noticeInformation = getScenariosViewModel.getNotificationInformation(section: section)
+        cell.bind(name: name, noticeInformation: noticeInformation)
     }
 }
 
@@ -285,23 +247,21 @@ extension MyScenarioViewController: UITableViewDragDelegate {
         itemsForBeginning session: any UIDragSession,
         at indexPath: IndexPath
     ) -> [UIDragItem] {
-        return [UIDragItem(itemProvider: NSItemProvider())]
+        provideDragItem()
     }
 }
 
 extension MyScenarioViewController: UITableViewDropDelegate {
     
-    func tableView(_ tableView: UITableView, performDropWith coordinator: UITableViewDropCoordinator) {
-        guard let destinationIndexPath = coordinator.destinationIndexPath else { return }
-        let destinationSection = destinationIndexPath.section
-        
-        for item in coordinator.items {
-            guard let sourceIndexPath = item.sourceIndexPath else { continue }
-            let sourceSection = sourceIndexPath.section
-            
+    func tableView(
+        _ tableView: UITableView,
+        performDropWith coordinator: UITableViewDropCoordinator
+    ) {
+        handleDrop(with: coordinator) { sourceSection, destinationSection in
             moveScenario(originalAt: sourceSection, destinationAt: destinationSection)
             updateScenarioOrder(originalAt: sourceSection, destinationAt: destinationSection)
         }
+        
         tableView.reloadData()
     }
     
@@ -310,10 +270,7 @@ extension MyScenarioViewController: UITableViewDropDelegate {
         dropSessionDidUpdate session: UIDropSession,
         withDestinationIndexPath destinationIndexPath: IndexPath?
     ) -> UITableViewDropProposal {
-        if session.localDragSession != nil {
-            return UITableViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
-        }
-        return UITableViewDropProposal(operation: .cancel, intent: .unspecified)
+        handleDropProposal(dropSessionDidUpdate: session)
     }
     
     private func moveScenario(originalAt: Int, destinationAt: Int) {

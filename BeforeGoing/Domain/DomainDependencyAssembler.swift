@@ -94,6 +94,9 @@ final class DomainDependencyAssembler: DependencyAssembler {
         DIContainer.shared.register(type: SendAgreeTermsType.self) { _ in
             return SendAgreeTermsUseCase(repository: termsRepository)
         }
+        DIContainer.shared.register(type: IsAppleLoginType.self) { _ in
+            return IsAppleLoginedUseCase(repository: memberRepository)
+        }
         DIContainer.shared.register(type: UpdatePushNoticeType.self) { _ in
             return UpdatePushNoticeUseCase(repository: termsRepository)
         }
@@ -106,9 +109,6 @@ final class DomainDependencyAssembler: DependencyAssembler {
         }
         DIContainer.shared.register(type: MemberWithdrawType.self) { _ in
             return MemberWithdrawUseCase(repository: memberRepository)
-        }
-        DIContainer.shared.register(type: SaveOnboardingCompletedType.self) { _ in
-            return SaveOnboardingCompletedUseCase(repository: memberRepository)
         }
         
         DIContainer.shared.register(type: FetchWeatherType.self) { _ in

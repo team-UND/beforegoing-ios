@@ -6,7 +6,7 @@
 //
 
 protocol GetMemberNameType {
-    func execute() -> String
+    func execute() async throws -> String
 }
 
 struct GetMemberNameUseCase: GetMemberNameType {
@@ -17,9 +17,9 @@ struct GetMemberNameUseCase: GetMemberNameType {
         self.repository = repository
     }
     
-    func execute() -> String {
-        let name = repository.getMemberName() ?? ""
-        return name
+    func execute() async throws -> String {
+        let result = try await repository.getMemberName()
+        return result.memberName
     }
 }
 

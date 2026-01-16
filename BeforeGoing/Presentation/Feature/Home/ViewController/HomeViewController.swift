@@ -18,7 +18,7 @@ final class HomeViewController: BaseViewController {
     private let locationManager = CLLocationManager()
     
     private var homeDate: String?
-    private var memberName: String?
+    private var memberName: String = "워리"
     private var scenarioTitle: String?
     
     init(
@@ -50,10 +50,9 @@ final class HomeViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-                
-        setLocationManager()
-        requestDate()
-        updateWeatherInformation(date: DateUtil.getCurrentDate())
+        
+        locationManager.delegate = self
+        updateDateAndWeather()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -94,6 +93,16 @@ final class HomeViewController: BaseViewController {
             action: #selector(moveButtonDidTap),
             for: .touchUpInside
         )
+        [
+            rootView.modalView.weatherKitButtonView.weatherKitButton,
+            rootView.modalView.emptyView.weatherKitButtonView.weatherKitButton
+        ].forEach {
+            $0.addTarget(
+                self,
+                action: #selector(weatherKitButtonDidTap),
+                for: .touchUpInside
+            )
+        }
     }
     
     override func setDelegate() {
@@ -105,26 +114,52 @@ final class HomeViewController: BaseViewController {
         }
     }
     
-    private func requestDate() {
+    private func updateDateAndWeather() {
         Task {
-            do {
-                guard let result = try await homeViewModel.action(
-                    input: .requestDate
-                ) as? HomeViewModel.DateOutput,
-                      let monthAndDay = DateUtil.toMonthAndDay(date: result.date)
-                else {
-                    return
+            if #available(iOS 17.0, *) {
+                try await withThrowingDiscardingTaskGroup { group in
+                    group.addTask { [weak self] in
+                        try await self?.requestDate()
+                    }
+                    
+                    group.addTask { [weak self] in
+                        try await self?.updateWeatherInformation(date: DateUtil.getCurrentDate())
+                    }
                 }
-                self.homeDate = result.date
-                rootView.headerView.updateDateUI(date: result.date)
-                rootView.modalView.updateTaskField(
-                    isEnabled: true,
-                    text: "\(monthAndDay)의 미션을 추가해요"
-                )
-            } catch (let error) {
-                self.handleError(error)
-                BeforeGoingLogger.error(error)
+            } else {
+                try await withThrowingTaskGroup(of: Void.self) { group in
+                    group.addTask { [weak self] in
+                        try await self?.requestDate()
+                    }
+                    
+                    group.addTask { [weak self] in
+                        try await self?.updateWeatherInformation(date: DateUtil.getCurrentDate())
+                    }
+                    
+                    try await group.waitForAll()
+                }
             }
+        }
+    }
+    
+    private func requestDate() async throws {
+        do {
+            guard let result = try await homeViewModel.action(
+                input: .requestDate
+            ) as? HomeViewModel.DateOutput,
+                  let monthAndDay = DateUtil.toMonthAndDay(date: result.date)
+            else {
+                return
+            }
+            self.homeDate = result.date
+            rootView.headerView.updateDateUI(date: result.date)
+            rootView.modalView.updateTaskField(
+                isEnabled: true,
+                text: "\(monthAndDay)의 미션을 추가해요"
+            )
+        } catch (let error) {
+            self.handleError(error)
+            BeforeGoingLogger.error(error)
         }
     }
     
@@ -194,32 +229,26 @@ final class HomeViewController: BaseViewController {
         }
     }
     
-    private func updateWeatherInformation(date: Date) {
+    private func updateWeatherInformation(date: Date) async throws {
         guard let latitude = locationManager.location?.coordinate.latitude,
               let longitude = locationManager.location?.coordinate.longitude else {
             return
         }
         
-        Task {
-            try await getMemberName()
-            
-            guard let memberName else {
-                return
-            }
-            
-            guard let result = try await homeViewModel.action(
-                input: .requestWeather(date: date, memberName: memberName, latitude: latitude, longitude: longitude)
-            ) as? HomeViewModel.WeatherOutput else {
-                return
-            }
-            
-            switch result.weatherResult {
-            case .success(let weatherInformation):
-                self.rootView.headerView.updateWeatherUI(information: weatherInformation)
-            case .failure(let error):
-                self.handleError(error)
-                BeforeGoingLogger.error(error)
-            }
+        try await getMemberName()
+        
+        guard let result = try await homeViewModel.action(
+            input: .requestWeather(date: date, memberName: memberName, latitude: latitude, longitude: longitude)
+        ) as? HomeViewModel.WeatherOutput else {
+            return
+        }
+        
+        switch result.weatherResult {
+        case .success(let weatherInformation):
+            self.rootView.headerView.updateWeatherUI(information: weatherInformation)
+        case .failure(let error):
+            self.handleError(error)
+            BeforeGoingLogger.error(error)
         }
     }
     
@@ -238,11 +267,23 @@ final class HomeViewController: BaseViewController {
     }
     
     private func setGesture() {
-        let tapGesture = UITapGestureRecognizer(
+        let calendarTapGesture = UITapGestureRecognizer(
             target: self,
             action: #selector(viewCalendarButtonDidTap)
         )
-        rootView.headerView.dateStackView.addGestureRecognizer(tapGesture)
+        rootView.headerView.dateStackView.addGestureRecognizer(calendarTapGesture)
+        
+        [
+            rootView.modalView.weatherKitButtonView,
+            rootView.modalView.emptyView.weatherKitButtonView
+        ].forEach {
+            let weatherKitLogoTapGesture = UITapGestureRecognizer(
+                target: self,
+                action: #selector(weatherKitButtonDidTap)
+            )
+            $0.isUserInteractionEnabled = true
+            $0.addGestureRecognizer(weatherKitLogoTapGesture)
+        }
     }
     
     private func setGesture(scenarios: [ScenarioEntity]) {
@@ -257,12 +298,6 @@ final class HomeViewController: BaseViewController {
                 tag: index,
                 tapGesture: tapGesture
             )
-        }
-    }
-    
-    private func setLocationManager() {
-        locationManager.do {
-            $0.delegate = self
         }
     }
 }
@@ -291,7 +326,9 @@ extension HomeViewController: ToastPresentable {
                 monthAndDay: monthAndDay
             )
             
-            updateWeatherInformation(date: date)
+            Task {
+                try await self.updateWeatherInformation(date: date)
+            }
         }
         calendarViewController.onDismiss = { [weak self] in
             guard let homeDate = self?.homeDate,
@@ -408,6 +445,11 @@ extension HomeViewController: ToastPresentable {
         
         pushMyScenario(navigationController: navigationController)
         pushManageScenario(navigationController: navigationController)
+    }
+    
+    @objc
+    private func weatherKitButtonDidTap() {
+        ExternalLink.weatherLegal.openURL(for: self)
     }
     
     private func initSelectedDate(calendarViewController: CalendarViewController) {
@@ -658,8 +700,11 @@ extension HomeViewController: UITableViewDataSource {
     }
     
     private func createSwipeAction(deleteAction: UIContextualAction) -> UISwipeActionsConfiguration {
-        let config = UISwipeActionsConfiguration(actions: [deleteAction])
-        config.performsFirstActionWithFullSwipe = false
-        return config
+        let swipeActionsConfig: UISwipeActionsConfiguration = {
+            let config = UISwipeActionsConfiguration(actions: [deleteAction])
+            config.performsFirstActionWithFullSwipe = false
+            return config
+        }()
+        return swipeActionsConfig
     }
 }

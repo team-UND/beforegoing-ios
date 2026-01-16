@@ -19,6 +19,7 @@ final class ModifyNameView: BaseView {
     private(set) var confirmButton = CustomButton(state: .enableLongButton, title: "확인")
     
     override func setStyle() {
+        backgroundColor = .white
         nameLabel.do {
             $0.text = "이름"
             $0.textColor = .gray600

@@ -29,4 +29,5 @@ enum BeforeGoingError: Error, Equatable {
     case missionLimitError
     case tooManyRequset
     case withdrawFailed
+    case notFoundProvider
 }

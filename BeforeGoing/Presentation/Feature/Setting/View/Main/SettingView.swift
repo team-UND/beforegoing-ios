@@ -18,6 +18,7 @@ final class SettingView: BaseView {
     private(set) var policyView = PolicyView()
     
     override func setStyle() {
+        backgroundColor = .white
         titleLabel.do {
             $0.text = "설정"
             $0.textColor = .gray900

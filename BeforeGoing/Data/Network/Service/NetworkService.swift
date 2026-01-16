@@ -10,6 +10,7 @@ protocol APIManaging {
         responseType: T.Type
     ) async throws -> T
     func request(endPoint: any EndPoint) async throws
+    func requestString(endPoint: EndPoint) async throws -> String
     func requestKakaoIDToken(nonce: String?) async throws -> String
 }
 
@@ -45,6 +46,23 @@ final class NetworkService: APIManaging {
             let response = try await dataRequest.serializingData().value
             writeLog(response: response)
         } catch {
+            if let afError = error.asAFError {
+                throw handleError(afError: afError)
+            }
+            throw error
+        }
+    }
+    
+    func requestString(endPoint: EndPoint) async throws -> String {
+        do {
+            let dataRequest = createDataRequest(endPoint: endPoint)
+            let response = try await dataRequest.serializingString().value
+            writeLog(response: response)
+            return response
+        } catch {
+            if let afError = error.asAFError {
+                throw handleError(afError: afError)
+            }
             throw error
         }
     }
@@ -73,28 +91,24 @@ final class NetworkService: APIManaging {
             }
         }
         
-        switch afError {
-        case .responseValidationFailed(let reason):
-            if case .unacceptableStatusCode(let statuscode) = reason {
-                switch statuscode {
-                case 304:
-                    return .notModifiedError
-                case 400:
-                    return .badRequestError
-                case 404:
-                    return .notFoundError
-                case 429:
-                    return .tooManyRequset
-                case (500...599):
-                    return .serviceUnavailable
-                default:
-                    return .unknownError
-                }
+        if let statusCode = afError.responseCode {
+            switch statusCode {
+            case 304:
+                return .notModifiedError
+            case 400:
+                return .badRequestError
+            case 404:
+                return .notFoundError
+            case 429:
+                return .tooManyRequset
+            case 500...599:
+                return .serviceUnavailable
+            default:
+                break
             }
-            return .unknownError
-        default:
-            return .unknownError
         }
+        
+        return .unknownError
     }
 }
 

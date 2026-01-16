@@ -24,18 +24,23 @@ struct MemberRepository: MemberInterface {
         self.updateNicknameRequestMapper = updateNicknameRequestMapper
     }
     
-    func getMemberName() -> String? {
+    var isAppleLogined: Bool? {
         guard let provider: String = userDefaultsService.load(key: .provider) else {
             return nil
         }
         
-        switch provider {
-        case Provider.kakao.rawValue:
-            return userDefaultsService.load(key: .kakaoMemberName)
-        case Provider.apple.rawValue:
-            return userDefaultsService.load(key: .appleMemberName)
-        default:
-            return nil
+        if provider == Provider.apple.rawValue {
+            return true
+        }
+        return false
+    }
+    
+    func getMemberName() async throws -> MemberNameEntity {
+        do {
+            let memberName = try await fetchMemberName()
+            return memberName
+        } catch {
+            return .stub()
         }
     }
     
@@ -44,27 +49,17 @@ struct MemberRepository: MemberInterface {
             BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
             return
         }
-        guard let provider: String = userDefaultsService.load(key: .provider) else {
-            return
-        }
         
         let requestDTO = updateNicknameRequestMapper.map(nickname)
-        let responseDTO = try await networkService.request(
+        let _ = try await networkService.request(
             endPoint: MemberAPI.updateNickname(accessToken: accessToken, dto: requestDTO),
             responseType: MemberResponseDTO.self
         )
-        
-        if provider == Provider.apple.rawValue {
-            let _ = userDefaultsService.save(responseDTO.nickname, key: .appleMemberName)
-        }
-        if provider == Provider.kakao.rawValue {
-            let _ = userDefaultsService.save(responseDTO.nickname, key: .kakaoMemberName)
-        }
     }
     
     func withdrawMember() async throws {
         guard let accessToken = keyChainService.load(key: .accessToken),
-        let provider: String = userDefaultsService.load(key: .provider) else {
+              let provider: String = userDefaultsService.load(key: .provider) else {
             BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
             return
         }
@@ -78,15 +73,17 @@ struct MemberRepository: MemberInterface {
         }
     }
     
-    func completeOnboarding() -> Bool {
-        guard let providerString: String = userDefaultsService.load(key: .provider),
-              let provider = Provider(rawValue: providerString) else {
-            return false
+    private func fetchMemberName() async throws -> MemberNameEntity {
+        guard let accessToken = keyChainService.load(key: .accessToken) else {
+            BeforeGoingLogger.error(BeforeGoingError.accessTokenMissing)
+            return .stub()
         }
         
-let key: UserDefaultsKey = (provider == .apple) ? .isAppleCompletedOnboarding : .isKakaoCompletedOnboarding
-        let isSaved = userDefaultsService.save(true, key: key)
-        return isSaved
+        let fetchedName = try await networkService.requestString(
+            endPoint: MemberAPI.fetchMemberName(accessToken: accessToken)
+        )
+        
+        return .init(memberName: fetchedName)
     }
     
     private func removeMemberInfo(provider: String) {
@@ -105,24 +102,9 @@ let key: UserDefaultsKey = (provider == .apple) ? .isAppleCompletedOnboarding : 
     }
     
     private func removeUserDefaultsInfo(provider: String) {
-        let excludedKeys: [UserDefaultsKey?] = {
-            switch provider {
-            case Provider.kakao.rawValue: return [
-                .appleMemberName,
-                .isAppleCompletedOnboarding,
-                .isAppleCompletedAgreeTerms
-            ]
-            case Provider.apple.rawValue: return [
-                .kakaoMemberName,
-                .isKakaoCompletedOnboarding,
-                .isKakaoCompletedAgreeTerms
-            ]
-default: return []
-            }
-        }()
-
         UserDefaultsKey.allCases
-            .filter { !excludedKeys.contains($0) }
-            .forEach { let _ = userDefaultsService.delete(key: $0) }
+            .forEach {
+                let _ = userDefaultsService.delete(key: $0)
+            }
     }
 }
