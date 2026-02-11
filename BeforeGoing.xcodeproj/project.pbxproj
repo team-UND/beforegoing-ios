@@ -31,6 +31,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		1827AF552F307CD200D18376 /* Exceptions for "BeforeGoing" folder in "BeforeGoingTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Data/BeforeGoingModel.xcdatamodel,
+			);
+			target = 186E06F02DDDF10600E32490 /* BeforeGoingTests */;
+		};
 		186E07032DDDF10600E32490 /* Exceptions for "BeforeGoing" folder in "BeforeGoing" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -45,6 +52,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				186E07032DDDF10600E32490 /* Exceptions for "BeforeGoing" folder in "BeforeGoing" target */,
+				1827AF552F307CD200D18376 /* Exceptions for "BeforeGoing" folder in "BeforeGoingTests" target */,
 			);
 			path = BeforeGoing;
 			sourceTree = "<group>";
