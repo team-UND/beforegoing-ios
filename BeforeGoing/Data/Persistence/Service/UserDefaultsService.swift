@@ -46,3 +46,28 @@ struct UserDefaultsService: UserDefaultsProtocol {
         return UserDefaults.standard.value(forKey: key.rawValue) == nil
     }
 }
+
+final class MockuserDefaultsService: UserDefaultsProtocol {
+    
+    private var storage: [UserDefaultsKey: Any] = [:]
+    
+    func save(_ value: Any, key: UserDefaultsKey) -> Bool {
+        storage[key] = value
+        return true
+    }
+
+    func load<T>(key: UserDefaultsKey) -> T? {
+        storage[key] as? T
+    }
+
+    func delete(key: UserDefaultsKey) -> Bool {
+        guard let _ = storage.removeValue(forKey: key) else {
+            return false
+        }
+        return true
+    }
+    
+    func deleteAll() {
+        storage.removeAll()
+    }
+}

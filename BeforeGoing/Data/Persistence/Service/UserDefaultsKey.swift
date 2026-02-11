@@ -6,6 +6,7 @@
 //
 
 enum UserDefaultsKey: String, CaseIterable {
+    case userID
     case provider
     case lastProvider
 }
