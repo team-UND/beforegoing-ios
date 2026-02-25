@@ -9,15 +9,26 @@ import CoreData
 
 enum ContextProvider {
     
-    static func createMockContext() -> NSManagedObjectContext {
-        let container = NSPersistentContainer(name: "BeforeGoingModel")
+    static func makeMockContext() -> NSManagedObjectContext {
+        // 앱과 동일한 모델 인스턴스를 재사용
+        let container = NSPersistentContainer(
+            name: "BeforeGoingModel",
+            managedObjectModel: CoreDataStack.managedObjectModel
+        )
+        
         let description = NSPersistentStoreDescription()
+        description.url = URL(fileURLWithPath: "/dev/null/\(UUID().uuidString)")
         description.type = NSInMemoryStoreType
+        description.shouldAddStoreAsynchronously = false
         container.persistentStoreDescriptions = [description]
         
         container.loadPersistentStores { _, error in
-            if let error = error { fatalError("Failed to load store: \(error)") }
+            if let error { fatalError("Failed to load store: \(error)") }
         }
-        return container.viewContext
+        
+        let context = container.newBackgroundContext()
+        context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        
+        return context
     }
 }
