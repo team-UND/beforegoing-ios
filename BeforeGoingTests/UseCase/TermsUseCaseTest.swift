@@ -19,12 +19,12 @@ struct TermsUseCaseTest {
     private let updatePushNoticeUseCase: UpdatePushNoticeUseCase
     
     init() async throws {
-        self.userDefaultsService = MockuserDefaultsService()
         self.context = ContextProvider.makeMockContext()
+        self.userDefaultsService = .init()
         self.repository = TermsStorage(userDefaultsService: userDefaultsService, context: context)
-        self.fetchAgreeUseCase = FetchAgreeTermsUseCase(repository: repository)
-        self.sendAgreeTermsUseCase = SendAgreeTermsUseCase(repository: repository)
-        self.updatePushNoticeUseCase = UpdatePushNoticeUseCase(repository: repository)
+        self.fetchAgreeUseCase = .init(repository: repository)
+        self.sendAgreeTermsUseCase = .init(repository: repository)
+        self.updatePushNoticeUseCase = .init(repository: repository)
         
         try await createMember(id: 1, nickname: "tester")
     }
