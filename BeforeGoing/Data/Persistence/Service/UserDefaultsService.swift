@@ -47,7 +47,7 @@ struct UserDefaultsService: UserDefaultsProtocol {
     }
 }
 
-final class MockuserDefaultsService: UserDefaultsProtocol {
+final class MockUserDefaultsService: UserDefaultsProtocol {
     
     private var storage: [UserDefaultsKey: Any] = [:]
     

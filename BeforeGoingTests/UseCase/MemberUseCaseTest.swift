@@ -12,7 +12,7 @@ import Testing
 struct MemberUseCaseTest {
     
     private let context: NSManagedObjectContext
-    private let userDefaultsService: MockuserDefaultsService
+    private let userDefaultsService: MockUserDefaultsService
     private let memberRepository: MemberInterface
     private let getMemberNamseUseCase: GetMemberNameUseCase
     private let updateNickNameUseCase: UpdateNicknameUseCase

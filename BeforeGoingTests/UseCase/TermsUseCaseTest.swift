@@ -12,7 +12,7 @@ import Testing
 struct TermsUseCaseTest {
     
     private let context: NSManagedObjectContext
-    private let userDefaultsService: MockuserDefaultsService
+    private let userDefaultsService: MockUserDefaultsService
     private let repository: TermsInterface
     private let fetchAgreeUseCase: FetchAgreeTermsUseCase
     private let sendAgreeTermsUseCase: SendAgreeTermsUseCase
