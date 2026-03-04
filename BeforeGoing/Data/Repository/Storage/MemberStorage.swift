@@ -13,13 +13,9 @@ final class MemberStorage: MemberInterface {
     private let userDefaultsService: UserDefaultsProtocol
     private let context: NSManagedObjectContext
     
-    var memberEntity: NSEntityDescription? {
-        NSEntityDescription.entity(forEntityName: EntityName.member.string, in: context)
-    }
-    
     init(
         userDefaultsService: UserDefaultsProtocol,
-        context: NSManagedObjectContext = CoreDataStack.shared.newBackgroundContext()
+        context: NSManagedObjectContext
     ) {
         self.userDefaultsService = userDefaultsService
         self.context = context
@@ -27,57 +23,38 @@ final class MemberStorage: MemberInterface {
     
     func updateNickname(nickname: String) async throws {
         try await context.perform { [weak self] in
-            guard let self else {
-                return
-            }
-            
-            guard let member = try getMember() else {
-                return
+            guard let self,
+                  let member = try getMember()
+            else {
+                throw BeforeGoingError.memberNotFound
             }
             
             member.nickname = nickname
             
-            if context.hasChanges {
-                try context.save()
-            }
+            try context.save()
         }
     }
     
     func withdrawMember() async throws {
         try await context.perform { [weak self] in
-            guard let self else {
-                return
-            }
-            
-            guard let member = try getMember() else {
-                return
+            guard let self,
+                  let member = try getMember() else {
+                throw BeforeGoingError.memberNotFound
             }
             
             context.delete(member)
             
-            if context.hasChanges {
-                do {
-                    try self.context.save()
-                    let _ = userDefaultsService.delete(key: .userID)
-                } catch {
-                    throw error
-                }
-            }
+            try self.context.save()
+            let _ = userDefaultsService.delete(key: .userID)
         }
     }
     
     func getMemberName() async throws -> MemberNameEntity {
         try await context.perform { [weak self] in
-            guard let self else {
-                return .stub()
-            }
-            
-            guard let member = try getMember() else {
-                return .stub()
-            }
-            
-            guard let memberName = member.nickname else {
-                return .stub()
+            guard let self,
+                  let member = try getMember(),
+                  let memberName = member.nickname else {
+                throw BeforeGoingError.memberNotFound
             }
             
             return .init(memberName: memberName)
@@ -85,15 +62,14 @@ final class MemberStorage: MemberInterface {
     }
     
     private func getMember() throws -> Member? {
-        guard let userID: UUID = userDefaultsService.load(key: .userID) else {
+        guard let userID: Int = userDefaultsService.load(key: .userID) else {
             return nil
         }
                 
         let request = Member.fetchRequest()
-        request.predicate = NSPredicate(format: "memberId == %@", userID as NSUUID)
+        request.predicate = NSPredicate(format: "id == %d", userID)
         
         let member = try context.fetch(request).first
-        
         return member
     }
 }
