@@ -30,7 +30,7 @@ struct TermsUseCaseTest {
     }
     
     @Test("약관 동의 내역 저장", arguments: [true, false])
-    func sendAgreeTerms_success(eventPushAgreed: Bool) async throws {
+    func sendAgreeTerms(eventPushAgreed: Bool) async throws {
         try await sendAgreeTermsUseCase.execute(
             termsOfServiceAgreed: true,
             privacyPolicyAgreed: true,
@@ -44,7 +44,7 @@ struct TermsUseCaseTest {
     }
     
     @Test("약관 동의 내역 수정", arguments: [true, false])
-    func fetchAgreeTerms_success(eventPushAgreed: Bool) async throws {
+    func fetchAgreeTerms(eventPushAgreed: Bool) async throws {
         try await sendAgreeTermsUseCase.execute(
             termsOfServiceAgreed: true,
             privacyPolicyAgreed: true,

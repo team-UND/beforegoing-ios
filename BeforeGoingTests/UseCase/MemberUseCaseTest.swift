@@ -28,7 +28,7 @@ struct MemberUseCaseTest {
     }
     
     @Test("유저 이름 조회", arguments: ["test"])
-    func getMemberName_success(nickname: String) async throws {
+    func getMemberName(nickname: String) async throws {
         // give
         let _ = try await createMember(id: 1, nickname: nickname)
         
@@ -40,7 +40,7 @@ struct MemberUseCaseTest {
     }
     
     @Test("유저 이름 업데이트", arguments: ["user"])
-    func updateMemberName_success(nickname: String) async throws {
+    func updateMemberName(nickname: String) async throws {
         // give
         let _ = try await createMember(id: 1, nickname: "test")
         
@@ -53,7 +53,7 @@ struct MemberUseCaseTest {
     }
     
     @Test("유저 탈퇴")
-    func withdrawMemberName_success() async throws {
+    func withdrawMemberName() async throws {
         // give
         let _ = try await createMember(id: 1, nickname: "test")
         
