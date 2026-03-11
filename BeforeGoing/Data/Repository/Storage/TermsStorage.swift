@@ -59,7 +59,7 @@ final class TermsStorage: TermsInterface {
             terms.updatedAt = now
             
             if member.term == nil {
-                terms.id = Int64(member.id)
+                terms.id = AutoCounter.getNextID(for: Terms.self, in: self.context)
                 terms.createdAt = now
                 member.term = terms
             }
