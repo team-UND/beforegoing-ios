@@ -26,4 +26,15 @@ enum DaysOfWeek: Int, CaseIterable {
             return "일"
         }
     }
+    
+    static func toRawvalues(daysString: String) -> [Int] {
+        let daysOfWeek = daysString
+            .split(separator: ",")
+            .compactMap { day in
+                DaysOfWeek.allCases
+                    .first { $0.string == day }?
+                    .rawValue
+            }
+        return daysOfWeek
+    }
 }
