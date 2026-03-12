@@ -47,13 +47,12 @@ struct DataDependencyAssembler: DependencyAssembler {
             )
         }
         DIContainer.shared.register(type: MemberInterface.self) { _ in
-//            MemberRepository(
-//                networkService: networkService,
-//                keyChainService: keyChainService,
-//                userDefaultsService: userDefaultsService,
-//                updateNicknameRequestMapper: updateNicknameRequestMapper
-//            )
-            MemberStorage(userDefaultsService: userDefaultsService)
+            MemberRepository(
+                networkService: networkService,
+                keyChainService: keyChainService,
+                userDefaultsService: userDefaultsService,
+                updateNicknameRequestMapper: updateNicknameRequestMapper
+            )
         }
         DIContainer.shared.register(type: ScenarioInterface.self) { _ in
             ScenarioRepository(
