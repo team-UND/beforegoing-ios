@@ -35,6 +35,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Data/BeforeGoingModel.xcdatamodel,
+				Data/Persistence/CoreData/CoreDataStack.swift,
 			);
 			target = 186E06F02DDDF10600E32490 /* BeforeGoingTests */;
 		};
