@@ -280,7 +280,7 @@ extension ScenarioStorage {
         id: Int? = nil
     ) {
         let mission = Mission(context: context)
-        mission.id = Int64(id ?? 0)
+        mission.id = id.map(Int64.init) ?? AutoCounter.getNextID(for: Mission.self, in: context)
         mission.content = content
         mission.isChecked = false
         mission.missionType = "basic"
