@@ -88,26 +88,14 @@ extension AgreeTermsViewController {
             }
             
             if output.agreeTermsResult {
-                guard let isAppleLoginedOutput = try await viewModel.action(
-                    input: .checkLoginMethod
-                ) as? AgreeItemViewModel.IsAppleLoginedOutput else {
+                if true {
+                    let onboardoingViewController = ViewControllerFactory.shared.makeOnboardingViewController()
+                    onboardoingViewController.navigationItem.hidesBackButton = true
+                    self.navigationController?.pushViewController(onboardoingViewController, animated: false)
                     return
                 }
-                
-                switch isAppleLoginedOutput.isAppleLogined {
-                case .success(let isAppleLogined):
-                    if isAppleLogined {
-                        let onboardoingViewController = ViewControllerFactory.shared.makeOnboardingViewController()
-                        onboardoingViewController.navigationItem.hidesBackButton = true
-                        self.navigationController?.pushViewController(onboardoingViewController, animated: false)
-                        return
-                    }
-                    let nicknameViewController = ViewControllerFactory.shared.makeNicknameViewController()
-                    self.navigationController?.pushViewController(nicknameViewController, animated: false)
-                    
-                case .failure(let error):
-                    BeforeGoingLogger.error(error)
-                }
+                let nicknameViewController = ViewControllerFactory.shared.makeNicknameViewController()
+                self.navigationController?.pushViewController(nicknameViewController, animated: false)
                 return
             }
             BeforeGoingLogger.error(BeforeGoingError.agreeTermsFailed)
