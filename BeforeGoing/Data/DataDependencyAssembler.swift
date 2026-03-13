@@ -7,67 +7,42 @@
 
 struct DataDependencyAssembler: DependencyAssembler {
     
-    private let networkService = NetworkService.shared
     private let keyChainService = KeyChainService()
-    private let tokenReissuer: TokenReissuer
     private let userDefaultsService = UserDefaultsService()
-    private let nonceRequestMapper = NonceRequestMapper()
-    private let loginRequestMapper = LoginRequestMapper()
-    private let termsRequestMapper = TermsRequestMapper()
-    private let updateTermRequestMapper = UpdateTermRequestMapper()
-    private let updateNicknameRequestMapper = UpdateNicknameRequestMapper()
-    private let addScenarioRequestMapper = AddScenarioRequestMapper()
-    private let updateScenarioRequestMapper = UpdateScenarioRequestMapper()
-    private let updateScenarioOrderRequestMapper = UpdateScenarioOrderRequestMapper()
-    private let addTodayMissionRequestMapper = AddTodayMissionRequestMapper()
-    private let tokenValidator = TokenValidator()
-    
-    init() {
-        self.tokenReissuer = TokenReissuer(keyChainService: keyChainService)
-    }
     
     func assemble() {
-        DIContainer.shared.register(nonceRequestMapper)
-        DIContainer.shared.register(loginRequestMapper)
-        DIContainer.shared.register(termsRequestMapper)
-        DIContainer.shared.register(updateTermRequestMapper)
-        DIContainer.shared.register(updateScenarioRequestMapper)
-        DIContainer.shared.register(updateNicknameRequestMapper)
-        
         DIContainer.shared.register(type: AuthInterface.self) { _ in
-            AuthRepository(userDefaultsService: userDefaultsService)
+            AuthStorage(
+                userDefaultsService: userDefaultsService,
+                context: CoreDataStack.shared.context,
+                memberStorage: MemberStorage(
+                    userDefaultsService: userDefaultsService,
+                    context: CoreDataStack.shared.context
+                )
+            )
         }
         DIContainer.shared.register(type: TermsInterface.self) { _ in
-            TermsRepository(
-                networkService: networkService,
-                keyChainService: keyChainService,
+            TermsStorage(
                 userDefaultsService: userDefaultsService,
-                termsRequestMapper: termsRequestMapper,
-                updateTermRequestMapper: updateTermRequestMapper
+                context: CoreDataStack.shared.context
             )
         }
         DIContainer.shared.register(type: MemberInterface.self) { _ in
-            MemberRepository(
-                networkService: networkService,
-                keyChainService: keyChainService,
+            MemberStorage(
                 userDefaultsService: userDefaultsService,
-                updateNicknameRequestMapper: updateNicknameRequestMapper
+                context: CoreDataStack.shared.context
             )
         }
         DIContainer.shared.register(type: ScenarioInterface.self) { _ in
-            ScenarioRepository(
-                networkService: networkService,
-                keyChainService: keyChainService,
-                addScenarioRequestMapper: addScenarioRequestMapper,
-                updateScenarioRequestMapper: updateScenarioRequestMapper,
-                updateScenarioOrderRequestMapper: updateScenarioOrderRequestMapper
+            ScenarioStorage(
+                userDefaultService: userDefaultsService,
+                context: CoreDataStack.shared.context
             )
         }
         DIContainer.shared.register(type: MissionInterface.self) { _ in
-            MissionRepository(
-                networkService: networkService,
-                keyChainService: keyChainService,
-                addTodayMissionRequestMapper: addTodayMissionRequestMapper
+            MissionStorage(
+                userDefaultsService: userDefaultsService,
+                context: CoreDataStack.shared.context
             )
         }
     }
