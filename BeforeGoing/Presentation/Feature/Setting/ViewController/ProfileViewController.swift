@@ -46,11 +46,6 @@ final class ProfileViewController: BaseViewController {
             action: #selector(modifyNameButtonDidTap),
             for: .touchUpInside
         )
-        rootView.logoutView.seeMoreButton.addTarget(
-            self,
-            action: #selector(logoutDidTap),
-            for: .touchUpInside
-        )
         rootView.withdrawView.seeMoreButton.addTarget(
             self,
             action: #selector(withdrawDidTap),
@@ -59,12 +54,6 @@ final class ProfileViewController: BaseViewController {
     }
     
     private func setGesture() {
-        let logoutTapGesture = UITapGestureRecognizer(target: self, action: #selector(logoutDidTap))
-        rootView.logoutView.do {
-            $0.addGestureRecognizer(logoutTapGesture)
-            $0.isUserInteractionEnabled = true
-        }
-        
         let withdrawTapGesture = UITapGestureRecognizer(target: self, action: #selector(withdrawDidTap))
         rootView.withdrawView.do {
             $0.addGestureRecognizer(withdrawTapGesture)

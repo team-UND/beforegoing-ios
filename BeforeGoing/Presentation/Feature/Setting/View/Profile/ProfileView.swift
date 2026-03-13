@@ -14,7 +14,6 @@ final class ProfileView: BaseView {
     private let nameLabel = UILabel()
     private(set) var modifyNameButton = UIButton()
     private let divider = UILabel()
-    private(set) var logoutView = ProfileFeatureView(title: "로그아웃")
     private(set) var withdrawView = ProfileFeatureView(title: "회원탈퇴")
     
     override func setStyle() {
@@ -41,7 +40,6 @@ final class ProfileView: BaseView {
             nameLabel,
             modifyNameButton,
             divider,
-            logoutView,
             withdrawView
         )
     }
@@ -72,16 +70,11 @@ final class ProfileView: BaseView {
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(6.adjustedH)
         }
-        logoutView.snp.makeConstraints {
+        withdrawView.snp.makeConstraints {
             $0.top.equalTo(divider.snp.bottom).offset(32.adjustedH)
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(48.adjustedH)
-        }
-        withdrawView.snp.makeConstraints {
-            $0.top.equalTo(logoutView.snp.bottom).offset(8.adjustedH)
-            $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(48.adjustedH)
-            $0.bottom.equalToSuperview().inset(220.adjustedH)
+            $0.bottom.equalToSuperview().inset(276.adjustedH)
         }
     }
 }
