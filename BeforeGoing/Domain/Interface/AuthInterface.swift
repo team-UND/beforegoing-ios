@@ -6,5 +6,5 @@
 //
 
 protocol AuthInterface {
-    func login() -> Bool
+    func login() async throws -> Bool
 }

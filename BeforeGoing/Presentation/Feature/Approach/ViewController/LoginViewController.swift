@@ -5,7 +5,6 @@
 //  Created by APPLE on 8/2/25.
 //
 
-import AuthenticationServices
 import UIKit
 
 final class LoginViewController: BaseViewController {
@@ -29,9 +28,11 @@ final class LoginViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let loginOutput = viewModel.action(input: .viewDidLoad)
-        if loginOutput.isRegisteredMember {
-            moveByNotification()
+        Task {
+            let loginOutput = try await viewModel.action(input: .viewDidLoad)
+            if loginOutput.isRegisteredMember {
+                moveByNotification()
+            }
         }
     }
     

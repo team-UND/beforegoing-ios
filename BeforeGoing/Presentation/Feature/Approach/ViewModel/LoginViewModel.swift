@@ -23,10 +23,10 @@ final class LoginViewModel: ViewModeling {
         let isRegisteredMember: Bool
     }
     
-    func action(input: Input) -> Output {
+    func action(input: Input) async throws -> Output {
         switch input {
         case .viewDidLoad:
-            let isRegisteredMember = loginUseCase.execute()
+            let isRegisteredMember = try await loginUseCase.execute()
             return LoginOutput(isRegisteredMember: isRegisteredMember)
         }
     }
