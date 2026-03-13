@@ -88,12 +88,6 @@ extension AgreeTermsViewController {
             }
             
             if output.agreeTermsResult {
-                if true {
-                    let onboardoingViewController = ViewControllerFactory.shared.makeOnboardingViewController()
-                    onboardoingViewController.navigationItem.hidesBackButton = true
-                    self.navigationController?.pushViewController(onboardoingViewController, animated: false)
-                    return
-                }
                 let nicknameViewController = ViewControllerFactory.shared.makeNicknameViewController()
                 self.navigationController?.pushViewController(nicknameViewController, animated: false)
                 return
