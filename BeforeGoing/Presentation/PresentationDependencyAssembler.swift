@@ -177,5 +177,6 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             )
         )
         DIContainer.shared.register(ManageScenarioViewModel())
+        DIContainer.shared.register(AgreeItemViewModel(sendAgreeUseCase: agreeTermsUseCase))
     }
 }
