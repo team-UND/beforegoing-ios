@@ -21,6 +21,20 @@ final class MemberStorage: MemberInterface {
         self.context = context
     }
     
+    func setMember(userID: Int64) async throws {
+        try await context.perform { [weak self] in
+            guard let self else { return }
+            
+            let member = Member(context: context)
+            member.id = userID
+            member.nickname = ""
+            member.createdAt = Date()
+            member.updatedAt = Date()
+            
+            try context.save()
+        }
+    }
+    
     func updateNickname(nickname: String) async throws {
         try await context.perform { [weak self] in
             guard let self,
