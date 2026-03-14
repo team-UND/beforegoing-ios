@@ -65,6 +65,8 @@ final class TermsStorage: TermsInterface {
             }
             
             try self.context.save()
+            
+            let _ = self.userDefaultsService.save(true, key: .isAgreedTerms)
         }
     }
     

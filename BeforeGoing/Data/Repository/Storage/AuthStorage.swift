@@ -25,12 +25,28 @@ struct AuthStorage: AuthInterface {
     
     func login() async throws -> Bool {
         guard let _: Int = userDefaultsService.load(key: .userID) else {
-            let memberID = AutoCounter.getNextID(for: Member.self, in: context)
-            let _ = userDefaultsService.save(memberID, key: .userID)
-            try await memberStorage.setMember(userID: memberID)
-            
+            try await initMember()
             return false
         }
+        
+        guard let isAgreedTerms: Bool = userDefaultsService.load(key: .isAgreedTerms),
+              isAgreedTerms
+        else {
+            return false
+        }
+        
+        guard let isSetNickname: Bool = userDefaultsService.load(key: .isSetNickname),
+              isSetNickname
+        else {
+            return false
+        }
+        
         return true
+    }
+    
+    private func initMember() async throws {
+        let memberID = AutoCounter.getNextID(for: Member.self, in: context)
+        let _ = userDefaultsService.save(memberID, key: .userID)
+        try await memberStorage.setMember(userID: memberID)
     }
 }
