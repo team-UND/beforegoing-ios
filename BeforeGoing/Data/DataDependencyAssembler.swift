@@ -53,7 +53,10 @@ struct DataDependencyAssembler: DependencyAssembler {
 //                userDefaultsService: userDefaultsService,
 //                updateNicknameRequestMapper: updateNicknameRequestMapper
 //            )
-            MemberStorage(userDefaultsService: userDefaultsService)
+            MemberStorage(
+                userDefaultsService: userDefaultsService,
+                context: CoreDataStack.shared.context
+            )
         }
         DIContainer.shared.register(type: ScenarioInterface.self) { _ in
             ScenarioRepository(

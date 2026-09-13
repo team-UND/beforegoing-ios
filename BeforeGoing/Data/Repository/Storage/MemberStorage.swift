@@ -20,7 +20,15 @@ final class MemberStorage: MemberInterface {
         self.userDefaultsService = userDefaultsService
         self.context = context
     }
-    
+
+    var isAppleLogined: Bool? {
+        guard let provider: String = userDefaultsService.load(key: .provider) else {
+            return nil
+        }
+
+        return provider == Provider.apple.rawValue
+    }
+
     func updateNickname(nickname: String) async throws {
         try await context.perform { [weak self] in
             guard let self,
