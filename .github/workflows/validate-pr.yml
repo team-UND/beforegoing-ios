@@ -60,6 +60,9 @@ jobs:
 
       - name: Run Fastlane
         run: bundle exec fastlane test
+        env:
+          FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 120
+          FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 5
 
       - name: Generate Coverage Report
         run: |
