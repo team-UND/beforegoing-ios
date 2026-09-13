@@ -23,7 +23,7 @@ struct ScenarioNotificationDTO: Decodable {
 extension NotificationsDTO {
     func toEntity() -> NotificationsEntity {
         let scenarios = scenarios.map { $0.toEntity() }
-        return .init(scenarios: scenarios)
+        return .init(notifications: scenarios)
     }
 }
 

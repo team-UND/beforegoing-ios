@@ -7,6 +7,6 @@
 
 import Foundation
 
-extension Notification.Name {
-    static let loginExpired = Notification.Name("loginExpired")
+extension Foundation.Notification.Name {
+    static let loginExpired = Foundation.Notification.Name("loginExpired")
 }

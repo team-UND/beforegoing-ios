@@ -56,7 +56,7 @@ final class GetScenariosViewModel: ViewModeling {
         case .requestNotifications:
             do {
                 let result = try await fetchNotificationsUseCase.execute()
-                createScenarios(notifications: result.scenarios)
+                createScenarios(notifications: result.notifications)
                 return NotificationsOutput(notificationsResult: .success(result))
             } catch (let error) {
                 return NotificationsOutput(notificationsResult: .failure(error))

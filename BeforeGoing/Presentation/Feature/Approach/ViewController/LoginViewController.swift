@@ -29,27 +29,9 @@ final class LoginViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        Task {
-            do {
-                if let output = try await viewModel.action(input: .viewDidLoad) as? LoginViewModel.AutoLoginOutput,
-                   output.isSucceed {
-                    moveByNotification()
-                }
-            } catch {
-                BeforeGoingLogger.error(BeforeGoingError.autoLoginFailed)
-            }
-        }
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        Task {
-            guard let output = try await viewModel.action(input: .viewWillAppear) as? LoginViewModel.LastLoginOutput else {
-                return
-            }
-            
-            rootView.updateLastLoginBadgeConstraint(provider: output.lastLoginProvider)
+        let loginOutput = viewModel.action(input: .viewDidLoad)
+        if loginOutput.isRegisteredMember {
+            moveByNotification()
         }
     }
     
@@ -59,22 +41,14 @@ final class LoginViewController: BaseViewController {
     }
     
     override func setAction() {
-        rootView.do {
-            $0.kakaoLoginButton.addTarget(self, action: #selector(kakaoLoginButtonDidTap), for: .touchUpInside)
-            $0.appleLoginButton.addTarget(self, action: #selector(appleLoginButtonDidTap), for: .touchUpInside)
-        }
+        rootView.startButton.addTarget(self, action: #selector(startButtonDidTap), for: .touchUpInside)
     }
     
     private func setAnimation() {
         DispatchQueue.main.async {
             UIView.animate(withDuration: 0.5, delay: 1.5, options: [.curveEaseOut]) {
                 self.rootView.do {
-                    $0.appIconTopConstraint?.update(inset: 230.adjustedH)
-                    $0.kakaoLoginTopConstraint?.update(offset: 151.adjustedH)
-                    
-                    $0.kakaoLoginButton.alpha = 1
-                    $0.appleLoginButton.alpha = 1
-                    $0.lastLoginBadgeView.alpha = 1
+                    $0.startButton.alpha = 1
                     $0.layoutIfNeeded()
                 }
             }
@@ -85,35 +59,8 @@ final class LoginViewController: BaseViewController {
 extension LoginViewController: NetworkRequestable, NetworkRequestErrorHandler {
     
     @objc
-    func kakaoLoginButtonDidTap() {
-        Task {
-            do {
-                guard let output = try await viewModel.action(
-                    input: .kakaoLoginDidTap
-                ) as? LoginViewModel.SocialLoginOutput else {
-                    return
-                }
-                output.isRegisteredMember ? moveByNotification() : moveTerms()
-            } catch (let error) {
-                self.handleError(error)
-                BeforeGoingLogger.error(BeforeGoingError.loginFailed)
-            }
-        }
-    }
-    
-    @objc
-    func appleLoginButtonDidTap() {
-        Task {
-            do {
-                let _ = try await viewModel.action(input: .appleLoginDidTap)
-                viewModel.onAppleLoginPerformed = { [weak self] isMemberRegistered in
-                    isMemberRegistered ? self?.moveByNotification() : self?.moveTerms()
-                }
-            } catch (let error) {
-                self.handleError(error)
-                BeforeGoingLogger.error(BeforeGoingError.loginFailed)
-            }
-        }
+    func startButtonDidTap() {
+        moveTerms()
     }
     
     private func moveByNotification() {
@@ -123,7 +70,7 @@ extension LoginViewController: NetworkRequestable, NetworkRequestErrorHandler {
             guard let notificationIdentifier = NotificationIdentifier.convertIdentifier(from: request.identifier) else {
                 return
             }
-                    
+            
             switch notificationIdentifier {
             case .pushNotice :
                 replaceViewController(

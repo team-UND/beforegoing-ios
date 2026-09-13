@@ -6,7 +6,7 @@
 //
 
 struct NotificationsEntity {
-    let scenarios: [NotificationEntity]
+    let notifications: [NotificationEntity]
 }
 
 struct NotificationEntity {
@@ -22,7 +22,7 @@ struct NotificationEntity {
 
 extension NotificationsEntity {
     static func stub() -> Self {
-        .init(scenarios: [.stub()])
+        .init(notifications: [.stub()])
     }
 }
 

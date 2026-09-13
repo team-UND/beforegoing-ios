@@ -30,4 +30,13 @@ enum BeforeGoingError: Error, Equatable {
     case tooManyRequset
     case withdrawFailed
     case notFoundProvider
+    
+    
+    case userIDNotFound
+    case memberNotFound
+    case termsNotFound
+    case scenarioNotFound
+    case notificationNotFound
+    case invalidMissionType
+    case invalidDateFormat
 }

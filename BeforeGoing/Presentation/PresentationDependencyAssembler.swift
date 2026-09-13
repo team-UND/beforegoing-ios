@@ -21,27 +21,7 @@ struct PresentationDependencyAssembler: DependencyAssembler {
             fatalError()
         }
         
-        guard let autoLoginUseCase = DIContainer.shared.resolve(type: AutoLoginType.self) else {
-            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            fatalError()
-        }
-        
-        guard let getLastLoginUseCase = DIContainer.shared.resolve(type: GetLastLoginType.self) else {
-            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            fatalError()
-        }
-        
-        guard let logoutUseCase = DIContainer.shared.resolve(type: LogoutType.self) else {
-            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            fatalError()
-        }
-        
         guard let agreeTermsUseCase = DIContainer.shared.resolve(type: SendAgreeTermsType.self) else {
-            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            fatalError()
-        }
-        
-        guard let isAppleLoginedUseCase = DIContainer.shared.resolve(type: IsAppleLoginType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()
         }
@@ -132,17 +112,7 @@ struct PresentationDependencyAssembler: DependencyAssembler {
         }
         
         DIContainer.shared.register(
-            AgreeItemViewModel(
-                sendAgreeUseCase: agreeTermsUseCase,
-                isAppleLoginedUseCase: isAppleLoginedUseCase
-            )
-        )
-        DIContainer.shared.register(
-            LoginViewModel(
-                autoLoginUseCase: autoLoginUseCase,
-                loginUseCase: loginUseCase,
-                getLastLoginUseCase: getLastLoginUseCase
-            )
+            LoginViewModel(loginUseCase: loginUseCase)
         )
         DIContainer.shared.register(
             HomeViewModel(
@@ -157,7 +127,6 @@ struct PresentationDependencyAssembler: DependencyAssembler {
         DIContainer.shared.register(
             ProfileViewModel(
                 getMemberNameUseCase: getMemberNameUseCase,
-                logoutUseCase: logoutUseCase,
                 withdrawUseCase: withdrawUseCase
             )
         )

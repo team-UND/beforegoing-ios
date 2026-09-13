@@ -6,10 +6,7 @@
 //
 
 protocol LoginType {
-    
-    func login(provider: Provider) async throws -> Bool
-    func login(provider: Provider, idToken: String, name: String?) async throws -> Bool
-    func requestNonce(provider: Provider) async throws -> String
+    func execute() -> Bool
 }
 
 struct LoginUseCase: LoginType {
@@ -20,34 +17,13 @@ struct LoginUseCase: LoginType {
         self.repository = repository
     }
     
-    func login(provider: Provider) async throws -> Bool {
-        try await repository.requestLogin(provider: provider)
-    }
-    
-    func login(provider: Provider, idToken: String, name: String?) async throws -> Bool {
-        return try await repository.requestLogin(
-            provider: provider,
-            idToken: idToken,
-            name: name
-        )
-    }
-    
-    func requestNonce(provider: Provider) async throws -> String {
-        let nonceEntity = try await repository.requestNonce(provider: provider)
-        return nonceEntity.nonce
+    func execute() -> Bool {
+        repository.login()
     }
 }
 
 struct MockLoginUseCase: LoginType {
-    func login(provider: Provider) -> Bool {
+    func execute() -> Bool {
         return true
-    }
-    
-    func login(provider: Provider, idToken: String, name: String?) -> Bool {
-        return true
-    }
-    
-    func requestNonce(provider: Provider) -> String {
-        return "nonce"
     }
 }

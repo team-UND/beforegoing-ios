@@ -16,38 +16,6 @@ final class DomainDependencyAssembler: DependencyAssembler {
     }
     
     func assemble() {
-        let isUITestWithMock = ProcessInfo.processInfo.environment["USE_MOCK"] == "true"
-        
-        if isUITestWithMock {
-            DIContainer.shared.register(type: AutoLoginType.self) { _ in MockAutoLoginUseCase() }
-            DIContainer.shared.register(type: LoginType.self) { _ in MockLoginUseCase() }
-            DIContainer.shared.register(type: LogoutType.self) { _ in MockLogoutUseCase() }
-            
-            DIContainer.shared.register(type: FetchAgreeTermsType.self) { _ in MockFetchAgreeTermsUseCase() }
-            DIContainer.shared.register(type: SendAgreeTermsType.self) { _ in MockSendAgreeTermsUseCase() }
-            DIContainer.shared.register(type: UpdatePushNoticeType.self) { _ in MockUpdatePushNoticeUseCase() }
-            
-            DIContainer.shared.register(type: UpdateNicknameType.self) { _ in MockUpdateNicknameUseCase() }
-            DIContainer.shared.register(type: GetMemberNameType.self) { _ in MockGetMemberNameUseCase() }
-            DIContainer.shared.register(type: MemberWithdrawType.self) { _ in MockMemberWithdrawUseCase() }
-            
-            DIContainer.shared.register(type: FetchWeatherType.self) { _ in MockFetchWeatherUseCase() }
-            
-            DIContainer.shared.register(type: AddScenarioType.self) { _ in MockAddScenarioUseCase() }
-            DIContainer.shared.register(type: FetchScenariosType.self) { _ in MockFetchScenariosUseCase() }
-            DIContainer.shared.register(type: DeleteScenarioType.self) { _ in MockDeleteScenarioUseCase() }
-            DIContainer.shared.register(type: UpdateScenarioType.self) { _ in  MockUpdateScenarioUseCase() }
-            DIContainer.shared.register(type: UpdateScenarioOrderType.self) { _ in MockUpdateScenarioOrderUseCase() }
-            DIContainer.shared.register(type: FetchSingleScenarioType.self) { _ in MockFetchSingleScenarioUseCase() }
-            
-            DIContainer.shared.register(type: FetchMissionsType.self) { _ in MockFetchMissionsUseCase() }
-            DIContainer.shared.register(type: CheckMissionType.self) { _ in MockCheckMissionUseCase() }
-            DIContainer.shared.register(type: AddTodayMissionType.self) { _ in MockAddTodayMissionUseCase() }
-            DIContainer.shared.register(type: DeleteTodayMissionType.self) { _ in MockDeleteTodayMissionUseCase() }
-            
-            return
-        }
-        
         dataDependencyAssembler.assemble()
         
         guard let authrepository = DIContainer.shared.resolve(type: AuthInterface.self) else {
@@ -75,17 +43,8 @@ final class DomainDependencyAssembler: DependencyAssembler {
             return
         }
         
-        DIContainer.shared.register(type: AutoLoginType.self) { _ in
-            AutoLoginUseCase(repository: authrepository)
-        }
         DIContainer.shared.register(type: LoginType.self) { _ in
             LoginUseCase(repository: authrepository)
-        }
-        DIContainer.shared.register(type: GetLastLoginType.self) { _ in
-            GetLastLoginUseCase(repository: authrepository)
-        }
-        DIContainer.shared.register(type: LogoutType.self) { _ in
-            return LogoutUseCase(repository: authrepository)
         }
         
         DIContainer.shared.register(type: FetchAgreeTermsType.self) { _ in
@@ -93,9 +52,6 @@ final class DomainDependencyAssembler: DependencyAssembler {
         }
         DIContainer.shared.register(type: SendAgreeTermsType.self) { _ in
             return SendAgreeTermsUseCase(repository: termsRepository)
-        }
-        DIContainer.shared.register(type: IsAppleLoginType.self) { _ in
-            return IsAppleLoginedUseCase(repository: memberRepository)
         }
         DIContainer.shared.register(type: UpdatePushNoticeType.self) { _ in
             return UpdatePushNoticeUseCase(repository: termsRepository)

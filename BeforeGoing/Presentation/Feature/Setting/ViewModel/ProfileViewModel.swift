@@ -10,22 +10,18 @@ protocol ProfileOutput {}
 final class ProfileViewModel: ViewModeling {
     
     private let getMemberNameUseCase: GetMemberNameType
-    private let logoutUseCase: LogoutType
     private let withdrawUseCase: MemberWithdrawType
     
     init(
         getMemberNameUseCase: GetMemberNameType,
-        logoutUseCase: LogoutType,
         withdrawUseCase: MemberWithdrawType
     ) {
         self.getMemberNameUseCase = getMemberNameUseCase
-        self.logoutUseCase = logoutUseCase
         self.withdrawUseCase = withdrawUseCase
     }
     
     enum Input {
         case viewWillAppear
-        case logoutButtonDidTap
         case withdrawButtonDidTap
     }
     
@@ -33,10 +29,6 @@ final class ProfileViewModel: ViewModeling {
     
     struct MemberNameOutput: ProfileOutput {
         let name: String
-    }
-    
-    struct LogoutOutput: ProfileOutput {
-        let isSucceedLogout: Bool
     }
     
     struct WithdrawOutput: ProfileOutput {
@@ -48,14 +40,7 @@ final class ProfileViewModel: ViewModeling {
         case .viewWillAppear:
             let name = try await getMemberNameUseCase.execute()
             return MemberNameOutput(name: name)
-        case .logoutButtonDidTap:
-            do {
-                try await logoutUseCase.execute()
-                return LogoutOutput(isSucceedLogout: true)
-            } catch(let error) {
-                BeforeGoingLogger.error(error)
-                return LogoutOutput(isSucceedLogout: false)
-            }
+            
         case .withdrawButtonDidTap:
             do {
                 try await withdrawUseCase.execute()

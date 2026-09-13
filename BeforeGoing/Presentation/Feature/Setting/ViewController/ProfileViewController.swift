@@ -125,27 +125,7 @@ extension ProfileViewController: NetworkRequestable, NetworkRequestErrorHandler 
     }
     
     private func defineLogout() -> () -> Void {
-        return { [weak self] in
-            guard let self = self else { return }
-            Task {
-                do {
-                    guard let result = try await self.viewModel.action(
-                        input: .logoutButtonDidTap
-                    ) as? ProfileViewModel.LogoutOutput else {
-                        return
-                    }
-                    if result.isSucceedLogout {
-                        let loginViewController = ViewControllerFactory.shared.makeLoginViewController()
-                        let navigationController = UINavigationController(rootViewController: loginViewController)
-                        ViewControllerUtil.replaceRootViewController(to: navigationController)
-                        return
-                    }
-                } catch {
-                    self.handleError(error)
-                    BeforeGoingLogger.error(BeforeGoingError.logoutFailed)
-                }
-            }
-        }
+        return {}
     }
     
     private func defineWithdrawal() -> () -> Void {
