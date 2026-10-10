@@ -20,15 +20,21 @@ final class MemberStorage: MemberInterface {
         self.userDefaultsService = userDefaultsService
         self.context = context
     }
-
-    var isAppleLogined: Bool? {
-        guard let provider: String = userDefaultsService.load(key: .provider) else {
-            return nil
+    
+    func setMember(userID: Int64) async throws {
+        try await context.perform { [weak self] in
+            guard let self else { return }
+            
+            let member = Member(context: context)
+            member.id = userID
+            member.nickname = ""
+            member.createdAt = Date()
+            member.updatedAt = Date()
+            
+            try context.save()
         }
-
-        return provider == Provider.apple.rawValue
     }
-
+    
     func updateNickname(nickname: String) async throws {
         try await context.perform { [weak self] in
             guard let self,
@@ -40,6 +46,8 @@ final class MemberStorage: MemberInterface {
             member.nickname = nickname
             
             try context.save()
+            
+            let _ = self.userDefaultsService.save(true, key: .isSetNickname)
         }
     }
     

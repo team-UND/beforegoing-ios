@@ -278,7 +278,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "앱 사용 여부와 관계없이 현재 위치의 날씨를 확인하고 정확한 알림을 제공하는 데 사용됩니다.";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "앱이 닫혀 있을 때에도 날씨 정보를 미리 업데이트하여 정확한 정보를 제공하기 위해 위치를 사용합니다.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "현재 위치의 날씨 정보를 제공하고, 사용자가 직접 미션을 추가할 때 지리적 태그를 지정하기 위해 필요합니다.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "사용자의 현재 위치를 기반으로 기상정보와 준비물을 추천해 드리기 위해 위치 권한을 사용합니다";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -320,7 +320,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "앱 사용 여부와 관계없이 현재 위치의 날씨를 확인하고 정확한 알림을 제공하는 데 사용됩니다.";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "앱이 닫혀 있을 때에도 날씨 정보를 미리 업데이트하여 정확한 정보를 제공하기 위해 위치를 사용합니다.";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "현재 위치의 날씨 정보를 제공하고, 사용자가 직접 미션을 추가할 때 지리적 태그를 지정하기 위해 필요합니다.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "사용자의 현재 위치를 기반으로 기상정보와 준비물을 추천해 드리기 위해 위치 권한을 사용합니다";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";

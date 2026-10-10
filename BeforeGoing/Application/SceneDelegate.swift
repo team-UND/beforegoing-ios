@@ -94,17 +94,12 @@ extension SceneDelegate: UNUserNotificationCenterDelegate {
             AudioServicesPlaySystemSound(SystemSoundID(1005))
         }
         
-        DispatchQueue.main.async { [weak self] in
-            if AuthManager.shared.isAutoLoginEnabled {
-                self?.navigateToScreen(for: notificationRequest)
-                completionHandler()
-            } else {
-                AuthManager.shared.pendingNotificationRequest = notificationRequest
-                let loginVC = ViewControllerFactory.shared.makeLoginViewController()
-                ViewControllerUtil.replaceRootViewController(to: loginVC)
+        DispatchQueue.main.async {
+            NotificationManager.shared.deliveredNotifiactionRequest = notificationRequest
+            let loginVC = ViewControllerFactory.shared.makeLoginViewController()
+            ViewControllerUtil.replaceRootViewController(to: loginVC)
 
-                completionHandler()
-            }
+            completionHandler()
         }
     }
     

@@ -8,8 +8,8 @@
 import Foundation
 
 protocol UserDefaultsProtocol {
-    func save(_ value: Any, key: UserDefaultsKey) -> Bool
-    func load<T>(key: UserDefaultsKey) -> T?
+    func save<T: Codable>(_ value: T, key: UserDefaultsKey) -> Bool
+    func load<T: Codable>(key: UserDefaultsKey) -> T?
     func delete(key: UserDefaultsKey) -> Bool
 }
 
@@ -18,20 +18,11 @@ struct UserDefaultsService: UserDefaultsProtocol {
     private let encoder = JSONEncoder()
     private let decoder = JSONDecoder()
     
-    func save(_ value: Any, key: UserDefaultsKey) -> Bool {
-        UserDefaults.standard.setValue(value, forKey: key.rawValue)
-        return UserDefaults.standard.value(forKey: key.rawValue) != nil
-    }
-    
     func save<T: Codable>(_ value: T, key: UserDefaultsKey) -> Bool {
         if let encoded = try? encoder.encode(value) {
             UserDefaults.standard.set(encoded, forKey: key.rawValue)
         }
         return UserDefaults.standard.value(forKey: key.rawValue) != nil
-    }
-    
-    func load<T>(key: UserDefaultsKey) -> T? {
-        UserDefaults.standard.value(forKey: key.rawValue) as? T
     }
     
     func load<T: Codable>(key: UserDefaultsKey) -> T? {
@@ -49,21 +40,23 @@ struct UserDefaultsService: UserDefaultsProtocol {
 
 final class MockUserDefaultsService: UserDefaultsProtocol {
     
-    private var storage: [UserDefaultsKey: Any] = [:]
+    private let encoder = JSONEncoder()
+    private let decoder = JSONDecoder()
+    private var storage: [UserDefaultsKey: Data] = [:]
     
-    func save(_ value: Any, key: UserDefaultsKey) -> Bool {
-        storage[key] = value
+    func save<T: Codable>(_ value: T, key: UserDefaultsKey) -> Bool {
+        guard let encoded = try? encoder.encode(value) else { return false }
+        storage[key] = encoded
         return true
     }
-
-    func load<T>(key: UserDefaultsKey) -> T? {
-        storage[key] as? T
+    
+    func load<T: Codable>(key: UserDefaultsKey) -> T? {
+        guard let data = storage[key] else { return nil }
+        return try? decoder.decode(T.self, from: data)
     }
-
+    
     func delete(key: UserDefaultsKey) -> Bool {
-        guard let _ = storage.removeValue(forKey: key) else {
-            return false
-        }
+        guard let _ = storage.removeValue(forKey: key) else { return false }
         return true
     }
     

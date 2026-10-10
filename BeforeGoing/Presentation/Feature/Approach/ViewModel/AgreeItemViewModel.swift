@@ -12,12 +12,10 @@ final class AgreeItemViewModel: ViewModeling {
     private var agreeItems = AgreeItem.allCases
     private var checkBoxStates: [AgreeItem : CheckBoxState] = [:]
     private let sendAgreeUseCase: SendAgreeTermsType
-    private let isAppleLoginedUseCase: IsAppleLoginType
     
     enum Input {
         case nextButtonDidTap
         case initTerms
-        case checkLoginMethod
     }
     
     typealias Output = AgreeItemOutput
@@ -28,16 +26,8 @@ final class AgreeItemViewModel: ViewModeling {
     
     struct EmptyOutput: AgreeItemOutput {}
     
-    struct IsAppleLoginedOutput: AgreeItemOutput {
-        let isAppleLogined: Result<Bool, BeforeGoingError>
-    }
-    
-    init(
-        sendAgreeUseCase: SendAgreeTermsType,
-        isAppleLoginedUseCase: IsAppleLoginType
-    ) {
+    init(sendAgreeUseCase: SendAgreeTermsType) {
         self.sendAgreeUseCase = sendAgreeUseCase
-        self.isAppleLoginedUseCase = isAppleLoginedUseCase
         
         agreeItems.forEach { checkBoxStates[$0] = .unchecked }
     }
@@ -62,16 +52,6 @@ final class AgreeItemViewModel: ViewModeling {
         case .initTerms:
             agreeItems.forEach { checkBoxStates[$0] = .unchecked }
             return EmptyOutput()
-            
-        case .checkLoginMethod:
-            let result = isAppleLoginedUseCase.execute()
-            
-            switch result {
-            case .some(let isAppleLogined):
-                return IsAppleLoginedOutput(isAppleLogined: .success(isAppleLogined))
-            case .none:
-                return IsAppleLoginedOutput(isAppleLogined: .failure(.notFoundProvider))
-            }
         }
     }
 }

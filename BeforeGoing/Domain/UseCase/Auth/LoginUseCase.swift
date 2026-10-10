@@ -6,7 +6,7 @@
 //
 
 protocol LoginType {
-    func execute() -> Bool
+    func execute() async throws -> Bool
 }
 
 struct LoginUseCase: LoginType {
@@ -17,8 +17,8 @@ struct LoginUseCase: LoginType {
         self.repository = repository
     }
     
-    func execute() -> Bool {
-        repository.login()
+    func execute() async throws -> Bool {
+        try await repository.login()
     }
 }
 

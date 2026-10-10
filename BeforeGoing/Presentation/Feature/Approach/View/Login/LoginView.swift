@@ -39,8 +39,10 @@ final class LoginView: BaseView {
         }
         startButton.do {
             $0.setTitle("시작하기", for: .normal)
-            $0.titleLabel?.font = .custom(.bodyLGMedium)
-            $0.alpha = 0
+            $0.setTitleColor(.gray600, for: .normal)
+            $0.titleLabel?.font = .custom(.bodyLGSemiBold)
+            $0.layer.cornerRadius = 14
+            $0.backgroundColor = .white
         }
     }
     
@@ -59,13 +61,12 @@ final class LoginView: BaseView {
             $0.edges.equalToSuperview()
         }
         appIconImageView.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(296.adjustedH)
+            $0.top.equalToSuperview().inset(223.adjustedH)
             $0.centerX.equalToSuperview()
             $0.width.equalTo(180.adjustedW)
-            $0.height.equalTo(150.adjustedH)
         }
         subtitleLabel.snp.makeConstraints {
-            $0.top.equalTo(appIconImageView.snp.bottom).offset(20.adjustedH)
+            $0.top.equalTo(appIconImageView.snp.bottom)
             $0.centerX.equalToSuperview()
             $0.height.equalTo(17.adjustedH)
         }
