@@ -13,6 +13,8 @@ final class NotificationManager {
     
     private init() {}
     
+    var deliveredNotifiactionRequest: UNNotificationRequest?
+    
     func setPermission(completion: @escaping () -> Void) {
         let authOptions: UNAuthorizationOptions = [.alert, .sound, .badge]
         UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { _, _ in

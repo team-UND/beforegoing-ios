@@ -65,37 +65,45 @@ extension LoginViewController: NetworkRequestable, NetworkRequestErrorHandler {
     }
     
     private func moveByNotification() {
-        if let request = AuthManager.shared.pendingNotificationRequest {
-            AuthManager.shared.pendingNotificationRequest = nil
-            
-            guard let notificationIdentifier = NotificationIdentifier.convertIdentifier(from: request.identifier) else {
-                return
-            }
-            
-            switch notificationIdentifier {
-            case .pushNotice :
-                replaceViewController(
-                    to: BottomNavigationViewController(
-                        scenarioTitle: request.content.title
-                    )
-                )
-            case .callNotice(let sequence):
-                replaceViewController(
-                    to: NotificationViewController(
-                        notificationViewType: .init(sequence: sequence),
-                        content: request.content,
-                        identifier: notificationIdentifier.identifier
-                    )
-                )
-            case .terminate:
-                replaceViewController(to: BottomNavigationViewController())
-            }
-            
+        guard let deliveredNotificationRequest = NotificationManager.shared.deliveredNotifiactionRequest else {
+            let bottomNavigationViewController = BottomNavigationViewController()
+            ViewControllerUtil.replaceRootViewController(to: bottomNavigationViewController)
             return
         }
         
-        let viewController = BottomNavigationViewController()
-        ViewControllerUtil.replaceRootViewController(to: viewController)
+        DispatchQueue.main.async { [weak self] in
+            guard let notificationIdentifier = NotificationIdentifier.convertIdentifier(
+                from: deliveredNotificationRequest.identifier
+            ) else {
+                return
+            }
+            
+            self?.handleNotificationRouting(by: notificationIdentifier, request: deliveredNotificationRequest)
+        }
+    }
+    
+    private func handleNotificationRouting(
+        by notificationIdentifier: NotificationIdentifier,
+        request: UNNotificationRequest
+    ) {
+        switch notificationIdentifier {
+        case .pushNotice :
+            replaceViewController(
+                to: BottomNavigationViewController(
+                    scenarioTitle: request.content.title
+                )
+            )
+        case .callNotice(let sequence):
+            replaceViewController(
+                to: NotificationViewController(
+                    notificationViewType: .init(sequence: sequence),
+                    content: request.content,
+                    identifier: notificationIdentifier.identifier
+                )
+            )
+        case .terminate:
+            replaceViewController(to: BottomNavigationViewController())
+        }
     }
     
     private func moveTerms() {
