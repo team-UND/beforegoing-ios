@@ -7,7 +7,6 @@
 
 struct DataDependencyAssembler: DependencyAssembler {
     
-    private let keyChainService = KeyChainService()
     private let userDefaultsService = UserDefaultsService()
     
     func assemble() {
