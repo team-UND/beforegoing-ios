@@ -47,7 +47,7 @@ final class MemberStorage: MemberInterface {
             
             try context.save()
             
-            let _ = self.userDefaultsService.save(true, key: .isAgreedTerms)
+            let _ = self.userDefaultsService.save(true, key: .isSetNickname)
         }
     }
     
