@@ -7,16 +7,12 @@
 
 import UIKit
 
-import KakaoSDKCommon
-import KakaoSDKAuth
-
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         DIContainer.shared.injectDependency()
-        initKakaoSDK()
         
         return true
     }
@@ -43,15 +39,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func applicationWillTerminate(_ application: UIApplication) {}
-}
-
-extension AppDelegate {
-    
-    func initKakaoSDK() {
-        if let appKey = Bundle.main.object(forInfoDictionaryKey: "KAKAO_NATIVE_APP_KEY") as? String {
-            KakaoSDK.initSDK(appKey: appKey)
-        } else {
-            fatalError("카카오 네이티브 앱 키 없음")
-        }
-    }
 }

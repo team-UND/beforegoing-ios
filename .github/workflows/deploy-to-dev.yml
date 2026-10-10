@@ -9,9 +9,6 @@ env:
   SCHEME_NAME: ${{ vars.SCHEME_NAME }}
   APP_IDENTIFIER: ${{ vars.APP_IDENTIFIER }}
 
-  BASE_URL: ${{ secrets.BASE_URL }}
-  KAKAO_NATIVE_APP_KEY: ${{ secrets.KAKAO_NATIVE_APP_KEY }}
-
   APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
   APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
   APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
@@ -64,13 +61,6 @@ jobs:
           echo "${MATCH_SSH_KEY}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan github.com >> ~/.ssh/known_hosts
-
-      - name: Generate Config Files
-        run: |
-          echo "BASE_URL = ${{ env.BASE_URL }}" > BeforeGoing/Config.xcconfig
-          echo "KAKAO_NATIVE_APP_KEY = ${{ env.KAKAO_NATIVE_APP_KEY }}" >> BeforeGoing/Config.xcconfig
-          echo "Generated Config.xcconfig:"
-          cat BeforeGoing/Config.xcconfig
 
       - name: Run Fastlane
         run: bundle exec fastlane beta
