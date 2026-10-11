@@ -20,7 +20,7 @@ final class SettingScenarioViewController: BaseViewController {
     private var daysOfWeek: [Int]?
     private var startHour: Int?
     private var startMinute: Int?
-    private var notificationMethod: NoticeMethodType?
+    private var notificationMethod: NotificationMethod?
     
     private let addScenarioViewModel: AddScenarioViewModel
     private let updateScenarioViewModel: UpdateScenarioViewModel
@@ -158,7 +158,7 @@ extension SettingScenarioViewController {
         daysOfWeek: [Int]?,
         startHour: Int?,
         startMinute: Int?,
-        notificationMethod: NoticeMethodType?,
+        notificationMethod: NotificationMethod?,
         enterType: SettingScenarioEnterType
     ) {
         self.scenarioID = scenarioID

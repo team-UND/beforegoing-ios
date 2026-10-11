@@ -15,7 +15,7 @@ final class NoticeViewController: BaseViewController {
     private var daysOfWeek: [Int]?
     private var startHour: Int?
     private var startMinute: Int?
-    private var notificationMethod: NoticeMethodType?
+    private var notificationMethod: NotificationMethod?
     private var enterType: SettingScenarioEnterType?
     
     private let addScenarioViewModel: AddScenarioViewModel
@@ -243,7 +243,7 @@ extension NoticeViewController: NetworkRequestable, NetworkRequestErrorHandler {
     
     private func moveSetNoticeMethod(
         enterType: SettingScenarioEnterType,
-        notificationMethod: NoticeMethodType?
+        notificationMethod: NotificationMethod?
     ) {
         let viewController = ViewControllerFactory.shared.makeSetNoticeMethodViewController()
         viewController.navigationItem.hidesBackButton = true
@@ -262,7 +262,7 @@ extension NoticeViewController {
         daysOfWeek: [Int]?,
         startHour: Int?,
         startMinute: Int?,
-        notificationMethod: NoticeMethodType?,
+        notificationMethod: NotificationMethod?,
         enterType: SettingScenarioEnterType
     ) {
         self.isNotificationActive = isNotificationActive

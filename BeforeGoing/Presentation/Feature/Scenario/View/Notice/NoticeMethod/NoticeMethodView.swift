@@ -11,10 +11,10 @@ final class NoticeMethodView: BaseView {
     
     private(set) var imageView = UIImageView()
     private let methodNameLabel = UILabel()
-    private let methodType: NoticeMethodType
+    private let methodType: NotificationMethod
     private(set) var radioButton: RadioButton
     
-    init(type: NoticeMethodType) {
+    init(type: NotificationMethod) {
         self.methodType = type
         self.radioButton = type.component.radioButton
         super.init(frame: .zero)
@@ -22,7 +22,7 @@ final class NoticeMethodView: BaseView {
         initProperty(type: type)
     }
     
-    private func initProperty(type: NoticeMethodType) {
+    private func initProperty(type: NotificationMethod) {
         let component = type.component
         imageView.image = (type == .push) ? component.selectedImage : component.unSelectedImage
         methodNameLabel.text = component.methodName

@@ -20,6 +20,8 @@ final class HomeViewController: BaseViewController {
     private var homeDate: String?
     private var memberName: String = "워리"
     private var scenarioTitle: String?
+    private var currentLocation: CLLocation?
+    private var weatherDate = DateUtil.getCurrentDate()
     
     init(
         homeViewModel: HomeViewModel,
@@ -52,7 +54,10 @@ final class HomeViewController: BaseViewController {
         super.viewDidLoad()
         
         locationManager.delegate = self
-        updateDateAndWeather()
+        
+        Task {
+            try await requestDate()
+        }
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -111,34 +116,6 @@ final class HomeViewController: BaseViewController {
             $0.dataSource = self
             $0.register(ListItemCell.self, forCellReuseIdentifier: ListItemCell.identifier)
             $0.reloadData()
-        }
-    }
-    
-    private func updateDateAndWeather() {
-        Task {
-            if #available(iOS 17.0, *) {
-                try await withThrowingDiscardingTaskGroup { group in
-                    group.addTask { [weak self] in
-                        try await self?.requestDate()
-                    }
-                    
-                    group.addTask { [weak self] in
-                        try await self?.updateWeatherInformation(date: DateUtil.getCurrentDate())
-                    }
-                }
-            } else {
-                try await withThrowingTaskGroup(of: Void.self) { group in
-                    group.addTask { [weak self] in
-                        try await self?.requestDate()
-                    }
-                    
-                    group.addTask { [weak self] in
-                        try await self?.updateWeatherInformation(date: DateUtil.getCurrentDate())
-                    }
-                    
-                    try await group.waitForAll()
-                }
-            }
         }
     }
     
@@ -230,15 +207,23 @@ final class HomeViewController: BaseViewController {
     }
     
     private func updateWeatherInformation(date: Date) async throws {
-        guard let latitude = locationManager.location?.coordinate.latitude,
-              let longitude = locationManager.location?.coordinate.longitude else {
+        weatherDate = date
+        
+        // 위치는 requestLocation()의 콜백(didUpdateLocations)에서 비동기로 들어오므로,
+        // 아직 위치가 없으면 콜백에서 weatherDate로 다시 요청한다.
+        guard let coordinate = currentLocation?.coordinate else {
             return
         }
         
         try await getMemberName()
         
         guard let result = try await homeViewModel.action(
-            input: .requestWeather(date: date, memberName: memberName, latitude: latitude, longitude: longitude)
+            input: .requestWeather(
+                date: date,
+                memberName: memberName,
+                latitude: coordinate.latitude,
+                longitude: coordinate.longitude
+            )
         ) as? HomeViewModel.WeatherOutput else {
             return
         }
@@ -560,11 +545,25 @@ extension HomeViewController: CLLocationManagerDelegate, NetworkRequestable, Net
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location = locations.last else {
+            return
+        }
         
+        currentLocation = location
+        
+        Task {
+            try await updateWeatherInformation(date: weatherDate)
+        }
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
         BeforeGoingLogger.error(error)
+        
+        guard currentLocation == nil else {
+            return
+        }
+        
+        rootView.headerView.updateWeatherUI(information: "현재 위치를 확인하지 못해\n날씨 정보를 불러올 수 없어요")
     }
 }
 

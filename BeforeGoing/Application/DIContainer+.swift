@@ -8,11 +8,8 @@
 extension DIContainer {
     
     func injectDependency() {
-        let dataDependencyAssembler = DataDependencyAssembler()
-        let domainDependencyAssembler = DomainDependencyAssembler(preAssembler: dataDependencyAssembler)
-        let presentationDependencyAssembler = PresentationDependencyAssembler(
-            preAssembler: domainDependencyAssembler
-        )
-        presentationDependencyAssembler.assemble()
+        DataDependencyAssembler().assemble()
+        DomainDependencyAssembler().assemble()
+        PresentationDependencyAssembler().assemble()
     }
 }

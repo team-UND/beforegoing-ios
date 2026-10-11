@@ -12,7 +12,7 @@ final class SetNoticeMethodViewController: BaseViewController {
     private let rootView = SetNoticeMethodView()
     
     private var enterType: SettingScenarioEnterType?
-    private var notificationMethod: NoticeMethodType?
+    private var notificationMethod: NotificationMethod?
     
     private let addScenarioViewModel: AddScenarioViewModel
     private let updateScenarioViewModel: UpdateScenarioViewModel
@@ -75,7 +75,7 @@ extension SetNoticeMethodViewController {
     
     func configure(
         enterType: SettingScenarioEnterType,
-        notificationMethod: NoticeMethodType?
+        notificationMethod: NotificationMethod?
     ) {
         self.enterType = enterType
         self.notificationMethod = notificationMethod

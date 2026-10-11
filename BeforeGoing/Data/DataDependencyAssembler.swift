@@ -7,7 +7,6 @@
 
 struct DataDependencyAssembler: DependencyAssembler {
     
-    private let keyChainService = KeyChainService()
     private let userDefaultsService = UserDefaultsService()
     
     func assemble() {
@@ -44,6 +43,9 @@ struct DataDependencyAssembler: DependencyAssembler {
                 userDefaultsService: userDefaultsService,
                 context: CoreDataStack.shared.context
             )
+        }
+        DIContainer.shared.register(type: WeatherInterface.self) { _ in
+            WeatherRepository()
         }
     }
 }
