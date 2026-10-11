@@ -1,15 +1,13 @@
 //
-//  NoticeMethodType.swift
+//  NotificationMethod+.swift
 //  BeforeGoing
 //
-//  Created by APPLE on 9/4/25.
+//  Created by 더스틴 on 10/11/26.
 //
 
 import UIKit
 
-enum NoticeMethodType: String, CaseIterable {
-    
-    case push, alarm
+extension NotificationMethod {
     
     var component: NoticeMethodComponent {
         switch self {
@@ -30,22 +28,9 @@ enum NoticeMethodType: String, CaseIterable {
         }
     }
     
-    static func findMethod(value: String) -> Self? {
-        for method in Self.allCases {
-            if method.rawValue.uppercased() == value {
-                return method
-            }
-        }
-        return nil
-    }
-    
     static func convertMethodName(string: String) -> String? {
-        let notificationType = Self.allCases.first { $0.rawValue == string.lowercased() }
-        return notificationType?.component.methodName
-    }
-    
-    var isPush: Bool {
-        self == .push
+        let notificationMethod = Self.allCases.first { $0.rawValue == string.lowercased() }
+        return notificationMethod?.component.methodName
     }
     
     func convertIdentifier() -> String {

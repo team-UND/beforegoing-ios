@@ -35,7 +35,7 @@ final class AddScenarioViewModel: ViewModeling {
             startHour: Int?,
             startMinute: Int?
         )
-        case saveButtonInSetNoticeMethodDidTap(noticeMethodType: NoticeMethodType)
+        case saveButtonInSetNoticeMethodDidTap(noticeMethodType: NotificationMethod)
     }
     
     typealias Output = ScenarioOutput

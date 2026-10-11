@@ -75,7 +75,7 @@ final class ScenariosModel {
     }
     
     private func makeNotificationMethodString(notificationMethodType: String) -> String {
-        guard let methodString = NoticeMethodType.convertMethodName(string: notificationMethodType) else {
+        guard let methodString = NotificationMethod.convertMethodName(string: notificationMethodType) else {
             return ""
         }
         return methodString

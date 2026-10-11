@@ -53,8 +53,8 @@ extension SelectNoticeMethodView {
         }
     }
     
-    func getSelectedNoticeMethodType() -> NoticeMethodType {
-        let noticeMethodType: NoticeMethodType =
+    func getSelectedNoticeMethodType() -> NotificationMethod {
+        let noticeMethodType: NotificationMethod =
         (pushNoticeView.radioButton.currentState == .enable) ? .push : .alarm
         
         return noticeMethodType

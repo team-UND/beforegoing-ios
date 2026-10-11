@@ -27,7 +27,7 @@ struct ActiveNotificationEntity {
     let notificationID: Int
     var isActive: Bool = true
     let notificationType: String
-    let notificationMethodType: NoticeMethodType
+    let notificationMethodType: NotificationMethod
     let daysOfWeekOrdinal: [Int]
 }
 

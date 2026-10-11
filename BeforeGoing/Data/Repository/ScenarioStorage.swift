@@ -336,7 +336,7 @@ extension ScenarioStorage {
             active: ActiveNotificationEntity(
                 notificationID: Int(notification.id),
                 notificationType: notification.notificationType ?? "",
-                notificationMethodType: NoticeMethodType(
+                notificationMethodType: NotificationMethod(
                     rawValue: notification.notificationMethodType ?? ""
                 ) ?? .alarm,
                 daysOfWeekOrdinal: daysOfWeekOrdinal
