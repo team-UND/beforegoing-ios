@@ -1,22 +1,22 @@
 //
-//  UVIndex+.swift
+//  UVLevel.swift
 //  BeforeGoing
 //
-//  Created by APPLE on 12/9/25.
+//  Created by 더스틴 on 10/11/26.
 //
 
-import WeatherKit
-
-protocol UVProtocol {
-    
-    var description: String { get }
-    var supply: String? { get }
+enum UVLevel {
+    case low
+    case moderate
+    case high
+    case veryHigh
+    case extreme
 }
 
-extension UVIndex: UVProtocol {
+extension UVLevel {
     
     var description: String {
-        switch self.category {
+        switch self {
         case .low:
             return "낮음"
         case .moderate:
@@ -31,7 +31,7 @@ extension UVIndex: UVProtocol {
     }
     
     var supply: String? {
-        switch self.category {
+        switch self {
         case .high, .veryHigh, .extreme:
             return "선크림"
         case .low, .moderate:

@@ -7,25 +7,18 @@
 
 import Foundation
 
-import WeatherKit
-
 struct WeatherEntity {
         
-    let weatherCondition: WeatherCondition
-    let uvIndex: UVProtocol
+    let weatherCondition: WeatherKind
+    let uvIndex: UVLevel
 }
 
 extension WeatherEntity {
     
-    struct MockUVIndex: UVProtocol {
-        var description: String = "눈"
-        var supply: String? = "우산"
-    }
-    
     static func stub() -> Self {
         .init(
             weatherCondition: .blizzard,
-            uvIndex: MockUVIndex()
+            uvIndex: .high
         )
     }
 }

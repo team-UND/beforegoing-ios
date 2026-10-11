@@ -1,14 +1,26 @@
 //
-//  WeatherCondition+.swift
+//  WeatherKind.swift
 //  BeforeGoing
 //
-//  Created by APPLE on 12/9/25.
+//  Created by 더스틴 on 10/10/26.
 //
 
-import WeatherKit
+enum WeatherKind {
+    case blizzard, blowingSnow, flurries, heavySnow, sleet, snow, sunFlurries
+    case blowingDust
+    case breezy, hurricane, windy
+    case clear, mostlyClear
+    case cloudy, mostlyCloudy, partlyCloudy
+    case drizzle, freezingDrizzle, freezingRain, heavyRain, rain, strongStorms, sunShowers, tropicalStorm
+    case foggy, haze, smoky
+    case frigid
+    case hail
+    case hot
+    case isolatedThunderstorms, scatteredThunderstorms, thunderstorms
+    case wintryMix
+}
 
-extension WeatherCondition {
-    
+extension WeatherKind {
     var description: String {
         switch self {
         case .blizzard, .blowingSnow, .flurries, .heavySnow, .sleet, .snow, .sunFlurries:
@@ -35,8 +47,6 @@ extension WeatherCondition {
             return "천둥·번개"
         case .wintryMix:
             return "눈·비"
-        @unknown default:
-            return "알 수 없는 날씨"
         }
     }
     

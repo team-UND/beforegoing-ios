@@ -44,5 +44,8 @@ struct DataDependencyAssembler: DependencyAssembler {
                 context: CoreDataStack.shared.context
             )
         }
+        DIContainer.shared.register(type: WeatherInterface.self) { _ in
+            WeatherRepository()
+        }
     }
 }

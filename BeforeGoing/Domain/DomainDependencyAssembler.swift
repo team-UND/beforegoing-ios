@@ -43,6 +43,11 @@ final class DomainDependencyAssembler: DependencyAssembler {
             return
         }
         
+        guard let weatherRepository = DIContainer.shared.resolve(type: WeatherInterface.self) else {
+            BeforeGoingLogger.error(BeforeGoingError.diContainerError)
+            return
+        }
+        
         DIContainer.shared.register(type: LoginType.self) { _ in
             LoginUseCase(repository: authrepository)
         }
@@ -68,7 +73,7 @@ final class DomainDependencyAssembler: DependencyAssembler {
         }
         
         DIContainer.shared.register(type: FetchWeatherType.self) { _ in
-            return FetchWeatherUseCase()
+            return FetchWeatherUseCase(repository: weatherRepository)
         }
         
         DIContainer.shared.register(type: AddScenarioType.self) { _ in
