@@ -7,15 +7,7 @@
 
 struct PresentationDependencyAssembler: DependencyAssembler {
     
-    private let domainDependencyAssembler: DomainDependencyAssembler
-    
-    init(preAssembler: DomainDependencyAssembler) {
-        self.domainDependencyAssembler = preAssembler
-    }
-    
     func assemble() {
-        domainDependencyAssembler.assemble()
-        
         guard let loginUseCase = DIContainer.shared.resolve(type: LoginType.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
             fatalError()

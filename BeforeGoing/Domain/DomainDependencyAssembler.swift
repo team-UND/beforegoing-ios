@@ -7,45 +7,37 @@
 
 import Foundation
 
-final class DomainDependencyAssembler: DependencyAssembler {
-    
-    private let dataDependencyAssembler: DataDependencyAssembler
-    
-    init(preAssembler: DataDependencyAssembler) {
-        self.dataDependencyAssembler = preAssembler
-    }
+struct DomainDependencyAssembler: DependencyAssembler {
     
     func assemble() {
-        dataDependencyAssembler.assemble()
-        
         guard let authrepository = DIContainer.shared.resolve(type: AuthInterface.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            return
+            fatalError()
         }
         
         guard let termsRepository = DIContainer.shared.resolve(type: TermsInterface.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            return
+            fatalError()
         }
         
         guard let memberRepository = DIContainer.shared.resolve(type: MemberInterface.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            return
+            fatalError()
         }
         
         guard let scenarioRepository = DIContainer.shared.resolve(type: ScenarioInterface.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            return
+            fatalError()
         }
         
         guard let missionRepository = DIContainer.shared.resolve(type: MissionInterface.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            return
+            fatalError()
         }
         
         guard let weatherRepository = DIContainer.shared.resolve(type: WeatherInterface.self) else {
             BeforeGoingLogger.error(BeforeGoingError.diContainerError)
-            return
+            fatalError()
         }
         
         DIContainer.shared.register(type: LoginType.self) { _ in
